@@ -60,7 +60,7 @@ function UnscheduledContributionList({
   );
 }
 
-export default function TimetableSidePanel({dt}: {dt: Moment}) {
+function TimetableSidePanel({dt}: {dt: Moment}) {
   const dispatch = useDispatch<any>();
   const {openModal} = useModal();
   const minSidebarWidthPx = 200;
@@ -491,3 +491,5 @@ export default function TimetableSidePanel({dt}: {dt: Moment}) {
     </>
   );
 }
+
+export default React.memo(TimetableSidePanel);

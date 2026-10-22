@@ -15,7 +15,6 @@ import {ThunkDispatch} from 'redux-thunk';
 
 import {Translate, Param} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
-import {localeUses24HourTime} from 'indico/utils/date';
 
 import * as actions from './actions';
 import {Transform, Over, MousePosition} from './dnd';
@@ -34,7 +33,8 @@ import {
 } from './layout';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {TimetableDayControls} from './TimetableDayControls';
+import TimeGutter from './TimeGutter';
+import TimetableDayControls from './TimetableDayControls';
 import TimetableSidePanel from './TimetableSidePanel';
 import TimetableTabRail from './TimetableTabRail';
 import {useToast} from './ToastContext';
@@ -78,7 +78,14 @@ interface DayTimetableProps {
   scrollPosition: number;
 }
 
-function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) {
+// eslint-disable-next-line prefer-arrow-callback
+const TopLevelEntries = React.memo(function TopLevelEntries({
+  dt,
+  entries,
+}: {
+  dt: Moment;
+  entries: TopLevelEntry[];
+}) {
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   // (Ajob) In session block view, children become top-level entries
 
@@ -122,9 +129,7 @@ function TopLevelEntries({dt, entries}: {dt: Moment; entries: TopLevelEntry[]}) 
       ))}
     </>
   );
-}
-
-const MemoizedTopLevelEntries = React.memo(TopLevelEntries);
+});
 
 export function DayTimetable({
   dt,
@@ -138,7 +143,6 @@ export function DayTimetable({
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
-  const mouseEventRef = useRef<MouseEvent | null>(null);
   const calendarRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const innerWrapperRef = useRef<HTMLDivElement | null>(null);
@@ -488,17 +492,6 @@ export function DayTimetable({
   }
 
   useEffect(() => {
-    function onMouseMove(event: MouseEvent) {
-      mouseEventRef.current = event;
-    }
-
-    document.addEventListener('mousemove', onMouseMove);
-    return () => {
-      document.removeEventListener('mousemove', onMouseMove);
-    };
-  }, []);
-
-  useEffect(() => {
     async function handleMaterialsChanged(event: Event) {
       const {type, id}: AttachmentUpdatedEventDetail = (event as CustomEvent).detail;
       const url =
@@ -676,9 +669,6 @@ export function DayTimetable({
       </div>
       <div styleName="controls-container">
         <TimetableDayControls
-          onNavigate={d => {
-            dispatch(actions.setCurrentDate(d, eventId));
-          }}
           isSessionBlockExpanded={!!expandedSessionBlock}
           currentDayIdx={currentDayIdx}
           eventStart={eventStartDt}
@@ -707,7 +697,7 @@ export function DayTimetable({
                     {getCalendarTimeFromY(hoverGuideY)}
                   </div>
                 )}
-                <MemoizedTopLevelEntries dt={dt} entries={entries} />
+                <TopLevelEntries dt={dt} entries={entries} />
                 <div
                   styleName="draft"
                   style={{
@@ -736,12 +726,7 @@ export function DayTimetable({
   );
 }
 
-interface TimeGutterProps {
-  minHour: number;
-  maxHour: number;
-}
-
-export function Lines({minHour = 0, maxHour = 23}: TimeGutterProps) {
+export function Lines({minHour = 0, maxHour = 23}: {minHour: number; maxHour: number}) {
   const oneHour = minutesToPixels(60);
 
   return (
@@ -749,29 +734,6 @@ export function Lines({minHour = 0, maxHour = 23}: TimeGutterProps) {
       {Array.from({length: maxHour - minHour + 1}, (__, i) => (
         <div key={i} style={{height: oneHour}} styleName="line" />
       ))}
-    </div>
-  );
-}
-
-export function TimeGutter({minHour, maxHour}: TimeGutterProps) {
-  const oneHour = minutesToPixels(60);
-  const format = localeUses24HourTime(moment.locale().replace('_', '-')) ? 'HH:mm' : 'h A';
-
-  return (
-    <div styleName="time-gutter">
-      {Array.from({length: maxHour - minHour + 1}, (_, i) => {
-        const time = moment({hour: minHour + i}).format(format);
-
-        return <TimeSlot key={i} height={oneHour} time={time} />;
-      })}
-    </div>
-  );
-}
-
-function TimeSlot({height, time}: {height: number; time: string}) {
-  return (
-    <div styleName="time-slot" style={{height}}>
-      {time}
     </div>
   );
 }
