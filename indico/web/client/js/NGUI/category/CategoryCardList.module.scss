@@ -55,12 +55,11 @@
     .category-card-meta-category-count {
       &[data-has-events='true']::after {
         content: '•';
-        margin-right: var(--space-2);
-        margin-left: var(--space-2);
+        margin-right: var(--space-1);
+        margin-left: var(--space-1);
         color: var(--color-text-disabled);
-        font-size: var(--font-size-text-lg);
+        font-size: var(--font-size-text-sm);
         display: inline-block;
-        vertical-align: top;
       }
     }
   }

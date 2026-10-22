@@ -239,3 +239,39 @@
   font-weight: bold;
   font-style: italic;
 }
+
+@font-face {
+  font-family: 'Inter';
+  src:
+    url('static:fonts/inter/Inter-Regular.woff2') format('woff2'),
+    utl('static:fonts/inter/Inter-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src:
+    url('static:fonts/inter/Inter-Italic.woff2') format('woff2'),
+    url('static:fonts/inter/Inter-Italic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src:
+    url('static:fonts/inter/Inter-Bold.woff2') format('woff2'),
+    url('static:fonts/inter/Inter-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src:
+    url('static:fonts/inter/Inter-BoldItalic.woff2') format('woff2'),
+    url('static:fonts/inter/Inter-BoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+}
