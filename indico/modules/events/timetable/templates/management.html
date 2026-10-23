@@ -6,10 +6,9 @@
 {%- block title -%}{%- endblock -%}
 
 {% block content %}
-    <button
-        class="timetable-sidepanel-management-toggle icon-prev i-button"
-        title="{% trans %}Toggle menu{% endtrans %}"
-        data-qtip-position="right">
+    <button class="timetable-sidepanel-management-toggle icon-prev i-button"
+            title="{% trans %}Toggle menu{% endtrans %}"
+            data-qtip-position="right">
     </button>
     <div id="timetable-container"
          data-timetable-data="{{ timetable_data | tojson | forceescape }}"
@@ -19,10 +18,9 @@
     </div>
     <script>
         setupTimetable();
-    </script>
-    <script>
-        document.querySelector('.timetable-sidepanel-management-toggle').addEventListener('click', (evt) => {
-            const {target: sidePanelToggleButton} = evt;
+
+        document.querySelector('.timetable-sidepanel-management-toggle').addEventListener('click', evt => {
+            const sidePanelToggleButton = evt.target;
             const main = document.querySelector('main.main');
             sidePanelToggleButton.classList.toggle('icon-prev');
             sidePanelToggleButton.classList.toggle('icon-next');
