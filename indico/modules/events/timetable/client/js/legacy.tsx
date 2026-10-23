@@ -86,14 +86,21 @@ function NewTimetableDialog({eventId, onClose}: {eventId: number; onClose?: () =
     <Modal size="tiny" open={popupVisible} onClose={handleClose} closeIcon>
       <Modal.Content>
         <h2 style={{color: 'black', fontWeight: 'bold'}}>
-          &#x1F389; <Translate>Try out the new timetable!</Translate>
+          🎉 <Translate>Try out the new timetable!</Translate>
         </h2>
+        <strong
+          style={{
+            color: '#f0f',
+            fontFamily: 'Comic Sans MS',
+            fontSize: '1.5em',
+          }}
+        >
+          TODO - add an image here instead of this text!
+        </strong>
         <br />
-        <Translate>
-          The Indico team is proud to present a complete redesign of the timetable page! Featuring a
-          modern look, it aims to be more intuitive and easy-to-use, while preserving all the
-          functionality.
-        </Translate>
+        The Indico team is proud to present a complete redesign of the timetable page! Featuring a
+        modern look, it aims to be more intuitive and easy-to-use, while preserving all the
+        functionality.
       </Modal.Content>
       <Modal.Actions>
         <Button styleName="dont-show-again" onClick={handleDontShowAgain}>
