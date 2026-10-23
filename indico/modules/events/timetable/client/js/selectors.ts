@@ -95,7 +95,6 @@ export const getDayEntries = createSelector(
   entries => {
     const dayEntries: DayEntries = {};
     entries.forEach(entry => {
-      // TODO timezone?
       const dayKey = moment(entry.startDt).format('YYYYMMDD');
       dayEntries[dayKey] ??= [];
       dayEntries[dayKey].push(entry);
