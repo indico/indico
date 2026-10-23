@@ -15,7 +15,7 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Nothing so far :)
+- Enable CSRF check on oauth authorization endpoint (:pr:`7818`)
 
 Accessibility
 ^^^^^^^^^^^^^
