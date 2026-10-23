@@ -39,6 +39,7 @@
             </div>
             <div class="button-wrapper">
                 <form method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                     <input type="submit" name="confirm" class="i-button big highlight right" value="{% trans %}Authorize{% endtrans %}">
                     <button class="i-button big right">{% trans %}Cancel{% endtrans %}</button>
                 </form>

@@ -3,7 +3,7 @@
 {% block html %}
     <h3>{%- trans %}Permissions{% endtrans -%}</h3>
     <div id="permissions-widget-{{ field.id }}" class="permissions-widget">
-        <input type="hidden" value='{{ field._value()|tojson|forceescape }}' name="{{ field.name }}">
+        <input type="hidden" name="{{ field.name }}" value='{{ field._value()|tojson|forceescape }}'>
         <ul class="permissions-widget-list"></ul>
         <div class="toolbar">
             <div class="group">

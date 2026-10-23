@@ -123,7 +123,7 @@
                       action="{{ url_for('designer.upload_image', template, background=true) }}"
                       enctype="multipart/form-data"
                       method="POST">
-                    <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                     <input id="backgroundFile" name="file" type="file">
                     <label for="backgroundFile" class="i-button background-label truncate-text">
                         {%- trans %}Choose a file{% endtrans -%}
@@ -286,7 +286,7 @@
                           action="{{ url_for('designer.upload_image', template, background=false) }}"
                           enctype="multipart/form-data"
                           method="POST">
-                        <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                         <input id="imageFile" name="file" type="file">
                         <label for="imageFile" class="i-button background-label truncate-text">
                             {%- trans %}Choose a file{% endtrans -%}

@@ -43,7 +43,7 @@ celery==5.6.3
     # via
     #   -r requirements.in
     #   sentry-sdk
-certifi==2026.7.22
+certifi==2026.10.19
     # via
     #   -r requirements.in
     #   requests
@@ -225,7 +225,7 @@ parso==0.8.7
     # via jedi
 pexpect==4.9.0
     # via ipython
-pillow==12.3.0
+pillow==13.0.0
     # via
     #   -r requirements.in
     #   captcha

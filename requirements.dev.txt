@@ -22,7 +22,7 @@ blinker==1.9.0
     # via
     #   -c requirements.txt
     #   flask
-certifi==2026.7.22
+certifi==2026.10.19
     # via
     #   -c requirements.txt
     #   requests
@@ -242,7 +242,7 @@ urllib3==2.8.0
     #   docker
     #   requests
     #   responses
-uv==0.12.18
+uv==0.13.4
     # via -r requirements.dev.in
 uvicorn==0.52.1
     # via sphinx-autobuild

@@ -59,6 +59,7 @@ class CallableJsonWrapper:
         return getattr(self.resp, attr)
 
 
+@pytest.mark.usefixtures('no_csrf_check')
 @pytest.mark.parametrize('trusted', (False, True))
 @pytest.mark.parametrize(('token_endpoint_auth_method', 'pkce'), (
     ('client_secret_basic', False),
@@ -118,6 +119,36 @@ def test_oauth_flows(create_application, test_client, dummy_user, app, trusted, 
     assert test_client.get(auth_url).status_code == 302
 
 
+@pytest.mark.usefixtures('request_context')
+def test_oauth_consent_csrf(create_application, test_client, dummy_user, app):
+    oauth_app = create_application(name='test')
+    oauth_client = OAuth2Client(MockSession(test_client),
+                                oauth_app.client_id,
+                                oauth_app.client_secret,
+                                code_challenge_method=None,
+                                scope='read:user',
+                                response_type='code',
+                                token_endpoint=url_for('oauth.oauth_token', _external=True),
+                                token_endpoint_auth_method='client_secret_basic',
+                                redirect_uri=oauth_app.default_redirect_uri)
+
+    auth_url = oauth_client.create_authorization_url(url_for('oauth.oauth_authorize', _external=True))[0]
+
+    with test_client.session_transaction() as sess:
+        sess.set_session_user(dummy_user)
+        sess['_csrf_token'] = 'supersecure'
+
+    # try to give consent, csrf-style
+    csrf_resp = test_client.post(auth_url, data={'confirm': '1'})
+    assert csrf_resp.status_code == 400
+    assert b'problem with your current session' in csrf_resp.data
+
+    # expect a successful response (redirect) when a valid csrf token has been provided
+    authorized_resp = test_client.post(auth_url, data={'confirm': '1', 'csrf_token': 'supersecure'})
+    assert authorized_resp.status_code == 302
+
+
+@pytest.mark.usefixtures('no_csrf_check')
 @pytest.mark.parametrize('pkce_enabled', (False, True))
 def test_pkce_disabled(dummy_application, test_client, dummy_user, pkce_enabled):
     dummy_application.allow_pkce_flow = pkce_enabled
@@ -175,6 +206,7 @@ def test_no_querystring_tokens(dummy_user, dummy_token, test_client):
     assert resp.json is None  # the API returns json `null` if not authenticated
 
 
+@pytest.mark.usefixtures('no_csrf_check')
 def test_oauth_scopes(create_application, test_client, dummy_user, app):
     oauth_app = create_application(name='test', is_trusted=False, allowed_scopes=['read:user', 'read:legacy_api'])
     oauth_client = OAuth2Client(MockSession(test_client),

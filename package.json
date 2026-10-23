@@ -25,7 +25,7 @@
     "final-form": "^4.20.7",
     "final-form-arrays": "^3.0.2",
     "final-form-calculate": "^1.3.2",
-    "flask-urls": "^0.2.0",
+    "flask-urls": "^0.3.0",
     "flat": "^6.0.1",
     "fullcalendar": "^6.1.8",
     "geodesy": "^2.4.0",
@@ -126,7 +126,7 @@
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
     "autoprefixer": "^10.4.7",
     "babel-loader": "^9.1.3",
-    "babel-plugin-flask-urls": "^0.1.0",
+    "babel-plugin-flask-urls": "^0.2.0",
     "babel-plugin-macros": "^3.1.0",
     "browserslist": "^4.20.4",
     "chalk": "^5.3.0",
@@ -216,6 +216,7 @@
   },
   "allowScripts": {
     "core-js": false,
-    "husky@4.3.8": true
+    "husky@4.3.8": true,
+    "canvas@2.11.2": true
   }
 }

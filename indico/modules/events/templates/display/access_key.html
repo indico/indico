@@ -18,7 +18,7 @@
         {% endif %}
     </p>
     <form action="{{ url_for('events.key_access', event) }}" method="post" class="i-has-action" id="access-key-form">
-        <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
         <input type="password" name="access_key">
         <button class="i-button icon-key" type="submit"></button>
     </form>

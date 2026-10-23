@@ -38,7 +38,7 @@
   },
   "files": {
     "includes": [
-      "{bin,indico,webpack}/**/*.{js,jsx,mjs,ts,tsx}",
+      "{bin,indico,webpack}/**/*.{js,jsx,mjs,ts,tsx,mts}",
       "indico/**/*.{css,scss}",
       "{.github,indico}/**/*.json",
       "jest.config.js",
