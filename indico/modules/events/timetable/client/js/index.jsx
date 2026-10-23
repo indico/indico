@@ -32,9 +32,11 @@ import {getCurrentDateLocalStorage} from './utils';
         evt.preventDefault();
       });
 
+      const eventInfo = JSON.parse(root.dataset.eventInfo);
+      moment.tz.setDefault(eventInfo.timezone);
+
       const searchToken = root.dataset.searchToken;
       const timetableData = JSON.parse(root.dataset.timetableData);
-      const eventInfo = JSON.parse(root.dataset.eventInfo);
       const eventId = parseInt(eventInfo.id, 10);
       const startDt = moment(eventInfo.start_dt_local);
       const currentDate = getCurrentDateLocalStorage(eventId) || moment(startDt);
