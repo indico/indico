@@ -161,7 +161,7 @@ function TimetableDayControls({
                         {new Intl.DateTimeFormat(moment.locale(), {
                           month: 'short',
                           day: 'numeric',
-                          timeZone: (moment as any).defaultZone.name,
+                          timeZone: moment.defaultZone!.name,
                         }).format(d.toDate())}
                       </div>
                       <div styleName="day-name">{d.format('ddd')}</div>
