@@ -248,6 +248,7 @@ def serialize_event_info(event, *, user=None):
 
     return {'id': str(event.id),
             'title': event.title,
+            'timezone': event.timezone,
             'start_dt_local': event.start_dt_local.isoformat(),
             'end_dt_local': event.end_dt_local.isoformat(),
             'type': event.type,
