@@ -18,7 +18,7 @@ import {Translate} from 'indico/react/i18n';
 import './legacy.module.scss';
 
 const LEGACY_TIMETABLE_POPUP_LS_KEY = 'legacy-timetable-popup';
-const POPUP_REMINDER_DELAY = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const POPUP_REMINDER_DELAY = 86400 * 1000;
 
 type PopupState = 'hidden' | 'animating' | 'visible';
 
