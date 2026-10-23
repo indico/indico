@@ -25,7 +25,6 @@ $content-pane-bg-color: $white;
     left: 0;
     flex-shrink: 0;
     position: sticky;
-    z-index: 1;
 
     &:first-child {
       background: linear-gradient(180deg, $content-pane-bg-color 50%, transparent);

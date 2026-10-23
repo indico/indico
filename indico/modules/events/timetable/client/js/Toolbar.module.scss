@@ -19,7 +19,6 @@ $toolbar-bg-color: $raincloud-gray;
   position: sticky;
   top: 0;
   background-color: $bg-color;
-  z-index: 100;
   border-bottom: 2px solid rgba($raincloud-gray, 0.8);
   padding: 15px 10px 0 10px;
   // Makes sure there is spacing when there is no timetable bar (e.g. single day)
