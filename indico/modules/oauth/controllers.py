@@ -60,8 +60,6 @@ class RHOAuthMetadata(RH):
 
 
 class RHOAuthAuthorize(RHProtected):
-    CSRF_ENABLED = False
-
     def _process(self):
         try:
             grant = auth_server.get_consent_grant(end_user=session.user)
