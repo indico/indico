@@ -10,6 +10,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Provider} from 'react-redux';
 
+import {SidePanelView} from 'indico/modules/events/timetable/types';
 import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {camelizeKeys} from 'indico/utils/case';
 import createReduxStore from 'indico/utils/redux';
@@ -37,6 +38,8 @@ import {getCurrentDateLocalStorage} from './utils';
       const eventId = parseInt(eventInfo.id, 10);
       const startDt = moment(eventInfo.start_dt_local);
       const currentDate = getCurrentDateLocalStorage(eventId) || moment(startDt);
+      const supportsUnscheduledContribs =
+        eventInfo.type === 'conference' || !!eventInfo.contributions.length;
       const initialData = {
         staticData: {
           eventId,
@@ -53,6 +56,9 @@ import {getCurrentDateLocalStorage} from './utils';
           currentDate,
           // Refers to when a user clicks to view a session block as a timetable
           expandedSessionBlockId: null,
+        },
+        display: {
+          activePanel: supportsUnscheduledContribs ? SidePanelView.Unscheduled : SidePanelView.None,
         },
       };
 
