@@ -15,6 +15,8 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
+- Fix the legacy room export API rejecting location names that contain a hyphen
+  (:issue:`6527`, :pr:`7806`, thanks :user:`Thanatos9404`)
 - Enable CSRF check on oauth authorization endpoint (:pr:`7818`)
 
 Accessibility
