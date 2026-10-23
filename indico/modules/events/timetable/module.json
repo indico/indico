@@ -1,4 +1,7 @@
 {
   "parent": "events",
-  "name": "timetable"
+  "name": "timetable",
+  "partials": {
+    "legacy": "./legacy"
+  }
 }
