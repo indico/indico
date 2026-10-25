@@ -151,8 +151,8 @@ def test_event_import(db, dummy_user):
     assert e.start_dt == as_utc(datetime(2017, 8, 24, 10, 0, 0))
     assert e.end_dt == as_utc(datetime(2017, 8, 24, 12, 0, 0))
     # Check that attachment metadata is fine
-    assert get_attached_items(e)['files'] == []
-    folder = get_attached_items(e)['folders'][0]
+    assert get_attached_items(e, user=None)['files'] == []
+    folder = get_attached_items(e, user=None)['folders'][0]
     assert folder.title == 'dummy_folder'
     attachment = folder.attachments[0]
     assert attachment.title == 'dummy_attachment'

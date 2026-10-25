@@ -17,6 +17,8 @@ Bugfixes
 
 - Enable CSRF check on oauth authorization endpoint (:pr:`7818`)
 - Add missing checks for timetable draft mode (:pr:`7821`)
+- Take the user from the API token into account when serializing attachments
+  in the timetable export API (:pr:`7822`)
 
 Accessibility
 ^^^^^^^^^^^^^
