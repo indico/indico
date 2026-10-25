@@ -17,9 +17,7 @@ import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
 import {FormApi} from 'final-form';
 import _ from 'lodash';
-import moment from 'moment';
 import React, {useState} from 'react';
-import {Field} from 'react-final-form';
 import {Dimmer, Form, Loader, Popup} from 'semantic-ui-react';
 
 import {ContributionType} from 'indico/modules/events/timetable/types';
@@ -29,9 +27,12 @@ import {
   FinalLocationField,
   FinalReferences,
   FinalTagList,
+  FinalHoursDuration,
+  StartEndDurationFields,
+  withoutEndDt,
 } from 'indico/react/components';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
-import {FinalDateTimePicker, FinalDropdown, FinalDuration} from 'indico/react/forms/fields';
+import {FinalDropdown} from 'indico/react/forms/fields';
 import {
   ErrorMarker,
   FinalModalForm,
@@ -187,30 +188,9 @@ export function ContributionFormFields({
         />
       )}
       {initialValues.start_dt ? (
-        <>
-          <Field name="duration" subscription={{value: true}}>
-            {({input: {value: duration}}) => (
-              <FinalDateTimePicker
-                name="start_dt"
-                label={Translate.string('Start date')}
-                minStartDt={minStartDt}
-                maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
-                required
-              />
-            )}
-          </Field>
-          <Field name="start_dt" subscription={{value: true}}>
-            {({input: {value: startDt}}) => (
-              <FinalDuration
-                name="duration"
-                label={Translate.string('Duration')}
-                max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
-              />
-            )}
-          </Field>
-        </>
+        <StartEndDurationFields minStartDt={minStartDt} maxEndDt={maxEndDt} />
       ) : (
-        <FinalDuration name="duration" label={Translate.string('Duration')} />
+        <FinalHoursDuration name="duration" label={Translate.string('Duration')} />
       )}
       <FinalContributionPersonLinkField
         name="person_links"
@@ -295,7 +275,8 @@ function ContributionForm({
       ...formData,
       person_links: personLinks,
     };
-    const submitPayload = editing ? getChangedValues(formData, form) : formData;
+
+    const submitPayload = withoutEndDt(editing ? getChangedValues(formData, form) : formData);
     return await onSubmit(submitPayload);
   };
 

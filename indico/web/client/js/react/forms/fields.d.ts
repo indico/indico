@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {Moment} from 'moment/moment';
+import {Moment} from 'moment';
 import {ComponentType} from 'react';
 
 // TODO look into using FieldProps from react-final-form
@@ -16,18 +16,20 @@ interface SharedFieldProps {
   required?: boolean | 'no-validator';
   disabled?: boolean;
   initialValue?: any;
+  fieldProps?: object;
+  hideValidationError?: boolean | 'message' | 'never';
   className?: string;
   formatOnBlur?: boolean;
   allowNull?: boolean;
   parse?: (value: any) => any;
   format?: (value: any) => any;
-  validate?: (value: any) => string | undefined;
+  validate?: (value: any, allValues: Record<string, any>, meta: any) => string | undefined;
 }
 
 interface FinalFieldProps extends SharedFieldProps {
   adapter?: ComponentType<any>;
   component?: ComponentType<any>;
-  onChange?: (newValue: object, oldValue: object) => void;
+  onChange?: (newValue: any, oldValue: any) => void;
   [key: string]: any;
 }
 
@@ -88,13 +90,15 @@ interface FinalDurationProps extends SharedFieldProps {
   label?: string | null;
   defaultValue?: number;
   max?: number | null;
+  onChange?: (newValue: number, oldValue: number) => void;
 }
 
 interface FinalDateTimePickerProps extends SharedFieldProps {
   label?: string | null;
   defaultValue?: string;
-  minStartDt?: Moment;
-  maxEndDt?: Moment;
+  minStartDt?: Moment | null;
+  maxEndDt?: Moment | null;
+  onChange?: (newValue: string, oldValue: string) => void;
 }
 
 interface FinalSubmitButtonProps {

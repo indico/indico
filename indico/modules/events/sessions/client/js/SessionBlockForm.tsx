@@ -10,13 +10,16 @@ import sessionBlockCreateURL from 'indico-url:sessions.api_create_session_block'
 import sessionBlockURL from 'indico-url:sessions.api_manage_block';
 
 import React, {useState} from 'react';
-import {Field} from 'react-final-form';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {LocationParentObj} from 'indico/modules/events/timetable/types';
-import {FinalLocationField, FinalSessionBlockPersonLinkField} from 'indico/react/components';
+import {
+  FinalLocationField,
+  FinalSessionBlockPersonLinkField,
+  StartEndDurationFields,
+  withoutEndDt,
+} from 'indico/react/components';
 import {FinalInput} from 'indico/react/forms';
-import {FinalDateTimePicker, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -52,18 +55,7 @@ export function SessionBlockFormFields({
         description={Translate.string('Title of the session block')}
         autoFocus
       />
-      <Field name="duration" subscription={{value: true}}>
-        {({input: {value: duration}}) => (
-          <FinalDateTimePicker
-            name="start_dt"
-            label={Translate.string('Start time')}
-            required
-            minStartDt={minStartDt}
-            maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
-          />
-        )}
-      </Field>
-      <FinalDuration name="duration" label={Translate.string('Duration')} required />
+      <StartEndDurationFields minStartDt={minStartDt} maxEndDt={maxEndDt} />
       <FinalSessionBlockPersonLinkField
         name="person_links"
         label={Translate.string('Conveners')}
@@ -115,10 +107,10 @@ export default function SessionBlockEditForm({
         ...rest,
       })
     );
-    formData = {
+    formData = withoutEndDt({
       ...formData,
       conveners: snakifyKeys(personLinks),
-    };
+    });
     try {
       await indicoAxios.patch(
         sessionBlockURL({event_id: eventId, session_id: sessionId, block_id: blockId}),
@@ -172,7 +164,7 @@ export function SessionBlockCreateForm({eventId, sessionId, onClose}: SessionBlo
     try {
       await indicoAxios.patch(
         sessionBlockCreateURL({event_id: eventId, session_id: sessionId}),
-        formData
+        withoutEndDt(formData)
       );
     } catch (e) {
       return handleSubmitError(e);

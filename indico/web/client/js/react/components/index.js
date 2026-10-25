@@ -21,6 +21,12 @@ export {default as Paginator} from './Paginator';
 export {default as CollapsibleContainer} from './CollapsibleContainer';
 export {default as TooltipIfTruncated} from './TooltipIfTruncated';
 export {default as SessionBlockColorPicker, FinalSessionColorPicker} from './SessionColorPicker';
+export {
+  default as StartEndDurationFields,
+  FinalHoursDuration,
+  getEndDt,
+  withoutEndDt,
+} from './StartEndDurationFields';
 export {default as DatePicker, FinalDatePicker} from './DatePicker';
 export {default as DateRangePicker, FinalDateRangePicker} from './DateRangePicker';
 export {default as CalendarSingleDatePicker} from './dates/CalendarSingleDatePicker';
