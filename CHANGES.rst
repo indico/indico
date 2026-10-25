@@ -16,6 +16,7 @@ Bugfixes
 ^^^^^^^^
 
 - Enable CSRF check on oauth authorization endpoint (:pr:`7818`)
+- Add missing checks for timetable draft mode (:pr:`7821`)
 
 Accessibility
 ^^^^^^^^^^^^^
