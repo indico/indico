@@ -14,6 +14,7 @@ import {Button, Divider, Header, Segment} from 'semantic-ui-react';
 
 import {ContributionFormFields} from 'indico/modules/events/contributions/ContributionForm';
 import {SessionBlockFormFields} from 'indico/modules/events/sessions/SessionBlockForm';
+import {withoutEndDt} from 'indico/react/components';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate, Param} from 'indico/react/i18n';
@@ -236,7 +237,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const handleSubmit = async (data: any, form: any) => {
-    data = {...data};
+    data = withoutEndDt(data);
     const sessionObj = data.session_object;
     delete data.session_object;
 
@@ -268,7 +269,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         //              the handleSubmit and instead have a separate function
         const oldDayKey = getDateKey(entry.startDt);
         const newDayKey = getDateKey(updatedEntry.startDt);
-        const updatePayload = getChangedValues(data, form);
+        const updatePayload = withoutEndDt(getChangedValues(data, form));
         await dispatch(
           actions.updateEntry(activeType, updatedEntry, currentDay, updatePayload, false)
         );

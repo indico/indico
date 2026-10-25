@@ -10,13 +10,16 @@ import sessionBlockURL from 'indico-url:sessions.api_manage_block';
 
 import {FormApi} from 'final-form';
 import React, {useState} from 'react';
-import {Field} from 'react-final-form';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {LocationParentObj} from 'indico/modules/events/timetable/types';
-import {FinalLocationField, FinalSessionBlockPersonLinkField} from 'indico/react/components';
+import {
+  FinalLocationField,
+  FinalSessionBlockPersonLinkField,
+  StartEndDurationFields,
+  withoutEndDt,
+} from 'indico/react/components';
 import {FinalInput} from 'indico/react/forms';
-import {FinalDateTimePicker, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -52,18 +55,7 @@ export function SessionBlockFormFields({
         description={Translate.string('Title of the session block')}
         autoFocus
       />
-      <Field name="duration" subscription={{value: true}}>
-        {({input: {value: duration}}) => (
-          <FinalDateTimePicker
-            name="start_dt"
-            label={Translate.string('Start time')}
-            required
-            minStartDt={minStartDt}
-            maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
-          />
-        )}
-      </Field>
-      <FinalDuration name="duration" label={Translate.string('Duration')} required />
+      <StartEndDurationFields minStartDt={minStartDt} maxEndDt={maxEndDt} />
       <FinalSessionBlockPersonLinkField
         name="person_links"
         label={Translate.string('Conveners')}
@@ -109,10 +101,10 @@ function SessionBlockEditForm({eventId, sessionId, blockId, onClose}: SessionBlo
           ...personLinkData,
         })
     );
-    formData = {
+    formData = withoutEndDt({
       ...formData,
       person_links: personLinks,
-    };
+    });
     const changedValues = getChangedValues(formData, form);
     try {
       await indicoAxios.patch(
