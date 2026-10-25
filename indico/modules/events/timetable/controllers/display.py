@@ -64,6 +64,9 @@ class RHTimetableEntryInfo(RHTimetableProtectionBase):
         self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _check_access(self):
+        published = contribution_settings.get(self.event, 'published')
+        if not published and not self.event.can_manage(session.user):
+            raise NotFound(_('The contributions of this event have not been published yet'))
         if not self.entry.can_view(session.user):
             raise Forbidden
 

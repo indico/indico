@@ -9,13 +9,15 @@ from io import BytesIO
 
 from flask import request, session
 from sqlalchemy.orm import joinedload, subqueryload
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.sessions.ical import session_to_ical
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import generate_session_pdf_timetable, get_sessions_for_user
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
+from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.rh import allow_signed_url
 
@@ -39,6 +41,9 @@ class RHDisplaySessionBase(RHDisplayEventBase):
     }
 
     def _check_access(self):
+        published = contribution_settings.get(self.event, 'published')
+        if not published and not self.event.can_manage(session.user):
+            raise NotFound(_('The contributions of this event have not been published yet'))
         if not self.session.can_access(session.user):
             raise Forbidden
 
