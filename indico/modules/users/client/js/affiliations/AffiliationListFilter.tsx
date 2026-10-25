@@ -11,6 +11,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {ListFilter} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
 import {getPluginObjects} from 'indico/utils/plugins';
+import {normalizeSearchText} from 'indico/utils/search';
 
 import {Affiliation} from './types';
 
@@ -96,7 +97,7 @@ export default function AffiliationListFilter({
         return {
           id: affiliation.id,
           countryCode: affiliation.country_code,
-          searchableFields,
+          searchableFields: searchableFields.map(normalizeSearchText),
           affiliation,
         };
       }),
@@ -140,8 +141,7 @@ export default function AffiliationListFilter({
   );
 
   const filteredAffiliations = useMemo(() => {
-    const trimmedSearch = searchText.trim();
-    const normalizedSearch = trimmedSearch.toLowerCase();
+    const normalizedSearch = normalizeSearchText(searchText);
 
     return filterableAffiliations
       .filter(entry => {
@@ -161,7 +161,7 @@ export default function AffiliationListFilter({
           return true;
         }
 
-        return entry.searchableFields.some(field => field.toLowerCase().includes(normalizedSearch));
+        return entry.searchableFields.some(field => field.includes(normalizedSearch));
       })
       .map(entry => entry.affiliation);
   }, [filterableAffiliations, filterOptions, filters, searchText]);

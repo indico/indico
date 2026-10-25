@@ -10,7 +10,9 @@ Version 3.3.15
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Ignore punctuation, whitespace and accents when searching in editing lists and the affiliation
+  dashboard
+  (:pr:`7803`, thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
