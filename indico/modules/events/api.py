@@ -71,6 +71,8 @@ class EventTimeTableHook(HTTPAPIHook):
     def _serialize_timetable(self, event, user):
         if not contribution_settings.get(event, 'published') and not event.can_manage(user):
             return {}
+        if not event.can_access(user):
+            return {}
         return TimetableSerializer(event, management=False, user=user, api=True).serialize_timetable()
 
     def export_timetable(self, user):
