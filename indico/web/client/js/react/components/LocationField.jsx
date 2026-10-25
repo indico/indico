@@ -18,18 +18,7 @@ import {Translate} from 'indico/react/i18n';
 
 import './LocationField.module.scss';
 
-const EMPTY_LOCATION_VALUE = {
-  venue_id: null,
-  venue_name: '',
-  room_id: null,
-  room_name: '',
-  address: '',
-};
-
 const processLocations = (locations, value) => {
-  if (!locations.length) {
-    return [[], []];
-  }
   const venues = locations.map(({id, name}) => ({key: id, text: name, value: id}));
   const rooms = locations.flatMap(location => [
     {
@@ -49,7 +38,6 @@ const processLocations = (locations, value) => {
       key: 'custom',
       text: value.venue_name,
       value: value.venue_name,
-      content: Translate.string('Custom venue: "{venue}"', {venue: value.venue_name}),
     });
   }
   if (value.room_name && !value.room_id) {
@@ -57,7 +45,6 @@ const processLocations = (locations, value) => {
       key: 'custom',
       text: value.room_name,
       value: value.room_name,
-      content: Translate.string('Custom room: "{room}"', {room: value.room_name}),
     });
   }
   return [venues, rooms];
@@ -122,6 +109,33 @@ export default function LocationField({
 
   return (
     <>
+      {locationParent && (
+        <Form.Group>
+          <Form.Checkbox
+            label={Translate.string('Use default')}
+            checked={value.inheriting}
+            onChange={(evt, {checked}) =>
+              onChange(
+                checked
+                  ? {...locationParent.location_data, inheriting: true}
+                  : {...value, inheriting: false}
+              )
+            }
+            disabled={disabled}
+          />
+          <Popup
+            trigger={<Icon color="grey" name="info circle" />}
+            content={
+              value.inheriting
+                ? Translate.string("Using default location from '{title}' ({type})", {
+                    title: locationParent.title,
+                    type: locationParent.type,
+                  })
+                : Translate.string('Using custom location')
+            }
+          />
+        </Form.Group>
+      )}
       {locationsEnabled || loading ? (
         <Form.Group widths="equal">
           <Form.Select
@@ -183,33 +197,6 @@ export default function LocationField({
           disabled={disabled || value.inheriting}
           required={required}
         />
-      )}
-      {locationParent && (
-        <Form.Group>
-          <Form.Checkbox
-            label={Translate.string('Use default')}
-            checked={value.inheriting}
-            onChange={(evt, {checked}) =>
-              onChange(
-                checked
-                  ? {...locationParent.location_data, inheriting: true}
-                  : {...EMPTY_LOCATION_VALUE, inheriting: false}
-              )
-            }
-            disabled={disabled}
-          />
-          <Popup
-            trigger={<Icon color="grey" name="info circle" />}
-            content={
-              value.inheriting
-                ? Translate.string("Using default location from '{title}' ({type})", {
-                    title: locationParent.title,
-                    type: locationParent.type,
-                  })
-                : Translate.string('Using custom location')
-            }
-          />
-        </Form.Group>
       )}
     </>
   );
