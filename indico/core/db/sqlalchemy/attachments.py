@@ -28,9 +28,18 @@ class AttachedItemsMixin:
     @property
     @memoize_request
     def attached_items(self):
+        # XXX this must not be used in the Legacy APIs where the user is not set via `session.user`
         from indico.modules.attachments.util import get_attached_items
         return get_attached_items(self, include_empty=False, include_hidden=False,
                                   preload_event=self.PRELOAD_EVENT_ATTACHED_ITEMS)
+
+    @memoize_request
+    def get_attached_items_for_user(self, user):
+        # XXX this is *only* intended for the legacy API where the user must be passed explicitly
+        # and not make use of `session.user`
+        from indico.modules.attachments.util import get_attached_items
+        return get_attached_items(self, include_empty=False, include_hidden=False,
+                                  preload_event=self.PRELOAD_EVENT_ATTACHED_ITEMS, user=user)
 
     # added below due to import issues
     attachment_count = None

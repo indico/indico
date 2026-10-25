@@ -22,7 +22,7 @@ from indico.web.flask.util import url_for
 class TimetableSerializer:
     def __init__(self, event, management=False, user=None, api=False):
         self.management = management
-        self.user = user if user is not None or not has_request_context() else session.user
+        self.user = user if user is not None or not has_request_context() or api else session.user
         self.event = event
         self.can_manage_event = self.event.can_manage(self.user)
         self.api = api
@@ -217,7 +217,7 @@ class TimetableSerializer:
                     'attachments': list(map(serialize_attachment, folder.attachments))}
 
         data = {'files': [], 'folders': []}
-        items = obj.attached_items
+        items = obj.get_attached_items_for_user(self.user)
         data['files'] = list(map(serialize_attachment, items.get('files', [])))
         data['folders'] = list(map(serialize_folder, items.get('folders', [])))
         if not data['files'] and not data['folders']:

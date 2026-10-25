@@ -11,7 +11,10 @@ from indico.core.db import db
 from indico.util.signals import make_interceptable
 
 
-def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False):
+_notset = object()
+
+
+def get_attached_folders(linked_object, include_empty=True, include_hidden=True, preload_event=False, *, user=_notset):
     """Return a list of all the folders linked to an object.
 
     :param linked_object: The object whose attachments are to be returned
@@ -19,13 +22,17 @@ def get_attached_folders(linked_object, include_empty=True, include_hidden=True,
     :param include_hidden: Include folders that the user can't see
     :param preload_event: in the process, preload all objects tied to the
                           corresponding event and keep them in cache
+    :param user: explicit user to use for access checks instead of the session user
     """
     from indico.modules.attachments.models.folders import AttachmentFolder
+
+    if user is _notset:
+        user = session.user
 
     folders = AttachmentFolder.get_for_linked_object(linked_object, preload_event=preload_event)
 
     if not include_hidden:
-        folders = [f for f in folders if f.can_view(session.user)]
+        folders = [f for f in folders if f.can_view(user)]
 
     if not include_empty:
         folders = [f for f in folders if f.attachments]
@@ -34,7 +41,7 @@ def get_attached_folders(linked_object, include_empty=True, include_hidden=True,
 
 
 @make_interceptable
-def get_attached_items(linked_object, include_empty=True, include_hidden=True, preload_event=False):
+def get_attached_items(linked_object, include_empty=True, include_hidden=True, preload_event=False, *, user=_notset):
     """
     Return a structured representation of all the attachments linked
     to an object.
@@ -44,9 +51,10 @@ def get_attached_items(linked_object, include_empty=True, include_hidden=True, p
     :param include_hidden: Include folders that the user can't see
     :param preload_event: in the process, preload all objects tied to the
                           corresponding event and keep them in cache
+    :param user: explicit user to use for access checks instead of the session user
     """
     folders = get_attached_folders(linked_object, include_empty=include_empty,
-                                   include_hidden=include_hidden, preload_event=preload_event)
+                                   include_hidden=include_hidden, preload_event=preload_event, user=user)
     if not folders:
         return {}
 
