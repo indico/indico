@@ -16,7 +16,7 @@ import {
   FinalLocationField,
   FinalSessionColorPicker,
   StartEndDurationFields,
-  withoutEndDt,
+  stripEndDt,
 } from 'indico/react/components';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
@@ -86,7 +86,7 @@ export function BreakForm({
   ...rest
 }: BreakFormProps) {
   const handleSubmit = (formData: any) => {
-    onSubmit(withoutEndDt(formData));
+    onSubmit(stripEndDt(formData));
   };
 
   if (loading) {

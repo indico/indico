@@ -17,7 +17,7 @@ import {
   FinalLocationField,
   FinalSessionBlockPersonLinkField,
   StartEndDurationFields,
-  withoutEndDt,
+  stripEndDt,
 } from 'indico/react/components';
 import {FinalInput} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
@@ -101,7 +101,7 @@ function SessionBlockEditForm({eventId, sessionId, blockId, onClose}: SessionBlo
           ...personLinkData,
         })
     );
-    formData = withoutEndDt({
+    formData = stripEndDt({
       ...formData,
       person_links: personLinks,
     });

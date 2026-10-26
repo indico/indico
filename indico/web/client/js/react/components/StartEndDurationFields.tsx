@@ -11,16 +11,19 @@ import React, {useEffect, useState} from 'react';
 import {Field, useForm} from 'react-final-form';
 import {Form, Input} from 'semantic-ui-react';
 
+import {formatDuration} from 'indico/modules/events/timetable/utils';
 import {FinalDateTimePicker, FinalField} from 'indico/react/forms/fields';
 import validators from 'indico/react/forms/validators';
 import {Translate} from 'indico/react/i18n';
-
-const DT_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+import './StartEndDurationFields.module.scss';
 
 export const getEndDt = (startDt: string, duration: number) =>
-  moment(startDt).add(duration, 'seconds').format(DT_FORMAT);
+  moment(startDt).add(duration, 'seconds').format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS);
 
-export const withoutEndDt = (values: Record<string, any>) => _.omit(values, 'end_dt');
+export const stripEndDt = (values: Record<string, any>) => _.omit(values, 'end_dt');
+
+// This is aligned with FinalDuration's default time set (see fields.jsx l.868)
+const DEFAULT_DURATION_SECONDS = 20 * 60;
 
 const isValidDatetime = validators.datetime();
 
@@ -28,28 +31,24 @@ const validateEndDt = (endDt: string, values: Record<string, any>) => {
   const invalid = isValidDatetime(endDt);
   if (invalid) {
     return invalid;
-  } else if (!moment(endDt).isSame(values.start_dt, 'day')) {
+  }
+  if (!moment(endDt).isSame(values.start_dt, 'day')) {
     return Translate.string('An entry must start and end on the same day.');
-  } else if (!moment(endDt).isAfter(values.start_dt)) {
+  }
+  if (!moment(endDt).isAfter(values.start_dt)) {
     return Translate.string('An entry must end after it starts.');
   }
 };
 
-const formatDuration = (seconds: number) => {
-  const minutes = Math.floor(Math.max(0, seconds || 0) / 60);
-  return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`;
-};
-
 const parseDuration = (text: string) => {
-  const match = /^\s*(\d*)\s*(?::\s*(\d{1,2})\s*)?$/.exec(text);
-  if (!match || (!match[1] && !match[2])) {
+  const parts = text.split(':').map(part => part.trim());
+  const [hours = '', minutes = ''] = parts;
+  const isWellFormed = parts.length <= 2 && /^\d*$/.test(hours) && /^\d*$/.test(minutes);
+  const hasDigits = /\d/.test(text);
+  if (!isWellFormed || !hasDigits || Number(minutes || 0) > 59) {
     return null;
   }
-  const minutes = parseInt(match[2] || '0', 10);
-  if (minutes > 59) {
-    return null;
-  }
-  return parseInt(match[1] || '0', 10) * 3600 + minutes * 60;
+  return Number(hours || 0) * 3600 + Number(minutes || 0) * 60;
 };
 
 interface HoursDurationComponentProps {
@@ -104,7 +103,7 @@ function HoursDurationComponent({
 export function FinalHoursDuration({
   name,
   label,
-  defaultValue = 20 * 60,
+  defaultValue = DEFAULT_DURATION_SECONDS,
   ...rest
 }: {
   name: string;
@@ -112,7 +111,6 @@ export function FinalHoursDuration({
   defaultValue?: number;
   required?: boolean;
   onChange?: (newValue: number, oldValue: number) => void;
-  fieldProps?: object;
 }) {
   return (
     <FinalField
@@ -165,21 +163,19 @@ export default function StartEndDurationFields({
 
   return (
     <>
-      <Form.Group>
+      <Form.Group styleName="start-duration-row">
         <FinalDateTimePicker
           name="start_dt"
           label={Translate.string('Start date')}
           minStartDt={minStartDt}
           maxEndDt={maxEndDt}
           onChange={handleStartChange}
-          fieldProps={{style: {flex: '0 0 auto'}}}
           required
         />
         <FinalHoursDuration
           name="duration"
           label={Translate.string('Duration')}
           onChange={handleDurationChange}
-          fieldProps={{style: {flex: '0 0 auto', width: '10em'}}}
           required
         />
       </Form.Group>
