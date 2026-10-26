@@ -141,16 +141,21 @@ $toolbar-bg-color: $raincloud-gray;
   left: 0;
   right: 0;
   top: 0;
-  height: 0;
-  background: transparent;
-  border-top: 1px dashed #999;
-  mix-blend-mode: multiply;
+  height: 1px;
+  background: repeating-linear-gradient(
+    to right,
+    $dark-gray,
+    $dark-gray 6px,
+    transparent 6px,
+    transparent 12px
+  );
 }
 
 .hover-guide-label {
   position: absolute;
   right: 100%;
   top: 50%;
+  transform: translateY(-50%);
   width: max-content;
   display: flex;
   align-items: center;
