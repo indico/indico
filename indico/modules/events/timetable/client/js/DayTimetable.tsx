@@ -181,7 +181,7 @@ export function DayTimetable({
   function handleCalendarMouseMove(event: React.MouseEvent<HTMLDivElement>) {
     if (wrapperRef.current !== null) {
       const clientY = event.clientY + wrapperRef.current.scrollTop;
-      const offsetY = clientY - wrapperRef.current.offsetTop;
+      const offsetY = clientY - wrapperRef.current.getBoundingClientRect().top;
       const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
 
       if (isDragging || hasSelectedEntry || isWithinLimitsWithOffset) {
@@ -520,8 +520,12 @@ export function DayTimetable({
     let newEntryTimer: number | null = null;
 
     function onMouseDown(event: MouseEvent) {
+      if (!wrapperRef.current) {
+        return;
+      }
+
       const clientY = event.clientY + wrapperRef.current.scrollTop;
-      const offsetY = clientY - wrapperRef.current.offsetTop;
+      const offsetY = clientY - wrapperRef.current.getBoundingClientRect().top;
       const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
 
       const clickedOnCalendar =
