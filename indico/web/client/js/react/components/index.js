@@ -25,7 +25,7 @@ export {
   default as StartEndDurationFields,
   FinalHoursDuration,
   getEndDt,
-  withoutEndDt,
+  stripEndDt,
 } from './StartEndDurationFields';
 export {default as DatePicker, FinalDatePicker} from './DatePicker';
 export {default as DateRangePicker, FinalDateRangePicker} from './DateRangePicker';

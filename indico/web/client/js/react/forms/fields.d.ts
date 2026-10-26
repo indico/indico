@@ -16,7 +16,6 @@ interface SharedFieldProps {
   required?: boolean | 'no-validator';
   disabled?: boolean;
   initialValue?: any;
-  fieldProps?: object;
   hideValidationError?: boolean | 'message' | 'never';
   className?: string;
   formatOnBlur?: boolean;
@@ -29,7 +28,7 @@ interface SharedFieldProps {
 interface FinalFieldProps extends SharedFieldProps {
   adapter?: ComponentType<any>;
   component?: ComponentType<any>;
-  onChange?: (newValue: any, oldValue: any) => void;
+  onChange?: (newValue: unknown, oldValue: unknown) => void;
   [key: string]: any;
 }
 

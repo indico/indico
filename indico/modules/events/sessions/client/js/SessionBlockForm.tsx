@@ -17,7 +17,7 @@ import {
   FinalLocationField,
   FinalSessionBlockPersonLinkField,
   StartEndDurationFields,
-  withoutEndDt,
+  stripEndDt,
 } from 'indico/react/components';
 import {FinalInput} from 'indico/react/forms';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
@@ -107,7 +107,7 @@ export default function SessionBlockEditForm({
         ...rest,
       })
     );
-    formData = withoutEndDt({
+    formData = stripEndDt({
       ...formData,
       conveners: snakifyKeys(personLinks),
     });
@@ -164,7 +164,7 @@ export function SessionBlockCreateForm({eventId, sessionId, onClose}: SessionBlo
     try {
       await indicoAxios.patch(
         sessionBlockCreateURL({event_id: eventId, session_id: sessionId}),
-        withoutEndDt(formData)
+        stripEndDt(formData)
       );
     } catch (e) {
       return handleSubmitError(e);

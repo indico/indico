@@ -29,7 +29,7 @@ import {
   FinalTagList,
   FinalHoursDuration,
   StartEndDurationFields,
-  withoutEndDt,
+  stripEndDt,
 } from 'indico/react/components';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalDropdown} from 'indico/react/forms/fields';
@@ -276,7 +276,7 @@ function ContributionForm({
       person_links: personLinks,
     };
 
-    const submitPayload = withoutEndDt(editing ? getChangedValues(formData, form) : formData);
+    const submitPayload = stripEndDt(editing ? getChangedValues(formData, form) : formData);
     return await onSubmit(submitPayload);
   };
 
