@@ -99,22 +99,52 @@ function resetDraggableState(draggableData: DraggableData, id: string) {
   };
 }
 
-function setTransform(
+function setTransformOnScroll(
   draggableData: DraggableData,
   id: string,
-  initialMousePosition: MousePosition,
-  currentMousePosition: MousePosition,
+  currentTransform: Transform,
+  currentScrollPosition: Transform,
   modifier: Modifier
 ) {
   const draggable = draggableData[id];
   const transform = modifier({
     draggingNodeRect: draggable.rect,
     transform: {
-      x: currentMousePosition.x - initialMousePosition.x,
-      y: currentMousePosition.y - initialMousePosition.y,
+      x: currentTransform.x + currentScrollPosition.x,
+      y: currentTransform.y + currentScrollPosition.y,
     },
     id,
   });
+  transform.x -= currentScrollPosition.x;
+  transform.y -= currentScrollPosition.y;
+  return {
+    ...draggableData,
+    [id]: {
+      ...draggable,
+      transform,
+    },
+  };
+}
+
+function setTransform(
+  draggableData: DraggableData,
+  id: string,
+  initialMousePosition: MousePosition,
+  currentMousePosition: MousePosition,
+  currentScrollPosition: Transform,
+  modifier: Modifier
+) {
+  const draggable = draggableData[id];
+  const transform = modifier({
+    draggingNodeRect: draggable.rect,
+    transform: {
+      x: currentMousePosition.x - initialMousePosition.x + currentScrollPosition.x,
+      y: currentMousePosition.y - initialMousePosition.y + currentScrollPosition.y,
+    },
+    id,
+  });
+  transform.x -= currentScrollPosition.x;
+  transform.y -= currentScrollPosition.y;
   return {
     ...draggableData,
     [id]: {
@@ -318,19 +348,19 @@ export function DnDProvider({
           setDragged(state.current.activeDraggable);
         }
         const mousePosition = {x: e.pageX, y: e.pageY};
-        setDraggableData(d =>
-          setMousePosition(
-            setTransform(
-              d,
-              state.current.activeDraggable,
-              state.current.initialMousePosition,
-              mousePosition,
-              modifier
-            ),
+        setDraggableData(d => {
+          const newDraggable = setTransform(
+            d,
             state.current.activeDraggable,
-            mousePosition
-          )
-        );
+            state.current.initialMousePosition,
+            mousePosition,
+            state.current.scrollPosition,
+            modifier
+          );
+          state.current.transformSinceMouseMove =
+            newDraggable[state.current.activeDraggable].transform;
+          return setMousePosition(newDraggable, state.current.activeDraggable, mousePosition);
+        });
       }
     },
     [modifier]
@@ -397,20 +427,18 @@ export function DnDProvider({
         x: state.current.scrollPosition.x + deltaX,
         y: state.current.scrollPosition.y + deltaY,
       };
-      // setDraggableData(
-      //   d =>
-      //     setTransform(
-      //       d,
-      //       state.current.activeDraggable,
-      //       state.current.initialMousePosition,
-      //       {x: e.pageX, y: e.pageY},
-      //       modifier
-      //     ),
-      //   state.current.activeDraggable,
-      //   {x: e.pageX, y: e.pageY}
-      // );
+      setDraggableData(d => {
+        const newDraggable = setTransformOnScroll(
+          d,
+          state.current.activeDraggable,
+          state.current.transformSinceMouseMove,
+          state.current.scrollPosition,
+          modifier
+        );
+        return newDraggable;
+      });
     },
-    [draggables, draggableData]
+    [draggables, draggableData, modifier]
   );
 
   const onKeyDown = useCallback((e: KeyboardEvent) => {

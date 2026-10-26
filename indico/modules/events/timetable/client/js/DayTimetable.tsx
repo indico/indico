@@ -311,14 +311,18 @@ export function DayTimetable({
     mouse: MousePosition,
     calendarRect: Rect,
     offset: Coords,
-    duration: number
+    duration: number,
+    tolerance?: number
   ) {
     const mousePositionY = mouse.y - calendarRect.top - window.scrollY;
     const startDt = moment(dt)
       .startOf('day')
       .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
     const endDt = startDt.clone().add(duration, 'minutes');
-    return startDt.isSameOrAfter(eventStartDt) && endDt.isSameOrBefore(eventEndDt);
+    return (
+      startDt.isSameOrAfter(eventStartDt.clone().subtract(tolerance ?? 0, 'minutes')) &&
+      endDt.isSameOrBefore(eventEndDt.clone().add(tolerance ?? 0, 'minutes'))
+    );
   }
 
   function handleDragEnd(
@@ -406,7 +410,7 @@ export function DayTimetable({
 
       if (
         fromContrib === undefined ||
-        !isValidEntryTime(mouse, over.rect, offset, fromContrib.duration)
+        !isValidEntryTime(mouse, over.rect, offset, fromContrib.duration, fromContrib.duration)
       ) {
         return;
       }
@@ -482,7 +486,7 @@ export function DayTimetable({
     const originalEntry = findEntryById(who);
     if (
       originalEntry === undefined ||
-      !isValidEntryTime(mouse, over.rect, offset, originalEntry.duration)
+      !isValidEntryTime(mouse, over.rect, offset, originalEntry.duration, originalEntry.duration)
     ) {
       return;
     }
@@ -495,7 +499,9 @@ export function DayTimetable({
         {...over, id: sessionBlockId},
         delta,
         mouse,
-        over
+        over,
+        eventStartDt,
+        eventEndDt
       );
       if (originalEntry?.type === EntryType.Contribution) {
         showToastIfContribSessionChanged(
@@ -518,7 +524,9 @@ export function DayTimetable({
         who,
         over,
         delta,
-        mouse
+        mouse,
+        eventStartDt,
+        eventEndDt
       );
       if (originalEntry?.type === EntryType.Contribution) {
         showToastIfContribSessionChanged(originalEntry.title, originalEntry.sessionId, null);
@@ -536,7 +544,16 @@ export function DayTimetable({
   ) {
     const originalEntry = findEntryById(who);
     const [newLayout, movedEntry, blockId] =
-      layoutAfterDropOnBlock(entries, who, over, delta, mouse, calendar) || [];
+      layoutAfterDropOnBlock(
+        entries,
+        who,
+        over,
+        delta,
+        mouse,
+        calendar,
+        eventStartDt,
+        eventEndDt
+      ) || [];
     if (!newLayout) {
       return;
     }
@@ -858,7 +875,9 @@ function layoutAfterDropOnCalendar(
   who: string,
   over: Over,
   delta: Transform,
-  mouse: MousePosition
+  mouse: MousePosition,
+  minStartDt: Moment,
+  maxEndDt: Moment
 ): [TopLevelEntry[], Entry, number] | [TopLevelEntry[], Entry] {
   const {y} = delta;
   const deltaMinutes = Math.ceil(pixelsToMinutes(y) / GRID_SIZE_MINUTES) * GRID_SIZE_MINUTES;
@@ -883,9 +902,20 @@ function layoutAfterDropOnCalendar(
     }
   }
 
+  let startDt = moment(fromEntry.startDt).add(deltaMinutes, 'minutes');
+  if (startDt.isBefore(minStartDt)) {
+    startDt = minStartDt.clone();
+  }
+  let endDt = startDt.clone().add(fromEntry.duration);
+  if (endDt.isAfter(maxEndDt)) {
+    const diff = endDt.diff(maxEndDt, 'minutes');
+    startDt = startDt.subtract(diff, 'minutes');
+    endDt = startDt.clone().add(fromEntry.duration);
+  }
+
   const draftEntry = {
     ...fromEntry,
-    startDt: moment(fromEntry.startDt).add(deltaMinutes, 'minutes'),
+    startDt,
     y: minutesToPixels(
       moment(fromEntry.startDt)
         .add(deltaMinutes, 'minutes')
@@ -947,7 +977,9 @@ function layoutAfterDropOnBlock(
   over: Over,
   delta: Transform,
   mouse: MousePosition,
-  calendar: Over
+  calendar: Over,
+  minStartDt: Moment,
+  maxEndDt: Moment
 ): [TopLevelEntry[], Entry, number] {
   const overId = over.id;
   const toBlock = entries.find(e => e.id === overId);
@@ -981,7 +1013,15 @@ function layoutAfterDropOnBlock(
   if (fromEntry.type === EntryType.SessionBlock) {
     // Allow blocks being dropped on other blocks to be treated as if they
     // were dropped directly on the calendar instead
-    const calendarResult = layoutAfterDropOnCalendar(entries, who, calendar, delta, mouse);
+    const calendarResult = layoutAfterDropOnCalendar(
+      entries,
+      who,
+      calendar,
+      delta,
+      mouse,
+      minStartDt,
+      maxEndDt
+    );
     const [newLayout, movedEntry] = calendarResult;
     return [newLayout, movedEntry, toBlock.objId];
   }
