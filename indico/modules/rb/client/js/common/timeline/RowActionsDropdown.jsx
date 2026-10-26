@@ -10,9 +10,10 @@ import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Button, Confirm, Dropdown, Form, Icon} from 'semantic-ui-react';
+import {Button, Dropdown, Form, Icon} from 'semantic-ui-react';
 
 import {PopoverDropdownMenu} from 'indico/react/components';
+import {NativeConfirm as Confirm} from 'indico/react/components/NativeModal';
 import {FinalTextArea} from 'indico/react/forms';
 import {Param, Translate} from 'indico/react/i18n';
 import {serializeDate} from 'indico/utils/date';
@@ -57,6 +58,7 @@ class RowActionsDropdown extends React.Component {
   };
 
   showConfirm = type => {
+    this.dropdownIconRef.current?.focus();
     this.setState({activeConfirmation: type});
   };
 
@@ -148,9 +150,12 @@ class RowActionsDropdown extends React.Component {
 
     const styleName = dropdownOpen ? 'dropdown-button open' : 'dropdown-button';
     const trigger = (
-      <Button styleName={styleName} loading={actionInProgress}>
+      <Button ref={this.dropdownIconRef} styleName={styleName} loading={actionInProgress}>
         <Button.Content>
           <Icon name="ellipsis horizontal" size="large" />
+          <span styleName="visually-hidden">
+            <Translate>Occurrence actions</Translate>
+          </span>
         </Button.Content>
       </Button>
     );

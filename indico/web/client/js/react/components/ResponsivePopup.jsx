@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import {Popup} from 'semantic-ui-react';
 
 import {useResponsive} from 'indico/react/util';
+
+import {ContainedPopup as Popup} from './PopupMountScope';
 
 export default function ResponsivePopup(props) {
   const {isPhone, isTablet} = useResponsive();

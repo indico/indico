@@ -15,6 +15,7 @@ import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 
 import {FinalField} from '../../forms';
+import {Translate} from '../../i18n';
 
 import {EmptyPrincipalListItem, PendingPrincipalListItem, PrincipalListItem} from './items';
 import {UserSearch} from './Search';
@@ -89,7 +90,12 @@ const PrincipalField = props => {
   };
 
   const searchTrigger = triggerProps => (
-    <Icon styleName="button" name="search" size="large" {...triggerProps} />
+    <button type="button" styleName="button search-trigger" {...triggerProps}>
+      <Icon name="search" size="large" />
+      <span styleName="visually-hidden">
+        <Translate>Search for a user</Translate>
+      </span>
+    </button>
   );
   const userSearch = (
     <UserSearch
