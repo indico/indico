@@ -668,12 +668,14 @@ export function DayTimetable({
         <TimetableSidePanel dt={dt} />
       </div>
       <div styleName="controls-container">
-        <TimetableDayControls
-          isSessionBlockExpanded={!!expandedSessionBlock}
-          currentDayIdx={currentDayIdx}
-          eventStart={eventStartDt}
-          numDays={eventNumDays}
-        />
+        {eventNumDays > 1 && (
+          <TimetableDayControls
+            isSessionBlockExpanded={!!expandedSessionBlock}
+            currentDayIdx={currentDayIdx}
+            eventStart={eventStartDt}
+            numDays={eventNumDays}
+          />
+        )}
         {/* .timetable-popup-boundary is used by EntryPopup to be aware of its bounding box */}
         <div
           ref={wrapperRef}
