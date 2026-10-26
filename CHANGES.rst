@@ -23,7 +23,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Make room-booking carousel panes keyboard accessible, keep the selected pane stable,
+  and improve statistics text contrast (:pr:`7814`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
