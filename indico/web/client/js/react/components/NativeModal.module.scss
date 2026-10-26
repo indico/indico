@@ -1,0 +1,55 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system/visibility';
+
+:global(.ui.modal.native-modal) {
+  position: fixed;
+  inset: 0;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 2rem);
+  margin: auto;
+  overflow: auto;
+}
+
+:global(.ui.modal.native-modal[open]) {
+  display: block;
+}
+
+:global(.ui.modal.native-modal::backdrop) {
+  background: rgba(0, 0, 0, 0.85);
+}
+
+:global(.ui.modal.native-modal > .header) {
+  padding-right: 3rem;
+}
+
+:global(.ui.modal.native-modal > .header h2),
+:global(.ui.modal.native-modal > .header h3) {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+:global(.native-modal-close) {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  &:focus {
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
+  }
+}
+
+:global(.native-modal-close-text) {
+  @extend %visually-hidden;
+}

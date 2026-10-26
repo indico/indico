@@ -9,8 +9,10 @@ import roomImageURL from 'indico-url:rb.room_photo';
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Dimmer, Grid, Header, Icon, Image, Loader, Modal, Popup} from 'semantic-ui-react';
+import {Dimmer, Grid, Header, Icon, Image, Loader, Modal as SemanticModal} from 'semantic-ui-react';
 
+import NativeModal from 'indico/react/components/NativeModal';
+import {ContainedPopup as Popup, PopupMountContext} from 'indico/react/components/PopupMountScope';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 
 import {formatLatLon} from '../common/map/util';
@@ -48,7 +50,18 @@ RoomFeaturesBox.propTypes = {
 };
 
 function AnnotatedIcon({name, text}) {
-  return <Popup content={text} trigger={<Icon name={name} />} />;
+  return (
+    <Popup
+      content={text}
+      on={['hover', 'focus']}
+      trigger={
+        <button type="button" styleName="annotation-trigger">
+          <Icon name={name} />
+          <span styleName="visually-hidden">{text}</span>
+        </button>
+      }
+    />
+  );
 }
 
 AnnotatedIcon.propTypes = {
@@ -66,19 +79,16 @@ export default class RoomBasicDetails extends React.PureComponent {
     imageLoaded: false,
   };
 
+  static contextType = PopupMountContext;
+
   renderImage() {
     const {room} = this.props;
     const {imageModalOpen, imageLoaded} = this.state;
+    const inNativeDialog = !!this.context;
+    const Modal = inNativeDialog ? NativeModal : SemanticModal;
     const isClickable = room.hasPhoto;
     const spriteImage = (
-      <SpriteImage
-        styleName="clickable"
-        pos={room.spritePosition}
-        height="100%"
-        width="100%"
-        fillVertical
-        onClick={isClickable ? () => this.setState({imageModalOpen: true}) : undefined}
-      />
+      <SpriteImage pos={room.spritePosition} height="100%" width="100%" fillVertical />
     );
     if (isClickable) {
       return (
@@ -87,7 +97,19 @@ export default class RoomBasicDetails extends React.PureComponent {
             closeIcon
             open={imageModalOpen}
             onClose={() => this.setState({imageModalOpen: false, imageLoaded: false})}
+            {...(inNativeDialog
+              ? {
+                  size: '',
+                  title: Translate.string('Photo of {roomName}', {roomName: room.fullName}),
+                  initialFocus: 'close',
+                }
+              : {})}
           >
+            {inNativeDialog && (
+              <Modal.Header>
+                <h2>{Translate.string('Photo of {roomName}', {roomName: room.fullName})}</h2>
+              </Modal.Header>
+            )}
             <Modal.Content image styleName="photo-dimmer">
               <Dimmer.Dimmable styleName="photo-dimmable-width">
                 <Dimmer active={!imageLoaded} inverted>
@@ -98,12 +120,22 @@ export default class RoomBasicDetails extends React.PureComponent {
                   wrapped
                   onLoad={() => this.setState({imageLoaded: true})}
                   src={roomImageURL({room_id: room.id})}
+                  alt={Translate.string('Photo of {roomName}', {roomName: room.fullName})}
                 />
               </Dimmer.Dimmable>
             </Modal.Content>
           </Modal>
           <div styleName="image-container clickable">
-            {spriteImage}
+            <button
+              type="button"
+              styleName="photo-trigger"
+              onClick={() => this.setState({imageModalOpen: true})}
+            >
+              {spriteImage}
+              <span styleName="visually-hidden">
+                {Translate.string('View photo of {roomName}', {roomName: room.fullName})}
+              </span>
+            </button>
             <RoomFeaturesBox room={room} />
           </div>
         </>

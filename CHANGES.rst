@@ -23,7 +23,9 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Make room-booking details, edit, and related confirmation, photo, and user-search
+  overlays keyboard-accessible dialogs with named controls and contained focus
+  (:pr:`7825`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

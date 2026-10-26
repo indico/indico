@@ -85,6 +85,13 @@ a {
   display: flex !important;
   align-items: center;
 
+  button.legend-info-trigger {
+    border: 0;
+    padding: 0;
+    background: none;
+    cursor: pointer;
+  }
+
   .icon.legend-info-icon {
     display: flex;
     align-items: center;
@@ -92,6 +99,16 @@ a {
     margin-left: 0.5em;
     font-size: 0.9em;
   }
+}
+
+.rb-popup-param-trigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  cursor: help;
 }
 
 .filter-row {

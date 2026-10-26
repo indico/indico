@@ -10,8 +10,9 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
-import {Header, Icon, List, Message, Popup} from 'semantic-ui-react';
+import {Header, Icon, List, Message} from 'semantic-ui-react';
 
+import {ContainedPopup as Popup} from 'indico/react/components/PopupMountScope';
 import {Translate} from 'indico/react/i18n';
 import {getWeekday, serializeDate} from 'indico/utils/date';
 
@@ -134,7 +135,15 @@ class BookingEditCalendar extends React.Component {
             <Translate>Occurrences</Translate>
           </span>
           <Popup
-            trigger={<Icon name="info circle" className="legend-info-icon" />}
+            trigger={
+              <button type="button" className="legend-info-trigger">
+                <Icon name="info circle" className="legend-info-icon" />
+                <span styleName="visually-hidden">
+                  <Translate>Explain occurrence colors</Translate>
+                </span>
+              </button>
+            }
+            on={['hover', 'focus']}
             position="right center"
             content={<TimelineLegend labels={legendLabels} compact />}
           />

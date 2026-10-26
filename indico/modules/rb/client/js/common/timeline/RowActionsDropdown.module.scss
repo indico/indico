@@ -6,6 +6,11 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'design_system/visibility';
+
+.visually-hidden {
+  @extend %visually-hidden;
+}
 
 .actions-dropdown {
   :global(.dropdown.icon) {
