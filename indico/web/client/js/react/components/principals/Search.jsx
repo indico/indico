@@ -25,11 +25,16 @@ import {
   Label,
   List,
   Message,
-  Modal,
-  Popup,
   Image,
+  Modal as SemanticModal,
 } from 'semantic-ui-react';
 
+import NativeModal from 'indico/react/components/NativeModal';
+import {
+  ContainedPopup as Popup,
+  PopupMountScope,
+  usePopupMountNode,
+} from 'indico/react/components/PopupMountScope';
 import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
@@ -98,9 +103,8 @@ const searchFactory = config => {
 
     return (
       <Dropdown.Item
-        disabled={added}
+        active={added}
         styleName="favorite"
-        style={{pointerEvents: 'all'}}
         onClick={e => {
           e.stopPropagation();
           if (added) {
@@ -143,7 +147,12 @@ const searchFactory = config => {
         initialValuesEqual={_.isEqual}
       >
         {fprops => (
-          <Form onSubmit={fprops.handleSubmit}>
+          <Form
+            onSubmit={event => {
+              event.stopPropagation();
+              fprops.handleSubmit(event);
+            }}
+          >
             {config.onPaste && <PasteHandler onPaste={onPaste} formApi={fprops.form} />}
             {searchFields}
             <div styleName="search-buttons">
@@ -195,29 +204,37 @@ const searchFactory = config => {
     );
   };
 
-  const FavoriteControls = ({favorite, onAddFavorite, onDelFavorite}) =>
+  const FavoriteControls = ({favorite, onAddFavorite, onDelFavorite, disabled}) =>
     favorite ? (
-      <Icon
-        styleName="button favorite active"
-        name="star"
-        size="large"
-        title={Translate.string('Remove from favorites')}
+      <button
+        type="button"
+        disabled={disabled}
+        styleName="button favorite-control favorite active"
         onClick={evt => {
           evt.stopPropagation();
           onDelFavorite();
         }}
-      />
+      >
+        <Icon name="star" size="large" />
+        <span styleName="visually-hidden">
+          <Translate>Remove from favorites</Translate>
+        </span>
+      </button>
     ) : (
-      <Icon
-        styleName="button favorite"
-        name="star outline"
-        size="large"
-        title={Translate.string('Add to favorites')}
+      <button
+        type="button"
+        disabled={disabled}
+        styleName="button favorite-control favorite"
         onClick={evt => {
           evt.stopPropagation();
           onAddFavorite();
         }}
-      />
+      >
+        <Icon name="star outline" size="large" />
+        <span styleName="visually-hidden">
+          <Translate>Add to favorites</Translate>
+        </span>
+      </button>
     );
 
   const ResultItem = ({
@@ -232,6 +249,7 @@ const searchFactory = config => {
     existsInEvent,
     external,
     avatarURL,
+    disabled,
   }) => {
     const avatar = avatarURL ? (
       <Image src={avatarURL} size="mini" avatar />
@@ -242,52 +260,57 @@ const searchFactory = config => {
     const hasAvatarClass = avatarURL ? 'has-avatar' : '';
 
     return (
-      <List.Item styleName="result-item" onClick={added ? onRemove : onAdd}>
+      <List.Item styleName="result-item">
         <div styleName="item">
-          <div styleName="icon">
-            <Icon.Group size="large">
-              {avatar}
-              {favorite && <Icon name="star" color="yellow" corner="bottom right" />}
+          <button
+            type="button"
+            styleName="result-select"
+            onClick={added ? onRemove : onAdd}
+            disabled={disabled}
+          >
+            <span styleName="icon">
+              <Icon.Group size="large">
+                {avatar}
+                {favorite && <Icon name="star" color="yellow" corner="bottom right" />}
+              </Icon.Group>
+            </span>
+            <span styleName={`content ${hasAvatarClass}`}>
+              <span>{name}</span>
+              {detail && <small styleName="result-detail">{detail}</small>}
               {existsInEvent && (
-                <Popup
-                  content={Translate.string('Person exists in event')}
-                  trigger={<Icon name="ticket" styleName="event-person" corner="top right" />}
-                  offset={[-15, 0]}
-                  position="top left"
-                />
+                <span styleName="result-status">
+                  <Translate>Person exists in event</Translate>
+                </span>
               )}
               {external && (
-                <Popup
-                  content={Translate.string('Person does not have an Indico account yet')}
-                  trigger={<Icon name="external" styleName="event-person" corner="top right" />}
-                  offset={[-15, 0]}
-                  position="top left"
-                />
+                <span styleName="result-status">
+                  <Translate>Person does not have an Indico account yet</Translate>
+                </span>
               )}
-            </Icon.Group>
-          </div>
-          <div styleName={`content ${hasAvatarClass}`}>
-            <List.Content>{name}</List.Content>
-            {detail && (
-              <List.Description>
-                <small>{detail}</small>
-              </List.Description>
+              <span styleName="visually-hidden">
+                {added ? (
+                  <Translate>Remove selection</Translate>
+                ) : (
+                  <Translate>Add selection</Translate>
+                )}
+              </span>
+            </span>
+            {added ? (
+              <Icon name="checkmark" size="large" color="green" />
+            ) : (
+              <Icon name="add" size="large" />
             )}
-          </div>
-          <div styleName="actions">
-            {!external && onAddFavorite && onDelFavorite && (
+          </button>
+          {!external && onAddFavorite && onDelFavorite && (
+            <div styleName="actions">
               <FavoriteControls
                 onAddFavorite={onAddFavorite}
                 onDelFavorite={onDelFavorite}
                 favorite={favorite}
+                disabled={disabled}
               />
-            )}
-            {added ? (
-              <Icon name="checkmark" size="large" color="green" />
-            ) : (
-              <Icon styleName="button" name="add" size="large" />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </List.Item>
     );
@@ -338,6 +361,7 @@ const searchFactory = config => {
                 existsInEvent={r.existsInEvent}
                 external={r.type === 'user' && r.userId === null}
                 avatarURL={r.avatarURL}
+                disabled={loading}
               />
             ))}
           </List>
@@ -351,7 +375,12 @@ const searchFactory = config => {
           <Translate as={Message.Header}>I could not find the right person</Translate>
           <Translate as={Message.Content}>
             If nobody on the search results corresponds to the person you were looking for, you can{' '}
-            <Param name="enterManuallyLink" wrapper={<a onClick={onEnterManually} />}>
+            <Param
+              name="enterManuallyLink"
+              wrapper={
+                <button type="button" styleName="manual-entry-button" onClick={onEnterManually} />
+              }
+            >
               add them manually
             </Param>
             .
@@ -457,7 +486,12 @@ const searchFactory = config => {
       return (
         <Label circular styleName="staged-label">
           {staged[0].name}
-          <Icon name="delete" onClick={() => onRemove(staged[0])} />
+          <button type="button" styleName="remove-staged" onClick={() => onRemove(staged[0])}>
+            <Icon name="delete" />
+            <span styleName="visually-hidden">
+              {Translate.string('Remove {name}', {name: staged[0].name})}
+            </span>
+          </button>
         </Label>
       );
     }
@@ -465,19 +499,28 @@ const searchFactory = config => {
     return (
       <Popup
         trigger={
-          <Label circular styleName="staged-label">
+          <Label as="button" type="button" circular styleName="staged-label">
             {staged.length}
+            <span styleName="visually-hidden">
+              <Translate>Selected people</Translate>
+            </span>
           </Label>
         }
         position="bottom left"
         hoverable
+        on={['hover', 'focus']}
       >
         <List>
           {_.sortBy(staged, 'name').map(x => (
             <List.Item key={x.identifier}>
               <div styleName="staged-list-item">
                 {x.name}
-                <Icon styleName="button" name="delete" onClick={() => onRemove(x)} />
+                <button type="button" styleName="button remove-staged" onClick={() => onRemove(x)}>
+                  <Icon name="delete" />
+                  <span styleName="visually-hidden">
+                    {Translate.string('Remove {name}', {name: x.name})}
+                  </span>
+                </button>
               </div>
             </List.Item>
           ))}
@@ -504,6 +547,9 @@ const searchFactory = config => {
     searchToken,
   }) => {
     const searchTokenFromContext = useContext(UserSearchTokenContext);
+    const parentMountNode = usePopupMountNode();
+    const Modal = parentMountNode ? NativeModal : SemanticModal;
+    const MountScope = parentMountNode ? PopupMountScope : React.Fragment;
     const [open, setOpen] = useState(defaultOpen);
     const [staged, setStaged] = useState([]);
 
@@ -554,67 +600,58 @@ const searchFactory = config => {
       trigger = triggerFactory ? (
         triggerFactory({disabled, onClick: handleOpenClick})
       ) : (
-        <Button
-          as="div"
-          type="button"
-          content={buttonTitle}
-          disabled={disabled}
-          onClick={handleOpenClick}
-        />
+        <Button type="button" content={buttonTitle} disabled={disabled} onClick={handleOpenClick} />
       );
     }
 
-    const stopPropagation = evt => {
-      // https://github.com/Semantic-Org/Semantic-UI-React/issues/3644
-      evt.stopPropagation();
-    };
-
     return (
-      <Modal
-        trigger={trigger}
-        dimmer="inverted"
-        centered={false}
-        open={open}
-        onClose={handleClose}
-        onClick={stopPropagation}
-        onFocus={stopPropagation}
-        closeIcon
-      >
-        <Modal.Header styleName="header">
-          {modalTitle(single)}{' '}
-          {(!single || alwaysConfirm) && (
-            <SearchStaged
-              single={single}
-              alwaysConfirm={alwaysConfirm}
-              staged={staged}
-              onRemove={handleRemove}
-            />
-          )}
-        </Modal.Header>
-        <Modal.Content>
-          <SearchContent
-            favoritesController={favoritesController}
-            onAdd={handleAdd}
-            onRemove={handleRemove}
-            onEnterManually={onEnterManually ? handleEnterManually : null}
-            isAdded={isAdded}
-            single={single}
-            withEventPersons={withEventPersons}
-            eventId={eventId}
-            searchToken={searchToken ?? searchTokenFromContext}
-          />
-        </Modal.Content>
-        <Modal.Actions>
-          {(!single || alwaysConfirm) && (
-            <Button onClick={handleAddButtonClick} disabled={!staged.length} primary>
-              <Translate>Confirm</Translate>
-            </Button>
-          )}
-          <Button onClick={handleClose}>
-            <Translate>Cancel</Translate>
-          </Button>
-        </Modal.Actions>
-      </Modal>
+      <>
+        {trigger}
+        <Modal
+          open={open}
+          onClose={handleClose}
+          title={modalTitle(single)}
+          closeIcon
+          {...(parentMountNode ? {portal: true, size: ''} : {})}
+        >
+          <MountScope>
+            <Modal.Header styleName="header">
+              <h2>{modalTitle(single)}</h2>{' '}
+              {(!single || alwaysConfirm) && (
+                <SearchStaged
+                  single={single}
+                  alwaysConfirm={alwaysConfirm}
+                  staged={staged}
+                  onRemove={handleRemove}
+                />
+              )}
+            </Modal.Header>
+            <Modal.Content>
+              <SearchContent
+                favoritesController={favoritesController}
+                onAdd={handleAdd}
+                onRemove={handleRemove}
+                onEnterManually={onEnterManually ? handleEnterManually : null}
+                isAdded={isAdded}
+                single={single}
+                withEventPersons={withEventPersons}
+                eventId={eventId}
+                searchToken={searchToken ?? searchTokenFromContext}
+              />
+            </Modal.Content>
+            <Modal.Actions>
+              {(!single || alwaysConfirm) && (
+                <Button onClick={handleAddButtonClick} disabled={!staged.length} primary>
+                  <Translate>Confirm</Translate>
+                </Button>
+              )}
+              <Button onClick={handleClose}>
+                <Translate>Cancel</Translate>
+              </Button>
+            </Modal.Actions>
+          </MountScope>
+        </Modal>
+      </>
     );
   };
 

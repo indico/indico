@@ -8,6 +8,24 @@
 @use 'base/palette' as *;
 @use 'base/defaults' as *;
 @use 'base/borders' as *;
+@use 'design_system/visibility';
+
+.visually-hidden {
+  @extend %visually-hidden;
+}
+
+.search-trigger {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+}
+
+.favorite-control {
+  border: 0;
+  padding: 0;
+  background: none;
+}
 
 .item,
 :global(.ui.list) > .item,
