@@ -6,9 +6,10 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'design_system';
 
 :global(.ui.list) > .upcoming-bookings-item:global(.item) {
-  cursor: pointer;
+  position: relative;
 
   :global(.description) {
     margin: 0.5em 0;
@@ -16,13 +17,48 @@
 
   .booking-reason {
     font-style: italic;
-    color: $dark-gray;
+    color: #595959;
+  }
+
+  .pending-status {
+    display: block;
+    color: #595959;
+    font-weight: bold;
+  }
+
+  .details-button {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 3px solid #005a8b;
+      outline-offset: -3px;
+    }
+  }
+
+  .details-button-text {
+    @extend %visually-hidden;
   }
 }
 
-.upcoming-bookings-list {
-  overflow: hidden;
-  max-height: 150px;
+.upcoming-bookings-list:global(.ui.horizontal.list) {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  gap: 1rem;
+
+  > :global(.item) {
+    flex: 1 1 220px;
+    max-width: 300px;
+    margin-left: 0;
+  }
 }
 
 .upcoming-item-img-container {

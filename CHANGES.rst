@@ -23,7 +23,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Make upcoming room-booking cards keyboard accessible and show pending status
+  and full booking times as readable text (:pr:`7811`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
