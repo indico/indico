@@ -35,3 +35,4 @@ export type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 export type Variant = 'solid' | 'light' | 'white' | 'transparent';
 export type TextWeight = 'regular' | 'bold';
 export type IconPosition = 'left' | 'right';
+export type MessageBoxType = 'info' | 'warning' | 'error' | 'highlight' | 'danger' | 'success';
