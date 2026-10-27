@@ -125,7 +125,7 @@ function TimetableDayControls({
   return (
     <div styleName={`day-controls ${isSessionBlockExpanded ? 'block' : ''}`}>
       {isSessionBlockExpanded && <SessionBlockToolbar />}
-      {!isSessionBlockExpanded && numDays > 1 && (
+      {!isSessionBlockExpanded && (
         <>
           {numDays > 2 && (
             <Button
@@ -136,13 +136,15 @@ function TimetableDayControls({
               styleName="nav-button"
             />
           )}
-          <Button
-            onClick={() => scrollByDay(-1)}
-            disabled={currentDayIdx === 0}
-            title={Translate.string('Previous day')}
-            icon="angle left"
-            styleName="nav-button"
-          />
+          {numDays > 1 && (
+            <Button
+              onClick={() => scrollByDay(-1)}
+              disabled={currentDayIdx === 0}
+              title={Translate.string('Previous day')}
+              icon="angle left"
+              styleName="nav-button"
+            />
+          )}
           <div styleName="days-wrapper">
             <div ref={daysBarRef} styleName="days">
               <div styleName="gradient" />
@@ -172,14 +174,16 @@ function TimetableDayControls({
               <div styleName="gradient" />
             </div>
           </div>
-          <Button
-            onClick={() => scrollByDay(1)}
-            disabled={reachedLastDay}
-            title={Translate.string('Next day')}
-            icon="angle right"
-            position="right"
-            styleName="nav-button"
-          />
+          {numDays > 1 && (
+            <Button
+              onClick={() => scrollByDay(1)}
+              disabled={reachedLastDay}
+              title={Translate.string('Next day')}
+              icon="angle right"
+              position="right"
+              styleName="nav-button"
+            />
+          )}
           {numDays > 2 && (
             <Button
               onClick={() => scrollByPage(1)}
