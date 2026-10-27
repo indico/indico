@@ -8,9 +8,10 @@
 import apiCategoryChildrenURL from 'indico-url:categories.api_category_children';
 import apiCategoryInfoURL from 'indico-url:categories.api_category_info';
 import apiEventListWithMetadataURL from 'indico-url:categories.api_event_list_with_metadata';
+import displayURL from 'indico-url:categories.display';
 import manageModerationURL from 'indico-url:categories.manage_moderation';
 
-import React, {useState} from 'react';
+import React from 'react';
 import remarkRehype from 'remark-rehype';
 
 import {CategoryCardList} from 'indico/NGUI/category/CategoryCardList';
@@ -28,12 +29,10 @@ import './Category.module.scss';
 
 interface CategoryProps {
   categoryId: number;
-  isFlatInit?: boolean;
+  isFlat?: boolean;
 }
 
-export function Category({categoryId, isFlatInit = false}: CategoryProps) {
-  const [isFlat, setIsFlat] = useState(isFlatInit);
-
+export function Category({categoryId, isFlat = false}: CategoryProps) {
   const {data: categoryInfo, loading: categoryLoading} = useIndicoAxios(
     {url: apiCategoryInfoURL({category_id: categoryId})},
     {camelize: true}
@@ -69,8 +68,8 @@ export function Category({categoryId, isFlatInit = false}: CategoryProps) {
 
   const totalEventCount =
     categoryEventListWithMeta?.eventListData.eventCount +
-    categoryEventListWithMeta?.eventListData.pastEventCount +
-    categoryEventListWithMeta?.eventListData.futureEventCount;
+      categoryEventListWithMeta?.eventListData.pastEventCount +
+      categoryEventListWithMeta?.eventListData.futureEventCount || 0;
 
   return (
     <div styleName="category-wrapper">
@@ -85,7 +84,6 @@ export function Category({categoryId, isFlatInit = false}: CategoryProps) {
                   name="url"
                   wrapper={<a href={manageModerationURL({category_id: categoryId})} />}
                 >
-                  {' '}
                   pending moderation
                 </Param>
                 .
@@ -97,7 +95,6 @@ export function Category({categoryId, isFlatInit = false}: CategoryProps) {
                   name="url"
                   wrapper={<a href={manageModerationURL({category_id: categoryId})} />}
                 >
-                  {' '}
                   pending moderation
                 </Param>
                 .
@@ -105,6 +102,21 @@ export function Category({categoryId, isFlatInit = false}: CategoryProps) {
             </PluralTranslate>
           </span>
         </MessageBox>
+      )}
+      {isFlat && (
+        <MessageBox type="highlight" icon={false}>
+          <span>
+            Displaying all the events from subcategories.{' '}
+            <a href={displayURL({category_id: categoryId})}>Go back to single category view. </a>
+          </span>
+        </MessageBox>
+      )}
+      {categoryEventListWithMeta && categoryEventListWithMeta.hasHiddenEvents && (
+        <MessageBox
+          type="highlight"
+          message={Translate.string('Some events in this category have been hidden.')}
+          customIcon="fas:eye-slash"
+        />
       )}
       {category.title === 'Home' && category.isRoot ? (
         category.hasChildren ? (
@@ -128,36 +140,24 @@ export function Category({categoryId, isFlatInit = false}: CategoryProps) {
           <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
         </div>
       </div>
-      {!category.hasChildren && totalEventCount === 0 && (
+      {!category.hasChildren && totalEventCount === 0 ? (
         <MessageBox
           type="info"
           message={Translate.string('This category is empty.')}
           icon={false}
           noBorder
         />
-      )}
-
-      {!isFlat && <CategoryCardList data={categoryChildren} columns={2} />}
-      {isFlat && (
-        <MessageBox type="highlight" icon={false}>
-          <span>
-            Displaying all the events from subcategories.{' '}
-            <a onClick={() => setIsFlat(prevIsFlat => !prevIsFlat)}>
-              Go back to single category view.{' '}
-            </a>
-          </span>
-        </MessageBox>
-      )}
-      {categoryEventListWithMeta && categoryEventListWithMeta.hasHiddenEvents && (
-        <MessageBox
-          type="highlight"
-          message={Translate.string('Some events in this category have been hidden.')}
-          customIcon="fas:eye-slash"
-          noBorder
-        />
-      )}
-      {!categoryEventListWithMetaDataLoading && categoryEventListWithMeta && (
-        <EventList viewData={categoryEventListWithMeta} categoryId={categoryId} isFlat={isFlat} />
+      ) : (
+        <>
+          {!isFlat && <CategoryCardList data={categoryChildren} columns={2} />}
+          {!categoryEventListWithMetaDataLoading && categoryEventListWithMeta && (
+            <EventList
+              viewData={categoryEventListWithMeta}
+              categoryId={categoryId}
+              isFlat={isFlat}
+            />
+          )}
+        </>
       )}
     </div>
   );
