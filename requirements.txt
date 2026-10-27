@@ -33,7 +33,7 @@ blinker==1.9.0
     #   flask-multipass
     #   flask-pluginengine
     #   sentry-sdk
-brotli==1.2.0
+brotli==1.2.1
     # via fonttools
 cachelib==0.15.4
     # via flask-caching
