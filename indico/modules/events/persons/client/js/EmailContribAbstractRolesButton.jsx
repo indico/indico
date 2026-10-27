@@ -24,12 +24,15 @@ export function EmailContribAbstractRolesButton({
   const [open, setOpen] = useState(false);
   const ids = idSelector && getIds(idSelector);
   const idType = {abstracts: 'abstract_id', contributions: 'contribution_id'}[objectContext];
+  const disabled = className.includes('disabled');
 
   return (
     <>
       <button
         type="button"
         className={`i-button icon-mail ${className}`}
+        aria-disabled={disabled ? 'true' : undefined}
+        tabIndex={disabled ? -1 : undefined}
         onClick={evt => {
           if (!evt.target.classList.contains('disabled')) {
             setOpen(true);
