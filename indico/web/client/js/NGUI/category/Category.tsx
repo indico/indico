@@ -62,14 +62,21 @@ export function Category({categoryId, isFlat = false}: CategoryProps) {
 
   const categoryEventListWithMeta = categoryEventListWithMetaData as CategoryEventListWithMetaData;
 
-  if (!category || categoryLoading || !categoryChildren || childrenLoading) {
+  if (
+    !category ||
+    categoryLoading ||
+    !categoryChildren ||
+    childrenLoading ||
+    !categoryEventListWithMeta ||
+    categoryEventListWithMetaDataLoading
+  ) {
     return null;
   }
 
   const totalEventCount =
-    categoryEventListWithMeta?.eventListData.eventCount +
-      categoryEventListWithMeta?.eventListData.pastEventCount +
-      categoryEventListWithMeta?.eventListData.futureEventCount || 0;
+    categoryEventListWithMeta.eventListData.eventCount +
+    categoryEventListWithMeta.eventListData.pastEventCount +
+    categoryEventListWithMeta.eventListData.futureEventCount;
 
   return (
     <div styleName="category-wrapper">
