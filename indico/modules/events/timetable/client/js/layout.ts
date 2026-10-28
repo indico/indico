@@ -290,7 +290,7 @@ export function layoutAfterUnscheduledDrop(
   const deltaMinutes = 0;
   const mousePositionX = (mouse.x - calendar.rect.left) / calendar.rect.width;
   const mousePositionY = mouse.y - calendar.rect.top - window.scrollY;
-  const startDt = moment(dt)
+  let startDt = moment(dt)
     .startOf('day')
     .add(snapMinutes(pixelsToMinutes(mousePositionY - offset.y)), 'minutes');
 
@@ -303,9 +303,14 @@ export function layoutAfterUnscheduledDrop(
     return;
   }
 
-  const endDt = moment(startDt).add(unscheduledEntry.duration, 'minutes');
-  if (startDt.isBefore(minStartDt) || endDt.isAfter(maxEndDt)) {
-    return;
+  let endDt = moment(startDt).add(unscheduledEntry.duration, 'minutes');
+  if (startDt.isBefore(minStartDt)) {
+    startDt = minStartDt.clone();
+  }
+  if (endDt.isAfter(maxEndDt)) {
+    const diff = endDt.diff(maxEndDt, 'minutes');
+    startDt = startDt.subtract(diff, 'minutes');
+    endDt = moment(startDt).add(unscheduledEntry.duration, 'minutes');
   }
 
   const entry: ContribEntry = {
