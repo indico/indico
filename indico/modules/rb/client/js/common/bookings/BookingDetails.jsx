@@ -14,21 +14,11 @@ import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {
-  Button,
-  Confirm,
-  Form,
-  Grid,
-  Header,
-  Icon,
-  Label,
-  List,
-  Message,
-  Modal,
-  Popup,
-} from 'semantic-ui-react';
+import {Button, Form, Grid, Header, Icon, Label, List, Message} from 'semantic-ui-react';
 
 import {ClipboardButton} from 'indico/react/components';
+import Modal, {NativeConfirm as Confirm} from 'indico/react/components/NativeModal';
+import {ContainedPopup as Popup, PopupMountScope} from 'indico/react/components/PopupMountScope';
 import {FinalCheckbox, FinalTextArea} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
@@ -87,6 +77,8 @@ class BookingDetails extends React.Component {
     },
   };
 
+  headingRef = React.createRef();
+
   showAcceptanceForm = () => {
     this.setState({acceptanceFormVisible: true});
   };
@@ -95,7 +87,8 @@ class BookingDetails extends React.Component {
     this.setState({acceptanceFormVisible: false});
   };
 
-  showOccurrences = () => {
+  showOccurrences = event => {
+    event?.currentTarget?.focus();
     this.setState({occurrencesVisible: true});
   };
 
@@ -165,9 +158,17 @@ class BookingDetails extends React.Component {
       );
     });
     return (
-      <Modal open={warningVisible} size="small" onClose={this.hidePreBookingWarning}>
+      <Modal
+        open={warningVisible}
+        size="small"
+        onClose={this.hidePreBookingWarning}
+        title={Translate.string('Warning')}
+        initialFocus="safe"
+      >
         <Modal.Header>
-          <Translate>Warning</Translate>
+          <h2>
+            <Translate>Warning</Translate>
+          </h2>
         </Modal.Header>
         <Modal.Content>
           <Translate>
@@ -211,8 +212,18 @@ class BookingDetails extends React.Component {
       return null;
     } else if (bookings[cancelDate] === undefined || bookings[cancelDate].length === 0) {
       return (
-        <Modal open size="tiny" onClose={() => openBookingDetails(id)}>
-          <Modal.Header>Cancellation not possible</Modal.Header>
+        <Modal
+          open
+          size="tiny"
+          onClose={() => openBookingDetails(id)}
+          title={Translate.string('Cancellation not possible')}
+          initialFocus="close"
+        >
+          <Modal.Header>
+            <h2>
+              <Translate>Cancellation not possible</Translate>
+            </h2>
+          </Modal.Header>
           <Modal.Content>
             <Translate>
               There is no occurrence on this date (
@@ -227,9 +238,17 @@ class BookingDetails extends React.Component {
       );
     } else if (!bookings[cancelDate][0].canCancel) {
       return (
-        <Modal open size="tiny" onClose={() => openBookingDetails(id)}>
+        <Modal
+          open
+          size="tiny"
+          onClose={() => openBookingDetails(id)}
+          title={Translate.string('Cancellation not possible')}
+          initialFocus="close"
+        >
           <Modal.Header>
-            <Translate>Cancellation not possible</Translate>
+            <h2>
+              <Translate>Cancellation not possible</Translate>
+            </h2>
           </Modal.Header>
           <Modal.Content>
             <Translate>
@@ -244,9 +263,17 @@ class BookingDetails extends React.Component {
       );
     } else {
       return (
-        <Modal open size="tiny" onClose={() => openBookingDetails(id)}>
+        <Modal
+          open
+          size="tiny"
+          onClose={() => openBookingDetails(id)}
+          title={Translate.string('Confirm cancellation')}
+          initialFocus="safe"
+        >
           <Modal.Header>
-            <Translate>Confirm cancellation</Translate>
+            <h2>
+              <Translate>Confirm cancellation</Translate>
+            </h2>
           </Modal.Header>
           <Modal.Content>
             <Translate>
@@ -525,7 +552,7 @@ class BookingDetails extends React.Component {
       <>
         <Button
           icon="trash"
-          onClick={() => this.showConfirm('delete')}
+          onClick={event => this.showConfirm('delete', event)}
           disabled={bookingStateChangeInProgress}
           negative
           circular
@@ -558,7 +585,8 @@ class BookingDetails extends React.Component {
     this.setState({activeConfirmation: null});
   };
 
-  showConfirm = type => {
+  showConfirm = (type, event) => {
+    event?.currentTarget?.focus();
     this.setState({activeConfirmation: type});
   };
 
@@ -643,6 +671,11 @@ class BookingDetails extends React.Component {
         icon="edit outline"
         styleName="accept-with-message"
         disabled={bookingStateChangeInProgress || acceptanceFormVisible}
+        content={
+          <span styleName="visually-hidden">
+            <Translate>Accept with message</Translate>
+          </span>
+        }
       />
     );
 
@@ -724,7 +757,7 @@ class BookingDetails extends React.Component {
               type="button"
               icon="cancel"
               size="small"
-              onClick={() => this.showConfirm('cancel')}
+              onClick={event => this.showConfirm('cancel', event)}
               loading={actionInProgress === 'cancel' && bookingStateChangeInProgress}
               disabled={bookingStateChangeInProgress}
               content={Translate.string('Cancel booking')}
@@ -733,9 +766,13 @@ class BookingDetails extends React.Component {
               open={activeConfirmation === 'cancel'}
               size="small"
               onClose={() => this.hideConfirm()}
+              title={Translate.string('Confirm cancellation')}
+              initialFocus="safe"
             >
               <Modal.Header>
-                <Translate>Confirm cancellation</Translate>
+                <h2>
+                  <Translate>Confirm cancellation</Translate>
+                </h2>
               </Modal.Header>
               <Modal.Content>
                 <p>
@@ -879,68 +916,96 @@ class BookingDetails extends React.Component {
 
     return (
       <>
-        <Modal onClose={() => onClose()} size="large" closeIcon open>
-          <Modal.Header styleName="booking-modal-header">
-            <span styleName="header-text">
-              <Translate>Booking Details</Translate>
-            </span>
-            <span styleName="booking-status">{this.renderBookingStatus()}</span>
-            <ClipboardButton
-              text={externalDetailsURL}
-              successText={Translate.string('Booking link copied')}
-            />
-            <span>
-              <Responsive.Tablet andLarger>
-                {canEdit && editButton({disabled: bookingStateChangeInProgress})}
-              </Responsive.Tablet>
-              {canDelete && this.renderDeleteButton()}
-            </span>
-          </Modal.Header>
-          <Modal.Content>
-            <Grid stackable columns={2}>
-              <Grid.Column>
-                <RoomBasicDetails room={room} />
-                <RoomKeyLocation room={room} />
-                <TimeInformation
-                  recurrence={recurrence}
-                  dates={dates}
-                  timeSlot={times}
-                  onClickOccurrences={this.showOccurrences}
-                  occurrenceCount={occurrenceCount}
-                  recurrenceWeekdays={recurrenceWeekdays}
-                />
-                {renderPluginComponents('rb-booking-detail-extra-fields', {booking})}
-              </Grid.Column>
-              <Grid.Column>
-                <>
-                  {bookedForUser && this.renderBookedFor(bookedForUser)}
-                  {bookingReason && this.renderReason(bookingReason)}
-                  {room.canUserViewInternalNotes && this.renderNotes(internalNote)}
-                  {isLinkedToObjects && <LazyBookingLinks id={id} />}
-                  {editLogs && this.renderBookingHistory(editLogs, createdDt, createdByUser)}
-                  {this.renderMessages(error, newBookingId)}
-                </>
-              </Grid.Column>
-            </Grid>
-          </Modal.Content>
-          {showActionButtons &&
-            this.renderActionButtons(
-              canCancel,
-              canReject,
-              showAccept,
-              cancellableOccurrenceCount,
-              isAccepted
-            )}
+        <Modal
+          onClose={() => onClose()}
+          onMount={() => this.headingRef.current?.focus()}
+          size="large"
+          closeIcon
+          open
+          title={Translate.string('Booking Details')}
+        >
+          <PopupMountScope>
+            <Modal.Header styleName="booking-modal-header">
+              <h2 ref={this.headingRef} tabIndex={-1} styleName="header-text">
+                <Translate>Booking Details</Translate>
+              </h2>
+              <span styleName="booking-status">{this.renderBookingStatus()}</span>
+              <ClipboardButton
+                text={externalDetailsURL}
+                successText={Translate.string('Booking link copied')}
+                buttonText={Translate.string('Copy booking link')}
+              />
+              <span>
+                <Responsive.Tablet andLarger>
+                  {canEdit && editButton({disabled: bookingStateChangeInProgress})}
+                </Responsive.Tablet>
+                {canDelete && this.renderDeleteButton()}
+              </span>
+            </Modal.Header>
+            <Modal.Content>
+              <Grid stackable columns={2}>
+                <Grid.Column>
+                  <RoomBasicDetails room={room} />
+                  <RoomKeyLocation room={room} />
+                  <TimeInformation
+                    recurrence={recurrence}
+                    dates={dates}
+                    timeSlot={times}
+                    onClickOccurrences={this.showOccurrences}
+                    occurrenceCount={occurrenceCount}
+                    recurrenceWeekdays={recurrenceWeekdays}
+                  />
+                  {renderPluginComponents('rb-booking-detail-extra-fields', {booking})}
+                </Grid.Column>
+                <Grid.Column>
+                  <>
+                    {bookedForUser && this.renderBookedFor(bookedForUser)}
+                    {bookingReason && this.renderReason(bookingReason)}
+                    {room.canUserViewInternalNotes && this.renderNotes(internalNote)}
+                    {isLinkedToObjects && <LazyBookingLinks id={id} />}
+                    {editLogs && this.renderBookingHistory(editLogs, createdDt, createdByUser)}
+                    {this.renderMessages(error, newBookingId)}
+                  </>
+                </Grid.Column>
+              </Grid>
+            </Modal.Content>
+            {showActionButtons &&
+              this.renderActionButtons(
+                canCancel,
+                canReject,
+                showAccept,
+                cancellableOccurrenceCount,
+                isAccepted
+              )}
+          </PopupMountScope>
         </Modal>
-        <Modal open={occurrencesVisible} onClose={this.hideOccurrences} size="large" closeIcon>
-          <Modal.Header className="legend-header">
-            <Translate>Occurrences</Translate>
-            <Popup
-              trigger={<Icon name="info circle" className="legend-info-icon" />}
-              content={<TimelineLegend labels={this.getLegendLabels(occurrences)} compact />}
-            />
-          </Modal.Header>
-          <Modal.Content>{this.renderTimeline(occurrences, dateRange)}</Modal.Content>
+        <Modal
+          open={occurrencesVisible}
+          onClose={this.hideOccurrences}
+          size="large"
+          closeIcon
+          title={Translate.string('Occurrences')}
+        >
+          <PopupMountScope>
+            <Modal.Header className="legend-header">
+              <h2>
+                <Translate>Occurrences</Translate>
+              </h2>
+              <Popup
+                trigger={
+                  <button type="button" className="legend-info-trigger">
+                    <Icon name="info circle" className="legend-info-icon" />
+                    <span styleName="visually-hidden">
+                      <Translate>Explain occurrence colors</Translate>
+                    </span>
+                  </button>
+                }
+                on={['hover', 'focus']}
+                content={<TimelineLegend labels={this.getLegendLabels(occurrences)} compact />}
+              />
+            </Modal.Header>
+            <Modal.Content>{this.renderTimeline(occurrences, dateRange)}</Modal.Content>
+          </PopupMountScope>
         </Modal>
         {this.renderCancelOccurrence(occurrences.bookings, id)}
         {this.renderPreBookingWarning()}

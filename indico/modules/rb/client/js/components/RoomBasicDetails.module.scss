@@ -7,6 +7,30 @@
 
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'design_system/visibility';
+
+.visually-hidden {
+  @extend %visually-hidden;
+}
+
+.photo-trigger {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.annotation-trigger {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: help;
+}
 
 .photo-dimmable-width {
   width: 100%;
@@ -64,6 +88,7 @@
     }
 
     &.clickable {
+      min-height: 170px;
       cursor: zoom-in !important;
     }
   }

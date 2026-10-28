@@ -10,8 +10,8 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Popup} from 'semantic-ui-react';
 
+import {ContainedPopup as Popup} from 'indico/react/components/PopupMountScope';
 import {PluralTranslate, Translate, Param} from 'indico/react/i18n';
 import {Responsive} from 'indico/react/util';
 import {serializeDate} from 'indico/utils/date';
@@ -143,8 +143,14 @@ export function isDateWithinRange(date, dateRange, _toMoment) {
 }
 
 export function PopupParam({content, children}) {
-  const trigger = <span>{children}</span>;
-  return <Popup trigger={trigger} content={content} position="right center" />;
+  const trigger = (
+    <button type="button" className="rb-popup-param-trigger">
+      {children}
+    </button>
+  );
+  return (
+    <Popup trigger={trigger} content={content} position="right center" on={['hover', 'focus']} />
+  );
 }
 
 PopupParam.propTypes = {
