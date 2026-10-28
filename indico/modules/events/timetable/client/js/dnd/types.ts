@@ -7,7 +7,7 @@
 
 import {MutableRefObject} from 'react';
 
-interface Coords {
+export interface Coords {
   x: number;
   y: number;
 }
@@ -66,7 +66,7 @@ export type OnDrop = (
   over: Over[],
   delta: Transform,
   mouse: MousePosition,
-  offset: MousePosition
+  offset: Coords
 ) => void;
 
 export type Modifier = ({
