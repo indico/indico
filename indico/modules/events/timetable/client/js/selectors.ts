@@ -24,6 +24,7 @@ import {
   Entry,
   isChildEntry,
   Entries,
+  isBlockEntry,
 } from './types';
 import {
   DAY_SIZE,
@@ -185,8 +186,7 @@ export const getExpandedSessionBlock = createSelector(
   getExpandedSessionBlockId,
   getCurrentDayEntries,
   (sessionBlockId, entries) =>
-    entries.find(entry => entry.type === EntryType.SessionBlock && entry.id === sessionBlockId) ??
-    null
+    entries.filter(entry => isBlockEntry(entry)).find(entry => entry.id === sessionBlockId) ?? null
 );
 
 export const getCurrentLimits = createSelector(
