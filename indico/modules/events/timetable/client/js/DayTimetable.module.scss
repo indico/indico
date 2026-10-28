@@ -133,6 +133,7 @@ $toolbar-bg-color: $raincloud-gray;
   right: 0;
   height: 0;
   pointer-events: none;
+  user-select: none;
   transition: top 0.05s;
 }
 
