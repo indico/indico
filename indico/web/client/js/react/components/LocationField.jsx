@@ -124,6 +124,7 @@ export default function LocationField({
             disabled={disabled}
           />
           <Popup
+            inverted
             trigger={<Icon color="grey" name="info circle" />}
             content={
               value.inheriting
