@@ -246,6 +246,11 @@ class RHContributionAuthor(RHContributionDisplayBase):
 
 
 class RHContributionExportToPDF(RHContributionDisplayBase):
+    def _check_access(self):
+        if not session.user:
+            raise Forbidden
+        RHContributionDisplayBase._check_access(self)
+
     def _process(self):
         if not config.LATEX_ENABLED:
             raise NotFound
@@ -254,6 +259,11 @@ class RHContributionExportToPDF(RHContributionDisplayBase):
 
 
 class RHContributionsExportToPDF(RHContributionList):
+    def _check_access(self):
+        if not session.user:
+            raise Forbidden
+        RHContributionList._check_access(self)
+
     def _process(self):
         if not config.LATEX_ENABLED:
             raise NotFound

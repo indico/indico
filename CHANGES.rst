@@ -10,7 +10,7 @@ Version 3.3.15
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Only allow logged-in users to generate contribution PDFs (:pr:`7836`)
 
 Bugfixes
 ^^^^^^^^
