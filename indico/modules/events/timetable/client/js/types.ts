@@ -180,6 +180,10 @@ export function isChildEntry(entry: Entry | ContribEntryWithoutLayout): entry is
   return !!entry['sessionBlockId'];
 }
 
+export function isBlockEntry(entry: TopLevelEntry): entry is BlockEntry {
+  return entry.type === EntryType.SessionBlock;
+}
+
 // Request objects (lowercase)
 
 export interface LocationParentObj {
