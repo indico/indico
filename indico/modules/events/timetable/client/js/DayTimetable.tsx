@@ -675,13 +675,14 @@ export function DayTimetable({
       }
 
       // Instead of starting to drag right away, wait to make sure this isn't just a mouse click
+      const locationParent = expandedSessionBlock?.childLocationParent ?? eventLocationParent;
       newEntryTimer = window.setTimeout(() => {
         dispatch(
           actions.setDraftEntry({
             startDt: moment.max(startDt, dt),
             duration,
-            locationParent: eventLocationParent,
-            locationData: {...eventLocationParent.location_data, inheriting: true},
+            locationParent,
+            locationData: {...locationParent.location_data, inheriting: true},
             y,
           })
         );
