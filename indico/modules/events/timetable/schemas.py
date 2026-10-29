@@ -5,33 +5,32 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from marshmallow import EXCLUDE, fields
+from marshmallow import fields
 
 from indico.core.marshmallow import mm
 from indico.modules.events.contributions.schemas import ContributionRESTSchema, TimezoneAwareSessionBlockSchema
-from indico.modules.events.person_link_schemas import SessionBlockPersonLinkSchema as _SessionBlockPersonLinkSchema
-from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.sessions.schemas import SessionColorSchema
+from indico.modules.events.sessions.schemas import SessionBlockRESTSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.serializer import TimetableSerializer
 from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested
 
 
-class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = SessionBlock
-        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'person_links', 'location_data', 'location_parent',
-                  'child_location_parent', 'session_id', 'session_title', 'attachments')
-        rh_context = ('event', {'object': 'session_block'})
+class SessionBlockSchema(SessionBlockRESTSchema):
+    class Meta(SessionBlockRESTSchema.Meta):
+        fields = (
+            *SessionBlockRESTSchema.Meta.fields,
+            'session_id',
+            'session_title',
+            'location_parent',
+            'child_location_parent',
+            'attachments',
+        )
 
-    start_dt = EventTimezoneDateTimeField()
-    location_data = fields.Nested(LocationDataSchema)
-    location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
-    child_location_parent = fields.Nested(LocationParentSchema)
-    person_links = NonPartialNested(_SessionBlockPersonLinkSchema(many=True, unknown=EXCLUDE))
-    duration = fields.TimeDelta(required=True)
+    session_id = fields.Int(dump_only=True)
     session_title = fields.String(attribute='session.title', dump_only=True)
+    location_parent = NonPartialNested(LocationParentSchema, attribute='resolved_location_parent')
+    child_location_parent = fields.Nested(LocationParentSchema)
     attachments = fields.Function(lambda obj: TimetableSerializer.get_attachment_data(obj.session))
 
 
