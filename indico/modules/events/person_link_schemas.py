@@ -81,6 +81,8 @@ class PersonLinkBaseSchema(mm.Schema):
         return self.get_person_link(data)
 
     def get_person_link(self, data):
+        # XXX If you end up here debugging why something is broken, check if you have
+        # 'object' in the context...
         return get_person_link(
             data,
             person_link_cls=self.opts.person_link_cls,
