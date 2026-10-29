@@ -100,11 +100,14 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
   );
 
   const onCreate = () => {
+    const locationParent = block.childLocationParent;
     const draftEntry = {
       sessionId: session.id,
       sessionBlockId: block.objId,
       duration: Math.min(20, block.duration),
       startDt: block.startDt,
+      locationParent,
+      locationData: {...locationParent.location_data, inheriting: true},
     };
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,
