@@ -81,7 +81,7 @@ export const getEntryURLByObjId = (
 ): string => {
   return {
     [EntryType.Break]: breakURL({event_id: eventId, break_id: entryObjId}),
-    [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entryObjId}),
+    [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, block_id: entryObjId}),
     [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entryObjId}),
   }[entryType];
 };

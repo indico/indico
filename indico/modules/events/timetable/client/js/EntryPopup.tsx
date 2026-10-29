@@ -106,7 +106,7 @@ function EntryPopupContent({
 
     const editURL = {
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: objId}),
-      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: objId}),
+      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, block_id: objId}),
       [EntryType.Break]: breakURL({event_id: eventId, break_id: objId}),
     }[type];
 

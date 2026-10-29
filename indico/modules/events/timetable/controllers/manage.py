@@ -40,6 +40,7 @@ from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableLegacy
 from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
 from indico.util.i18n import _
+from indico.util.marshmallow import ModelField
 from indico.web.args import use_kwargs, use_rh_args
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
@@ -209,9 +210,16 @@ class RHTimetableBreakCreate(RHManageEventBase):
 
 
 class RHTimetableBreak(RHManageEventBase):
-    def _process_args(self):
+    normalize_url_spec = {
+        'locators': {lambda self: self.break_},
+    }
+
+    @use_kwargs({
+        'break_': ModelField(Break, data_key='break_id'),
+    }, location='view_args')
+    def _process_args(self, break_):
         RHManageEventBase._process_args(self)
-        self.break_ = Break.query.filter_by(id=request.view_args['break_id']).one()
+        self.break_ = break_
 
     @use_rh_args(BreakSchema, partial=True)
     def _process_PATCH(self, data):
@@ -402,9 +410,17 @@ class RHTimetableSessionBlockCreate(RHManageEventBase):
 
 
 class RHTimetableSessionBlock(RHManageEventBase):
-    def _process_args(self):
+    normalize_url_spec = {
+        'locators': {lambda self: self.session_block},
+        'skipped_args': {'session_id'},
+    }
+
+    @use_kwargs({
+        'block': ModelField(SessionBlock, data_key='block_id'),
+    }, location='view_args')
+    def _process_args(self, block):
         RHManageEventBase._process_args(self)
-        self.session_block = SessionBlock.query.filter_by(id=request.view_args['session_block_id']).one()
+        self.session_block = block
 
     @use_rh_args(SessionBlockSchema, partial=True)
     def _process_PATCH(self, data):
