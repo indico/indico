@@ -11,13 +11,14 @@ import sessionColorURL from 'indico-url:sessions.api_random_session_color';
 import locationParentURL from 'indico-url:sessions.api_sessions_location_parent';
 import typesURL from 'indico-url:sessions.types_rest';
 
+import {FormApi} from 'final-form';
 import React, {useState, useEffect} from 'react';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
 
 import {FinalLocationField, FinalSessionColorPicker} from 'indico/react/components';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
 import {FinalDropdown, FinalDuration} from 'indico/react/forms/fields';
-import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
+import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
@@ -54,6 +55,7 @@ export function SessionFormFields({
           placeholder={Translate.string('No type selected')}
           options={sessionTypes}
           selection
+          nullIfEmpty
         />
       )}
       {eventType === 'conference' && (
@@ -131,12 +133,13 @@ export default function SessionEditForm({
     sessionURL({event_id: eventId, session_id: sessionId})
   );
 
-  const handleSubmit = async (formData: any) => {
-    if (formData.type === '') {
-      formData.type = null;
-    }
+  const handleSubmit = async (formData: any, form: FormApi) => {
+    const submitPayload = getChangedValues(formData, form);
     try {
-      await indicoAxios.patch(sessionURL({event_id: eventId, session_id: sessionId}), formData);
+      await indicoAxios.patch(
+        sessionURL({event_id: eventId, session_id: sessionId}),
+        submitPayload
+      );
     } catch (e) {
       return handleSubmitError(e);
     }
