@@ -461,7 +461,7 @@ export function deleteBlock(entry: BlockEntry, eventId: number) {
   return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
     const {staticData, entries} = getState();
     const eventType = staticData.eventType;
-    const entryURL = sessionBlockURL({event_id: eventId, session_block_id: entry.objId});
+    const entryURL = sessionBlockURL({event_id: eventId, block_id: entry.objId});
     const deleteParentSession =
       eventType === 'meeting' &&
       !Object.values(entries.entries).find(
@@ -577,7 +577,7 @@ export function updateEntry(
     } = getState();
     const updateURL = {
       [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.objId}),
-      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, session_block_id: entry.objId}),
+      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, block_id: entry.objId}),
       [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.objId}),
     }[entryType];
 

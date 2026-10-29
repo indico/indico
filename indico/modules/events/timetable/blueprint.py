@@ -91,7 +91,7 @@ _bp.add_url_rule('/timetable/schedule', 'tt_schedule', RHTimetableScheduleContri
                  methods=('POST',))
 _bp.add_url_rule('/timetable/session-block', 'tt_session_block_create', RHTimetableSessionBlockCreate,
                  methods=('POST',))
-_bp.add_url_rule('/timetable/session-block/<int:session_block_id>', 'tt_session_block_rest', RHTimetableSessionBlock,
+_bp.add_url_rule('/timetable/session-block/<int:block_id>', 'tt_session_block_rest', RHTimetableSessionBlock,
                  methods=('GET', 'PATCH', 'DELETE'))
 
 # Display
