@@ -94,7 +94,7 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
   const eventId = useSelector(selectors.getEventId);
   const block = useSelector(selectors.getCurrentDayEntries).find(
     (e): e is BlockEntry => e.id === id
-  );
+  )!;
   const session = useSelector((state: ReduxState) =>
     selectors.getSessionById(state, block.sessionId)
   );
