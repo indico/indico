@@ -74,8 +74,8 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) =
         />
         <Button
           type="button"
-          icon="trash"
-          title={Translate.string('Delete')}
+          icon="calendar"
+          title={Translate.string('Unschedule')}
           basic
           size="small"
           onClick={onDelete}
