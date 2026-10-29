@@ -253,7 +253,7 @@ export function EditSessionButton({eventId, sessionId, eventType}: EditSessionBu
   return (
     <>
       <a
-        className="i-link highlight icon-edit hide-if-locked"
+        className="i-link highlight icon-edit hide-if-locked js-hide-balloon"
         title={Translate.string('Edit this session (new React-based dialog)')}
         onClick={evt => {
           evt.preventDefault();
