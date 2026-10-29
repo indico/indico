@@ -91,17 +91,6 @@ class SessionBlockPersonLinkSchema(mm.SQLAlchemyAutoSchema):
         return data
 
 
-# TODO: (Ajob) Get rid of this schema and use timetable SessionBlockSchema
-class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = SessionBlock
-        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'person_links', 'location_data', 'session_id')
-
-    start_dt = fields.DateTime()
-    location_data = fields.Nested(LocationDataSchema)
-    person_links = NonPartialNested(_SessionBlockPersonLinkSchema(many=True, unknown=EXCLUDE))
-
-
 class SessionBlockRESTSchema(mm.SQLAlchemyAutoSchema):
     """Schema for RESTful operations on session blocks."""
 

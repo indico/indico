@@ -26,12 +26,11 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
 from indico.modules.events.sessions.operations import (create_session, delete_session, update_session,
                                                        update_session_block)
-from indico.modules.events.sessions.schemas import (SessionBlockRESTSchema, SessionBlockSchema, SessionColorSchema,
-                                                    SessionSchema, SessionTypeSchema)
+from indico.modules.events.sessions.schemas import (SessionBlockRESTSchema, SessionColorSchema, SessionSchema,
+                                                    SessionTypeSchema)
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
                                                  render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
-from indico.modules.events.timetable.operations import create_session_block_entry
 from indico.modules.events.util import get_random_color, track_location_changes, track_time_changes
 from indico.modules.logs import LogKind
 from indico.util.locations import LocationParentSchema
@@ -221,13 +220,6 @@ class RHAPICreateSession(RHManageSessionsBase):
         return SessionSchema().jsonify(session)
 
 
-class RHAPICreateSessionBlock(RHManageSessionBase):
-
-    @use_args(SessionBlockSchema)
-    def _process_POST(self, data: SessionBlock):
-        return create_session_block_entry(self.session, data)
-
-
 class RHAPISessionRandomColor(RHManageSessionsBase):
 
     def _process(self):
@@ -268,7 +260,7 @@ class RHAPISessionBlock(RHManageSessionBase):  # this one
     def _process_PATCH(self, data):
         with track_location_changes(), track_time_changes():
             update_session_block(self.session_block, data)
-        return SessionBlockSchema().jsonify(self.session_block)
+        return SessionBlockRESTSchema().jsonify(self.session_block)
 
 
 class RHAPISessionBlocksInheritedLocation(RHManageSessionBase):

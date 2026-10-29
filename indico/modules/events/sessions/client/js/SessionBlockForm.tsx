@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import locationParentURL from 'indico-url:sessions.api_blocks_location_parent';
-import sessionBlockCreateURL from 'indico-url:sessions.api_create_session_block';
 import sessionBlockURL from 'indico-url:sessions.api_manage_block';
 
 import {FormApi} from 'final-form';
@@ -81,12 +80,7 @@ export function SessionBlockFormFields({
   );
 }
 
-export default function SessionBlockEditForm({
-  eventId,
-  sessionId,
-  blockId,
-  onClose,
-}: SessionBlockEditFormProps) {
+function SessionBlockEditForm({eventId, sessionId, blockId, onClose}: SessionBlockEditFormProps) {
   const {data: blockData, loading} = useIndicoAxios(
     sessionBlockURL({event_id: eventId, session_id: sessionId, block_id: blockId})
   );
@@ -154,58 +148,6 @@ export default function SessionBlockEditForm({
         ...blockData,
         person_links: camelizeKeys(blockData.person_links),
       }}
-      size="small"
-    >
-      <SessionBlockFormFields eventId={eventId} locationParent={locationParent} />
-    </FinalModalForm>
-  );
-}
-
-interface SessionBlockCreateFormProps {
-  eventId: number;
-  sessionId: number;
-  onClose: () => void;
-}
-
-export function SessionBlockCreateForm({eventId, sessionId, onClose}: SessionBlockCreateFormProps) {
-  const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
-    locationParentURL({event_id: eventId, session_id: sessionId})
-  );
-
-  const handleSubmit = async (formData: any) => {
-    try {
-      await indicoAxios.patch(
-        sessionBlockCreateURL({event_id: eventId, session_id: sessionId}),
-        formData
-      );
-    } catch (e) {
-      return handleSubmitError(e);
-    }
-    location.reload();
-    // never finish submitting to avoid fields being re-enabled
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    await new Promise(() => {});
-  };
-
-  if (locationParentLoading) {
-    return (
-      <Dimmer active>
-        <Loader />
-      </Dimmer>
-    );
-  }
-
-  const locationData = locationParent
-    ? {...locationParent.location_data, inheriting: true}
-    : {inheriting: false};
-
-  return (
-    <FinalModalForm
-      id="session-block-form"
-      header={Translate.string('Add new session block')}
-      onSubmit={handleSubmit}
-      onClose={onClose}
-      initialValues={{location_data: locationData}}
       size="small"
     >
       <SessionBlockFormFields eventId={eventId} locationParent={locationParent} />
