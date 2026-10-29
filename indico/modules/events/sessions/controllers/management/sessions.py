@@ -207,13 +207,11 @@ class RHAPISession(RHManageSessionBase):
 
 
 class RHAPISessionList(RHManageSessionsBase):
-
     def _process(self):
         return SessionSchema(many=True).jsonify(self.event.sessions)
 
 
 class RHAPICreateSession(RHManageSessionsBase):
-
     @use_args(SessionSchema)
     def _process_POST(self, data):
         session = create_session(self.event, data)
@@ -221,13 +219,11 @@ class RHAPICreateSession(RHManageSessionsBase):
 
 
 class RHAPISessionRandomColor(RHManageSessionsBase):
-
     def _process(self):
         return SessionColorSchema().jsonify(get_random_color(self.event))
 
 
 class RHAPISessionColors(RHManageSessionsBase):
-
     def _process(self):
         return SessionColorSchema(many=True).jsonify(get_colors())
 
