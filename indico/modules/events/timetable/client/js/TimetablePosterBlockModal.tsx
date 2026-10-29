@@ -119,10 +119,6 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
     });
   };
 
-  if (!(block || session)) {
-    return;
-  }
-
   const children = block.children.sort((c1, c2) => c1.title.localeCompare(c2.title));
 
   return (
