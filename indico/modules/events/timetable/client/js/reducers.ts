@@ -255,7 +255,9 @@ export default {
       case actions.EDIT_SESSION:
         return {
           ...state,
-          ...{[action.session.id]: {...action.session}},
+          // XXX we receive a full session in the action, but `attachments` is not returned
+          // by the API so we still need to merge it into the existing session data
+          ...{[action.session.id]: {...state[action.session.id], ...action.session}},
         };
       case actions.DELETE_BLOCK: {
         const {entry, deleteParentSession} = action;
