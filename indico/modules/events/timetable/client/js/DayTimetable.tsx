@@ -611,7 +611,7 @@ export function DayTimetable({
       const {type, id}: AttachmentUpdatedEventDetail = (event as CustomEvent).detail;
       const url =
         type === EntryType.SessionBlock
-          ? sessionBlockURL({event_id: eventId, session_block_id: id})
+          ? sessionBlockURL({event_id: eventId, block_id: id})
           : contributionURL({event_id: eventId, contrib_id: id});
       let entry;
       try {
