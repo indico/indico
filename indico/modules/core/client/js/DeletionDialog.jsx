@@ -7,7 +7,6 @@
 
 import PropTypes from 'prop-types';
 import React, {useEffect, useState} from 'react';
-import ReactDOM from 'react-dom';
 import {Button, Message, Modal, Icon, Popup} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
@@ -24,13 +23,18 @@ const DeleteDialog = ({
   onClose,
   isDeleting,
   recordName,
+  countdownSeconds,
 }) => {
-  const [countdown, setCountdown] = useState(10);
+  const initialCountdown = Number.isFinite(Number(countdownSeconds))
+    ? Number(countdownSeconds)
+    : 10;
+  const [countdown, setCountdown] = useState(initialCountdown);
   const [isButtonDisabled, setButtonDisabled] = useState(true);
 
   useEffect(() => {
     if (open) {
-      setCountdown(10);
+      const start = Number.isFinite(Number(countdownSeconds)) ? Number(countdownSeconds) : 10;
+      setCountdown(start);
       setButtonDisabled(true);
       const timer = setInterval(() => {
         setCountdown(prevCountdown => {
@@ -44,7 +48,7 @@ const DeleteDialog = ({
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [open]);
+  }, [open, countdownSeconds]);
 
   return (
     <Modal
@@ -109,13 +113,25 @@ const GenericDeleteButton = ({
   disabledMessage,
   icon,
   iconColor,
+  countdownSeconds,
+  method,
+  dataParams,
+  buttonClass,
 }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  const normalizedMethod = (method || 'DELETE').toUpperCase() === 'POST' ? 'POST' : 'DELETE';
+  const normalizedDataParams = JSON.parse(dataParams) || {};
+
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
-      await indicoAxios.delete(deleteURL);
+      if (normalizedMethod === 'POST') {
+        await indicoAxios.post(deleteURL, normalizedDataParams);
+      } else {
+        await indicoAxios.delete(deleteURL);
+      }
     } catch (err) {
       setIsDeleting(false);
       setIsDialogOpen(false);
@@ -158,6 +174,14 @@ const GenericDeleteButton = ({
     );
   }
 
+  const buttonProps = {};
+  if (buttonClass === 'basic') {
+    buttonProps.basic = true;
+  }
+  if (buttonClass === 'small') {
+    buttonProps.size = 'small';
+  }
+
   return (
     <>
       {icon ? (
@@ -176,7 +200,7 @@ const GenericDeleteButton = ({
         />
       ) : (
         <Button
-          size="small"
+          {...buttonProps}
           color="red"
           onClick={() => setIsDialogOpen(true)}
           disabled={isDeleting || isDisabled}
@@ -195,6 +219,7 @@ const GenericDeleteButton = ({
         onClose={() => setIsDialogOpen(false)}
         isDeleting={isDeleting}
         childrenHTML={childrenHTML}
+        countdownSeconds={countdownSeconds}
       />
     </>
   );
@@ -214,6 +239,10 @@ GenericDeleteButton.propTypes = {
   disabledMessage: PropTypes.string,
   icon: PropTypes.string,
   iconColor: PropTypes.string,
+  countdownSeconds: PropTypes.number,
+  method: PropTypes.oneOf(['DELETE', 'POST']),
+  dataParams: PropTypes.object,
+  buttonClass: PropTypes.oneOf(['small', 'basic']),
 };
 
 DeleteDialog.propTypes = {
@@ -227,38 +256,13 @@ DeleteDialog.propTypes = {
   recordName: PropTypes.string.isRequired,
   childrenHTML: PropTypes.string,
   cancelText: PropTypes.string.isRequired,
+  countdownSeconds: PropTypes.number,
 };
 
 DeleteDialog.defaultProps = {
   isDeleting: false,
+  countdownSeconds: 10,
 };
 
-customElements.define(
-  'ind-delete-button',
-  class extends HTMLElement {
-    connectedCallback() {
-      requestAnimationFrame(() => {
-        ReactDOM.render(
-          <GenericDeleteButton
-            title={this.getAttribute('dialog-title')}
-            buttonLabel={this.getAttribute('button-label')}
-            message={this.getAttribute('message')}
-            cancelText={this.getAttribute('cancel-text')}
-            confirmText={this.getAttribute('confirm-text')}
-            recordName={this.getAttribute('record-name')}
-            deleteURL={this.getAttribute('delete-url')}
-            redirectURL={this.getAttribute('redirect-url')}
-            isDisabled={JSON.parse(this.getAttribute('is-disabled') || 'false')}
-            disabledMessage={this.getAttribute('disabled-message')}
-            icon={this.getAttribute('icon')}
-            iconColor={this.getAttribute('icon-color')}
-            childrenHTML={this.innerHTML}
-          />,
-          this
-        );
-      });
-    }
-  }
-);
-
+export {DeleteDialog, GenericDeleteButton};
 export default GenericDeleteButton;
