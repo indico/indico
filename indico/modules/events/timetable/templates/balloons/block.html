@@ -23,18 +23,11 @@
             {% if editable and can_manage_blocks %}
                 {% set title="'%s'" | format(block.title) if block.title else '' %}
                 <div class="group right entry-action-buttons hide-if-locked">
-                    <a href="#" id="block-{{ block.id }}-edit-trigger"
-                            class="icon-edit i-link highlight"
-                            title="{% trans %}NEW Edit session block{% endtrans %}"></a>
-                    <div
-                        id="block-{{ block.id }}-edit"
-                        data-event-id="{{ event.id }}"
-                        data-session-id="{{ block.session.id }}"
-                        data-block-id="{{ block.id }}">
-                    </div>
-                    <script>
-                        setupSessionBlockForm('#block-{{ block.id }}-edit', '#block-{{ block.id }}-edit-trigger');
-                    </script>
+                    <ind-edit-session-block
+                       event-id="{{ event.id }}"
+                       session-id="{{ block.session.id }}"
+                       block-id="{{ block.id }}"
+                       search-token="{{ make_user_search_token() }}"></ind-edit-session-block>
                     <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"
                        title="{% trans %}Edit session block{% endtrans %}"
                        data-title="{% trans %}Edit session block {{ title }}{% endtrans %}"></a>
@@ -60,6 +53,10 @@
                            title="{% trans %}Edit session{% endtrans %}"
                            data-extra-params='{"edit_session": 1}'
                            data-title="{% trans title=block.session.title %}Edit session '{{ title }}'{% endtrans %}"></a>
+                        <ind-edit-session
+                            event-id="{{ event.id }}"
+                            session-id="{{ block.session.id }}"
+                            event-type="{{ event.type }}"></ind-edit-session>
                         <a class="i-link icon-shield js-hide-balloon"
                            title="{% trans %}Manage session protection{% endtrans %}"
                            data-href="{{ url_for('sessions.session_protection', block.session) }}"

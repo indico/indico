@@ -66,7 +66,7 @@ class SessionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Session
         fields = ('id', 'title', 'code', 'description', 'default_contribution_duration',
-                  'type', 'location_data', 'colors')
+                  'type', 'location_data', 'colors', 'is_poster')
 
     colors = fields.Nested(SessionColorSchema)
     type = ModelField(SessionType, allow_none=True)
