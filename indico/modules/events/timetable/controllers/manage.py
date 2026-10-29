@@ -210,9 +210,16 @@ class RHTimetableBreakCreate(RHManageEventBase):
 
 
 class RHTimetableBreak(RHManageEventBase):
-    def _process_args(self):
+    normalize_url_spec = {
+        'locators': {lambda self: self.break_},
+    }
+
+    @use_kwargs({
+        'break_': ModelField(Break, data_key='break_id'),
+    }, location='view_args')
+    def _process_args(self, break_):
         RHManageEventBase._process_args(self)
-        self.break_ = Break.query.filter_by(id=request.view_args['break_id']).one()
+        self.break_ = break_
 
     @use_rh_args(BreakSchema, partial=True)
     def _process_PATCH(self, data):
