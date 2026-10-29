@@ -12,8 +12,8 @@ import locationParentURL from 'indico-url:sessions.api_sessions_location_parent'
 import typesURL from 'indico-url:sessions.types_rest';
 
 import {FormApi} from 'final-form';
-import React, {useState, useEffect} from 'react';
-import {Button, Dimmer, Loader} from 'semantic-ui-react';
+import React, {useState} from 'react';
+import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {FinalLocationField, FinalSessionColorPicker} from 'indico/react/components';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
@@ -244,43 +244,23 @@ export function SessionCreateForm({eventId, eventType, onClose}: SessionCreateFo
 interface EditSessionButtonProps {
   eventId: number;
   sessionId: number;
-  eventTitle: string;
   eventType: string;
-  triggerSelector?: string;
-  [key: string]: any;
 }
 
-export function EditSessionButton({
-  eventId,
-  sessionId,
-  eventTitle,
-  eventType,
-  triggerSelector,
-  ...rest
-}: EditSessionButtonProps) {
+export function EditSessionButton({eventId, sessionId, eventType}: EditSessionButtonProps) {
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!triggerSelector) {
-      return;
-    }
-    const handler = () => setOpen(true);
-    const element = document.querySelector(triggerSelector);
-    if (!element) {
-      console.error(`No element matched ${triggerSelector}`);
-      return;
-    }
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
 
   return (
     <>
-      {!triggerSelector && (
-        <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Edit contribution</Translate>
-        </Button>
-      )}
+      <a
+        className="i-link highlight icon-edit hide-if-locked"
+        title={Translate.string('Edit this session (new React-based dialog)')}
+        onClick={evt => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          setOpen(true);
+        }}
+      />
       {open && (
         <SessionEditForm
           eventId={eventId}
@@ -293,42 +273,19 @@ export function EditSessionButton({
   );
 }
 
-interface AddSessionButtonProps {
+interface CreateSessionButtonProps {
   eventId: number;
   eventType: string;
-  triggerSelector?: string;
-  [key: string]: any;
 }
 
-export function AddSessionButton({
-  eventId,
-  eventType,
-  triggerSelector,
-  ...rest
-}: AddSessionButtonProps) {
+export function CreateSessionButton({eventId, eventType}: CreateSessionButtonProps) {
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!triggerSelector) {
-      return;
-    }
-    const handler = () => setOpen(true);
-    const element = document.querySelector(triggerSelector);
-    if (!element) {
-      console.error(`No element matched ${triggerSelector}`);
-      return;
-    }
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
 
   return (
     <>
-      {!triggerSelector && (
-        <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Edit contribution</Translate>
-        </Button>
-      )}
+      <button type="button" className="i-button highlight icon-plus" onClick={() => setOpen(true)}>
+        <Translate>Add new session (React)</Translate>
+      </button>
       {open && (
         <SessionCreateForm eventId={eventId} eventType={eventType} onClose={() => setOpen(false)} />
       )}
