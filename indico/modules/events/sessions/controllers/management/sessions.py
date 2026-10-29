@@ -197,7 +197,6 @@ class RHAPISession(RHManageSessionBase):
 
     @use_args(SessionSchema, partial=True)
     def _process_PATCH(self, data):
-        print('session data', data)
         with track_location_changes():
             update_session(self.session, data)
         return SessionSchema().jsonify(self.session)
@@ -261,10 +260,8 @@ class RHAPISessionBlock(RHManageSessionBase):
     def _process_GET(self):
         return SessionBlockSchema().jsonify(self.session_block)
 
-    # @use_args(SessionBlockSchema)
     @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event, 'object': self.session_block})
     def _process_PATCH(self, data):
-        print('session block data', data)
         with track_location_changes(), track_time_changes():
             update_session_block(self.session_block, data)
         return SessionBlockSchema().jsonify(self.session_block)
