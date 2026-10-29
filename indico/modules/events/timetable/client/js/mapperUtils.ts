@@ -59,12 +59,7 @@ const entryMapperConfig: MapperConfig<Record<string, unknown>, Entry> = [
     fromTransform: l => mapDataToLocationData(l),
     toTransform: l => mapLocationDataToData(l),
   },
-  {
-    from: 'location_parent',
-    to: 'locationParent',
-    fromTransform: l => mapDataToLocationData(l),
-    toTransform: l => mapLocationDataToData(l),
-  },
+  {from: 'location_parent', to: 'locationParent'},
   {from: 'child_location_parent', to: 'childLocationParent'},
   {from: 'code', to: 'code'},
   {from: 'keywords', to: 'keywords'},
