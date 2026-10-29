@@ -16,7 +16,7 @@ import {useDispatch, useSelector} from 'react-redux/es';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {SessionForm} from 'indico/modules/events/sessions/SessionForm';
-import {getChangedValues} from 'indico/react/forms';
+import {getChangedValues, handleSubmitError} from 'indico/react/forms';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
@@ -43,8 +43,12 @@ export function TimetableSessionEditModal({sessionId, onClose}: TimetableSession
     sessionURL({event_id: eventId, session_id: sessionId})
   );
 
-  const handleSubmit = (formData: any, form: FormApi) => {
-    dispatch(actions.editSession(formData.id, getChangedValues(formData, form)));
+  const handleSubmit = async (formData: any, form: FormApi) => {
+    try {
+      await dispatch(actions.editSession(formData.id, getChangedValues(formData, form)));
+    } catch (exc) {
+      return handleSubmitError(exc);
+    }
     onClose();
   };
 
@@ -96,8 +100,13 @@ export function TimetableSessionCreateModal({onClose}: TimetableSessionCreateMod
     sessionColorURL({event_id: eventId})
   );
 
-  const handleSubmit = (formData: any) => {
-    dispatch(actions.createSession(formData));
+  const handleSubmit = async (formData: any) => {
+    try {
+      await dispatch(actions.createSession(formData));
+    } catch (exc) {
+      return handleSubmitError(exc);
+    }
+
     onClose();
   };
 

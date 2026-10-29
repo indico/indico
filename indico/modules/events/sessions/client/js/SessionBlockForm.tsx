@@ -9,9 +9,9 @@ import locationParentURL from 'indico-url:sessions.api_blocks_location_parent';
 import sessionBlockCreateURL from 'indico-url:sessions.api_create_session_block';
 import sessionBlockURL from 'indico-url:sessions.api_manage_block';
 
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import {Field} from 'react-final-form';
-import {Button, Dimmer, Loader} from 'semantic-ui-react';
+import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {LocationParentObj} from 'indico/modules/events/timetable/types';
 import {FinalLocationField, FinalSessionBlockPersonLinkField} from 'indico/react/components';
@@ -213,39 +213,20 @@ interface EditSessionBlockButtonProps {
   eventId: number;
   sessionId: number;
   blockId: number;
-  triggerSelector?: string;
 }
 
-export function EditSessionBlockButton({
-  eventId,
-  sessionId,
-  blockId,
-  triggerSelector,
-  ...rest
-}: EditSessionBlockButtonProps) {
+export function EditSessionBlockButton({eventId, sessionId, blockId}: EditSessionBlockButtonProps) {
   const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!triggerSelector) {
-      return;
-    }
-    const handler = () => setOpen(true);
-    const element = document.querySelector(triggerSelector);
-    if (!element) {
-      console.error(`No element matched ${triggerSelector}`);
-      return;
-    }
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
 
   return (
     <>
-      {!triggerSelector && (
-        <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Edit contribution</Translate>
-        </Button>
-      )}
+      <a
+        className="i-link highlight icon-edit js-hide-balloon"
+        title={Translate.string('Edit session block (new React-based dialog)')}
+        onClick={() => {
+          setOpen(true);
+        }}
+      />
       {open && (
         <SessionBlockEditForm
           eventId={eventId}

@@ -266,26 +266,24 @@ export function setSessionData(data: any): SetSessionDataAction {
 }
 
 export function editSession(sessionId: number, payload: Record<string, unknown>) {
-  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+  return async (
+    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
+    getState: () => ReduxState
+  ) => {
     const {
       staticData: {eventId},
-      sessions,
     } = getState();
     const url = sessionURL({event_id: eventId, session_id: sessionId});
-    const partialSession = mapDataToSession(payload, true);
-    const changedSession = {...sessions[sessionId], ...partialSession};
-
-    return dispatch(
-      synchronizedAjaxAction(() => indicoAxios.patch(url, payload), {
-        type: EDIT_SESSION,
-        session: changedSession,
-      })
-    );
+    const resp = await indicoAxios.patch(url, payload);
+    return dispatch({
+      type: EDIT_SESSION,
+      session: mapDataToSession(resp.data),
+    });
   };
 }
 
 // TODO: (Ajob) Implement interface for raw data session (e.g. uses ColorSchema)
-export function createSession(session) {
+export function createSession(session: any) {
   return async (
     dispatch: ThunkDispatch<ReduxState, unknown, Action>,
     getState: () => ReduxState
@@ -295,20 +293,16 @@ export function createSession(session) {
     } = getState();
     const url = createSessionURL({event_id: eventId});
 
-    try {
-      if (!session.colors) {
-        session.colors = parseColorsToSchema(getRandomColors());
-      }
-
-      const {data: newSession} = await indicoAxios.post(url, session);
-
-      return dispatch({
-        type: CREATE_SESSION,
-        session: mapDataToSession(newSession),
-      });
-    } catch (e) {
-      handleAxiosError(e);
+    if (!session.colors) {
+      session.colors = parseColorsToSchema(getRandomColors());
     }
+
+    const {data: newSession} = await indicoAxios.post(url, session);
+
+    return dispatch({
+      type: CREATE_SESSION,
+      session: mapDataToSession(newSession),
+    });
   };
 }
 
