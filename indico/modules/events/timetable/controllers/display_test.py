@@ -8,9 +8,10 @@
 from unittest.mock import MagicMock
 
 import pytest
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.modules.events.contributions import contribution_settings
 from indico.modules.events.timetable.controllers.display import RHTimetableEntryInfo
 
 
@@ -31,3 +32,15 @@ def test_timetable_entry_info_access(dummy_event, dummy_user, allowed, event_all
     else:
         with pytest.raises(Forbidden):
             rh._check_access()
+
+
+@pytest.mark.usefixtures('request_context')
+def test_timetable_entry_info_unpublished(dummy_event):
+    rh = RHTimetableEntryInfo()
+    rh.event = dummy_event
+    rh.entry = MagicMock()
+    rh.entry.can_view.return_value = True
+    rh._check_access()
+    contribution_settings.set(dummy_event, 'published', False)
+    with pytest.raises(NotFound):
+        rh._check_access()

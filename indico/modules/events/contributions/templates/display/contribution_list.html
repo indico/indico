@@ -37,7 +37,7 @@
                 </div>
             {% endif %}
             <div class="group">
-                {% if indico_config.LATEX_ENABLED %}
+                {% if indico_config.LATEX_ENABLED and session.user %}
                     <ind-with-tooltip>
                         <a href="{{ url_for('contributions.contribution_list_pdf', event) }}"
                            class="i-button icon-only icon-file-pdf">

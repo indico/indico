@@ -10,14 +10,19 @@ Version 3.3.15
 Improvements
 ^^^^^^^^^^^^
 
-- Nothing so far :(
+- Only allow logged-in users to generate contribution PDFs (:pr:`7836`)
 
 Bugfixes
 ^^^^^^^^
 
 - Fix the legacy room export API rejecting location names that contain a hyphen
   (:issue:`6527`, :pr:`7806`, thanks :user:`Thanatos9404`)
+- Keep date pickers and other fixed-position popups beside their fields in modal dialogs
+  (:pr:`7845`, thanks :user:`foxbunny`)
 - Enable CSRF check on oauth authorization endpoint (:pr:`7818`)
+- Add missing checks for timetable draft mode (:pr:`7821`)
+- Take the user from the API token into account when serializing attachments
+  in the timetable export API (:pr:`7822`)
 
 Accessibility
 ^^^^^^^^^^^^^
@@ -177,7 +182,7 @@ Bugfixes
 ^^^^^^^^
 
 - Correctly restrict user access to their logs (:pr:`7404`)
-- Correctly restrict access to draft contribution list (:pr:`7408`)
+- Correctly restrict access to draft contribution list (:pr:`7409`)
 - Use new MS Outlook URL in the share widget (:pr:`7424`, thanks :user:`hirishh`)
 - Fix editing contribution time from timetable bubbles when the CSP is enabled
   (:pr:`7432`)

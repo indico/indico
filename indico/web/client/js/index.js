@@ -20,6 +20,7 @@ import '../styles/screen.scss';
 import '../styles/editor-output.scss';
 import '../styles/tinymce.scss';
 import 'indico-sui-theme/semantic.css';
+import '../styles/semantic-overrides.scss';
 import 'rc-time-picker/assets/index.css';
 
 import showReactErrorDialog from 'indico/react/errors';
