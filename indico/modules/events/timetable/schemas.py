@@ -27,7 +27,6 @@ class SessionBlockSchema(SessionBlockRESTSchema):
             'attachments',
         )
 
-    session_id = fields.Int(dump_only=True)
     session_title = fields.String(attribute='session.title', dump_only=True)
     location_parent = NonPartialNested(LocationParentSchema, attribute='resolved_location_parent')
     child_location_parent = fields.Nested(LocationParentSchema)
