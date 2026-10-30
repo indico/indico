@@ -113,6 +113,7 @@ class RHManageSessionTimetable(RHManageTimetableBase):
             event_info=event_info,
             timetable_data=timetable_data,
             session_=self.session,
+            show_new_timetable_button=False,
             **management_rights,
         )
 
