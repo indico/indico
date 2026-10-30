@@ -26,17 +26,17 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
 from indico.modules.events.sessions.operations import (create_session, delete_session, update_session,
                                                        update_session_block)
-from indico.modules.events.sessions.schemas import (SessionBlockSchema, SessionColorSchema, SessionSchema,
+from indico.modules.events.sessions.schemas import (SessionBlockRESTSchema, SessionColorSchema, SessionSchema,
                                                     SessionTypeSchema)
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
                                                  render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
-from indico.modules.events.timetable.operations import create_session_block_entry
 from indico.modules.events.util import get_random_color, track_location_changes, track_time_changes
 from indico.modules.logs import LogKind
 from indico.util.locations import LocationParentSchema
+from indico.util.marshmallow import ModelField
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.args import use_args, use_args_schema_context
+from indico.web.args import use_args, use_kwargs, use_rh_args
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
@@ -207,34 +207,23 @@ class RHAPISession(RHManageSessionBase):
 
 
 class RHAPISessionList(RHManageSessionsBase):
-
     def _process(self):
         return SessionSchema(many=True).jsonify(self.event.sessions)
 
 
 class RHAPICreateSession(RHManageSessionsBase):
-
     @use_args(SessionSchema)
     def _process_POST(self, data):
         session = create_session(self.event, data)
         return SessionSchema().jsonify(session)
 
 
-class RHAPICreateSessionBlock(RHManageSessionBase):
-
-    @use_args(SessionBlockSchema)
-    def _process_POST(self, data: SessionBlock):
-        return create_session_block_entry(self.session, data)
-
-
 class RHAPISessionRandomColor(RHManageSessionsBase):
-
     def _process(self):
         return SessionColorSchema().jsonify(get_random_color(self.event))
 
 
 class RHAPISessionColors(RHManageSessionsBase):
-
     def _process(self):
         return SessionColorSchema(many=True).jsonify(get_colors())
 
@@ -253,18 +242,21 @@ class RHAPISessionBlock(RHManageSessionBase):
 
     normalize_url_spec = {'locators': {lambda self: self.session_block}}
 
-    def _process_args(self):
+    @use_kwargs({
+        'block': ModelField(SessionBlock, data_key='block_id'),
+    }, location='view_args')
+    def _process_args(self, block):
         RHManageSessionBase._process_args(self)
-        self.session_block = SessionBlock.get_or_404(request.view_args['block_id'])
+        self.session_block = block
 
     def _process_GET(self):
-        return SessionBlockSchema().jsonify(self.session_block)
+        return SessionBlockRESTSchema(context={'event': self.event}).jsonify(self.session_block)
 
-    @use_args_schema_context(SessionBlockSchema, lambda self: {'event': self.event, 'object': self.session_block})
+    @use_rh_args(SessionBlockRESTSchema, partial=True)
     def _process_PATCH(self, data):
         with track_location_changes(), track_time_changes():
             update_session_block(self.session_block, data)
-        return SessionBlockSchema().jsonify(self.session_block)
+        return SessionBlockRESTSchema(context={'event': self.event}).jsonify(self.session_block)
 
 
 class RHAPISessionBlocksInheritedLocation(RHManageSessionBase):
