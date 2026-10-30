@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 
 import {DatePickerCalendar, DatePickerGrid} from 'indico/react/components/DatePickerCalendar';
 import {FinalField, validators as v} from 'indico/react/forms';
@@ -27,17 +27,31 @@ export default function DatePicker({
   filter,
   ...inputProps
 }) {
+  const pickerRef = useRef(null);
+
   function handleDateChange(evt) {
     const {date} = evt.target.closest('ind-date-picker');
     const invalid = !!evt.target.value && !date;
     onChange(invalid ? invalidValue : formatDate(ISO_FORMAT, date));
   }
 
+  useEffect(() => {
+    const picker = pickerRef.current;
+    if (!picker || value === invalidValue || picker.contains(document.activeElement)) {
+      return;
+    }
+    const date = fromISOLocalDate(value);
+    if (formatDate(ISO_FORMAT, picker.date) !== formatDate(ISO_FORMAT, date)) {
+      picker.value = date || '';
+    }
+  }, [value, invalidValue]);
+
   const formattedValue = formatDate(format, fromISOLocalDate(value));
   const showClear = !inputProps.required;
 
   return (
     <ind-date-picker
+      ref={pickerRef}
       min={fromISOLocalDate(min)?.toDateString()}
       max={fromISOLocalDate(max)?.toDateString()}
       format={format}

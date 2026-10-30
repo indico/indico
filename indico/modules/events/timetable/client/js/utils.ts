@@ -274,3 +274,10 @@ export function createTimetableURL(
   };
   return timetableURL(params);
 }
+
+// This is a standard function that turns seconds into a display string
+// Used in date & time input fields
+export const formatDuration = (seconds: number) => {
+  const minutes = Math.floor(Math.max(0, seconds || 0) / 60);
+  return `${Math.floor(minutes / 60)}:${String(minutes % 60).padStart(2, '0')}`;
+};

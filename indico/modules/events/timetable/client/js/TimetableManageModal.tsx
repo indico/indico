@@ -14,6 +14,7 @@ import {Button, Divider, Header, Segment} from 'semantic-ui-react';
 
 import {ContributionFormFields} from 'indico/modules/events/contributions/ContributionForm';
 import {SessionBlockFormFields} from 'indico/modules/events/sessions/SessionBlockForm';
+import {stripEndDt} from 'indico/react/components';
 import {FinalSubmitButton} from 'indico/react/forms';
 import {FinalModalForm, getChangedValues, handleSubmitError} from 'indico/react/forms/final-form';
 import {Translate, Param} from 'indico/react/i18n';
@@ -117,7 +118,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     maxEndDt: useSelector(selectors.getEventEndDt),
   };
   // Don't include timezone offset in string
-  let initialStartDt = entry.startDt.format('YYYY-MM-DDTHH:mm:ss');
+  let initialStartDt = entry.startDt.format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS);
 
   if (parent) {
     extraOptions.minStartDt = moment(parent.startDt);
@@ -129,7 +130,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         moment(initialStartDt),
         moment(extraOptions.maxEndDt).subtract(entry.duration, 'minutes')
       )
-      .format('YYYY-MM-DDTHH:mm:ss');
+      .format(moment.HTML5_FMT.DATETIME_LOCAL_SECONDS);
   }
 
   const initialValues: DraftEntry = {
@@ -226,7 +227,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const handleSubmit = async (data: any, form: any) => {
-    data = {...data};
+    data = stripEndDt(data);
     const sessionObj = data.session_object;
     delete data.session_object;
 
@@ -258,7 +259,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         //              the handleSubmit and instead have a separate function
         const oldDayKey = getDateKey(entry.startDt);
         const newDayKey = getDateKey(updatedEntry.startDt);
-        const updatePayload = getChangedValues(data, form);
+        const updatePayload = stripEndDt(getChangedValues(data, form));
         await dispatch(
           actions.updateEntry(activeType, updatedEntry, currentDay, updatePayload, false)
         );
