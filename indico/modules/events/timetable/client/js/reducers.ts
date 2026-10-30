@@ -15,7 +15,16 @@ import {
   preprocessTimetableEntries,
   preprocessUnscheduledContributions,
 } from './preprocess';
-import {Entries, EntryType, isChildEntry, SidePanelView, ChildEntry, Entry, Session} from './types';
+import {
+  ChildEntry,
+  Entries,
+  Entry,
+  EntryType,
+  EntryUniqueID,
+  isChildEntry,
+  Session,
+  SidePanelView,
+} from './types';
 import {createTimetableURL, setCurrentDateLocalStorage} from './utils';
 
 export default {
@@ -242,6 +251,23 @@ export default {
           ...state,
           entries: newEntries,
           unscheduled: [...oldUnscheduled, ...newUnscheduled],
+        };
+      }
+      case actions.UPDATE_LOCATION_DATA: {
+        const newEntries = Object.fromEntries(
+          Object.entries(state.entries).map(([id, entry]) => {
+            const updates = action.data[id as EntryUniqueID] ?? {};
+            return [id, {...entry, ...updates}];
+          })
+        );
+        const newUnscheduled = state.unscheduled.map(contrib => {
+          const updates = action.data[contrib.id as EntryUniqueID] ?? {};
+          return {...contrib, ...updates};
+        });
+        return {
+          ...state,
+          entries: newEntries,
+          unscheduled: newUnscheduled,
         };
       }
       default:

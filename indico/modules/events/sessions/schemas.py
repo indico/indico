@@ -17,7 +17,7 @@ from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
 from indico.modules.users.schemas import AffiliationSchema
-from indico.util.locations import LocationDataSchema
+from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested
 from indico.web.forms.colors import get_colors
 
@@ -66,11 +66,12 @@ class SessionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Session
         fields = ('id', 'title', 'code', 'description', 'default_contribution_duration',
-                  'type', 'location_data', 'colors', 'is_poster')
+                  'type', 'location_data', 'colors', 'is_poster', 'child_location_parent')
 
     colors = fields.Nested(SessionColorSchema)
     type = ModelField(SessionType, allow_none=True)
     location_data = fields.Nested(LocationDataSchema)
+    child_location_parent = fields.Nested(LocationParentSchema, dump_only=True)
 
 
 class SessionBlockPersonLinkSchema(mm.SQLAlchemyAutoSchema):
