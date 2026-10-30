@@ -237,7 +237,7 @@ class RHAPISessionsInheritedLocation(RHManageEventBase):
         return jsonify(None)
 
 
-class RHAPISessionBlock(RHManageSessionBase):  # this one
+class RHAPISessionBlock(RHManageSessionBase):
     """API for a single session block."""
 
     normalize_url_spec = {'locators': {lambda self: self.session_block}}
@@ -256,7 +256,7 @@ class RHAPISessionBlock(RHManageSessionBase):  # this one
     def _process_PATCH(self, data):
         with track_location_changes(), track_time_changes():
             update_session_block(self.session_block, data)
-        return SessionBlockRESTSchema().jsonify(self.session_block)
+        return SessionBlockRESTSchema(context={'event': self.event}).jsonify(self.session_block)
 
 
 class RHAPISessionBlocksInheritedLocation(RHManageSessionBase):
