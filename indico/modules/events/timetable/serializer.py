@@ -150,7 +150,7 @@ class TimetableSerializer:
                      'start_dt': self._get_start_dt(entry),
                      'attachments': self.get_attachment_data(contribution),
                      'description': contribution.description,
-                     'duration': contribution.duration_display.seconds,
+                     'duration': contribution.duration.seconds,
                      'pdf': url_for('contributions.export_pdf', entry.contribution),
                      'person_links': [self._get_person_data(x) for x in contribution.person_links],
                      'code': contribution.code,
@@ -203,14 +203,7 @@ class TimetableSerializer:
         return files + folders
 
     def _get_start_dt(self, entry):
-        tzinfo = entry.event.tzinfo
-
-        if entry.type == TimetableEntryType.CONTRIBUTION:
-            start_dt = entry.contribution.start_dt_display
-        else:
-            start_dt = entry.start_dt
-
-        return self._get_entry_date_dt(start_dt, tzinfo)
+        return self._get_entry_date_dt(entry.start_dt, entry.event.tzinfo)
 
     def _get_entry_date_dt(self, dt, tzinfo):
         return dt.astimezone(tzinfo).isoformat()

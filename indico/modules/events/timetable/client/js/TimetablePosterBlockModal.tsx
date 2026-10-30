@@ -74,8 +74,8 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) =
         />
         <Button
           type="button"
-          icon="trash"
-          title={Translate.string('Delete')}
+          icon="calendar"
+          title={Translate.string('Unschedule')}
           basic
           size="small"
           onClick={onDelete}
@@ -94,17 +94,20 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
   const eventId = useSelector(selectors.getEventId);
   const block = useSelector(selectors.getCurrentDayEntries).find(
     (e): e is BlockEntry => e.id === id
-  );
+  )!;
   const session = useSelector((state: ReduxState) =>
     selectors.getSessionById(state, block.sessionId)
   );
 
   const onCreate = () => {
+    const locationParent = block.childLocationParent;
     const draftEntry = {
       sessionId: session.id,
       sessionBlockId: block.objId,
       duration: Math.min(20, block.duration),
       startDt: block.startDt,
+      locationParent,
+      locationData: {...locationParent.location_data, inheriting: true},
     };
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,
@@ -115,10 +118,6 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
       },
     });
   };
-
-  if (!(block || session)) {
-    return;
-  }
 
   const children = block.children.sort((c1, c2) => c1.title.localeCompare(c2.title));
 
