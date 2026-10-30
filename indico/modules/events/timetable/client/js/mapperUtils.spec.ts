@@ -277,6 +277,11 @@ describe('mapperUtils', () => {
         colors: {backgroundColor: '#aabbcc', color: '#ddeeff'},
         defaultContribDurationMinutes: 10,
         attachments: [],
+        childLocationParent: {
+          location_data: entryLocationData,
+          type: 'Session',
+          title: 'Another Session',
+        },
       };
 
       const data = mapSessionToData(session);
@@ -287,6 +292,11 @@ describe('mapperUtils', () => {
       expect(data.colors).toEqual({background: '#aabbcc', text: '#ddeeff'});
       expect(data.default_contribution_duration).toBe(600);
       expect(data.attachments).toEqual([]);
+      expect(data.child_location_parent).toEqual({
+        location_data: entryLocationData, // XXX we don't do mapping on that one
+        type: 'Session',
+        title: 'Another Session',
+      });
     });
   });
 });

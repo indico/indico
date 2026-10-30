@@ -35,6 +35,7 @@ from indico.modules.events.timetable.operations import (create_break_entry, crea
 from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, SessionBlockSchema
 # TODO: (Ajob) Remove 'new' indications once old timetable is fully replaced
 from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
+from indico.modules.events.timetable.serializer import serialize_child_location_updates
 from indico.modules.events.timetable.serializer import serialize_event_info as serialize_event_info_new
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableLegacy
@@ -351,7 +352,7 @@ class RHTimetableContribution(RHManageContributionBase):
 class RHTimetableUnscheduleContribution(RHManageContributionBase):
     def _process_POST(self):
         delete_timetable_entry(self.contrib.timetable_entry)
-        return '', 204
+        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
 
 
 class RHTimetableScheduleContribution(RHManageTimetableBase):
@@ -374,14 +375,15 @@ class RHTimetableScheduleContribution(RHManageTimetableBase):
     })
     def _process(self, contribs):
         contrib_map = {c['contrib_id']: c['start_dt'] for c in contribs}
-        query = (
+        contribs = (
             Contribution
                 .query.with_parent(self.event)
                 .filter(Contribution.id.in_(contrib_map.keys()))
+                .all()
         )
 
         with track_time_changes():
-            for contrib in query:
+            for contrib in contribs:
                 if self.session_block is None:
                     contrib.session = None
                 if self.session and contrib.session_id != self.session.id:
@@ -394,7 +396,7 @@ class RHTimetableScheduleContribution(RHManageTimetableBase):
                 if entry.end_dt.astimezone(entry.event.tzinfo).date() > start_dt.date():
                     raise UserValueError(_("Contribution '{}' could not be scheduled since it doesn't fit on this day.")
                                          .format(contrib.title))
-        return '', 204
+        return ContributionSchema(many=True, context={'event': self.event}).jsonify(contribs)
 
 
 class RHTimetableSessionBlockCreate(RHManageEventBase):
@@ -493,3 +495,24 @@ class RHCloneContribution(RHManageTimetableBase):
     def _process(self):
         contrib = ContributionCloner.clone_single_contribution(self.contrib, preserve_session=True)
         return jsonify_data(update=serialize_entry_update(contrib.timetable_entry, session_=contrib.session))
+
+
+class RHTimetableChildLocations(RHManageTimetableBase):
+    """Return location data for children of a session or block."""
+
+    normalize_url_spec = {
+        'locators': {lambda self: self.obj},
+    }
+
+    @use_kwargs({
+        'block_id': fields.Int(load_default=None),
+    }, location='view_args')
+    def _process_args(self, block_id):
+        RHManageTimetableBase._process_args(self)
+        if block_id is not None:
+            self.obj = self.event.get_session_block(block_id)
+        else:
+            self.obj = self.session
+
+    def _process(self):
+        return jsonify(serialize_child_location_updates(self.obj))
