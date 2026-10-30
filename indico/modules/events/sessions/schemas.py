@@ -7,7 +7,7 @@
 
 import hashlib
 
-from marshmallow import ValidationError, fields, post_dump, post_load
+from marshmallow import EXCLUDE, ValidationError, fields, post_dump, post_load
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.marshmallow import mm
@@ -18,7 +18,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.locations import LocationDataSchema
-from indico.util.marshmallow import ModelField
+from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested
 from indico.web.forms.colors import get_colors
 
 
@@ -91,13 +91,15 @@ class SessionBlockPersonLinkSchema(mm.SQLAlchemyAutoSchema):
         return data
 
 
-# TODO: (Ajob) Get rid of this schema and use timetable SessionBlockSchema
-class SessionBlockSchema(mm.SQLAlchemyAutoSchema):
+class SessionBlockRESTSchema(mm.SQLAlchemyAutoSchema):
+    """Schema for RESTful operations on session blocks."""
+
     class Meta:
         model = SessionBlock
-        fields = ('id', 'title', 'start_dt', 'duration', 'code', 'person_links', 'location_data', 'session_id')
+        fields = ('id', 'title', 'code', 'location_data', 'start_dt', 'duration', 'person_links')
+        rh_context = ('event', {'object': 'session_block'})
 
-    start_dt = fields.DateTime()
-    location_data = fields.Nested(LocationDataSchema)
-    # TODO: Make it so that passing explicit `many=True` is not required
-    conveners = fields.Nested(_SessionBlockPersonLinkSchema(many=True), attribute='person_links')
+    id = fields.Int(dump_only=True)
+    start_dt = EventTimezoneDateTimeField()
+    location_data = NonPartialNested(LocationDataSchema)
+    person_links = fields.List(NonPartialNested(_SessionBlockPersonLinkSchema, unknown=EXCLUDE))
