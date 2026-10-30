@@ -25,9 +25,9 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
 from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetable,
                                                                 RHManageTimetable, RHManageTimetableEntryInfo,
                                                                 RHManageTimetableLegacy, RHTimetableBreak,
-                                                                RHTimetableBreakCreate, RHTimetableContribution,
-                                                                RHTimetableContributionCreate, RHTimetableREST,
-                                                                RHTimetableScheduleContribution,
+                                                                RHTimetableBreakCreate, RHTimetableChildLocations,
+                                                                RHTimetableContribution, RHTimetableContributionCreate,
+                                                                RHTimetableREST, RHTimetableScheduleContribution,
                                                                 RHTimetableSessionBlock, RHTimetableSessionBlockCreate,
                                                                 RHTimetableUnscheduleContribution)
 from indico.web.flask.util import make_compat_redirect_func
@@ -93,6 +93,9 @@ _bp.add_url_rule('/timetable/session-block', 'tt_session_block_create', RHTimeta
                  methods=('POST',))
 _bp.add_url_rule('/timetable/session-block/<int:block_id>', 'tt_session_block_rest', RHTimetableSessionBlock,
                  methods=('GET', 'PATCH', 'DELETE'))
+_bp.add_url_rule('/timetable/child-locations/<int:session_id>/', 'tt_child_locations', RHTimetableChildLocations)
+_bp.add_url_rule('/timetable/child-locations/<int:session_id>/<int:block_id>', 'tt_child_locations',
+                 RHTimetableChildLocations)
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)

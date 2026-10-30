@@ -11,7 +11,8 @@ from indico.core.marshmallow import mm
 from indico.modules.events.contributions.schemas import ContributionRESTSchema, TimezoneAwareSessionBlockSchema
 from indico.modules.events.sessions.schemas import SessionBlockRESTSchema, SessionColorSchema
 from indico.modules.events.timetable.models.breaks import Break
-from indico.modules.events.timetable.serializer import TimetableSerializer
+from indico.modules.events.timetable.models.entries import TimetableEntryType
+from indico.modules.events.timetable.serializer import TimetableSerializer, get_entry_type
 from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested
 
@@ -25,12 +26,14 @@ class SessionBlockSchema(SessionBlockRESTSchema):
             'location_parent',
             'child_location_parent',
             'attachments',
+            'type',
         )
 
     session_title = fields.String(attribute='session.title', dump_only=True)
     location_parent = NonPartialNested(LocationParentSchema, attribute='resolved_location_parent')
     child_location_parent = fields.Nested(LocationParentSchema)
     attachments = fields.Function(lambda obj: TimetableSerializer.get_attachment_data(obj.session))
+    type = fields.Function(lambda __: get_entry_type(TimetableEntryType.SESSION_BLOCK))
 
 
 def _get_break_session_id(entry):
@@ -52,6 +55,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     location_data = fields.Nested(LocationDataSchema)
     location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
     colors = fields.Nested(SessionColorSchema)
+    type = fields.Function(lambda __: get_entry_type(TimetableEntryType.BREAK))
     parent_id = fields.Integer(allow_none=True, attribute='timetable_entry.parent_id')
     session_block_id = fields.Integer(allow_none=True, attribute='session_block.id')
     session_id = fields.Function(_get_break_session_id, dump_only=True)
@@ -68,6 +72,7 @@ class ContributionSchema(ContributionRESTSchema):
             'event_id',
             'parent_id',
             'attachments',
+            'type',
         )
 
     location_parent = NonPartialNested(LocationParentSchema, attribute='resolved_location_parent')
@@ -77,3 +82,4 @@ class ContributionSchema(ContributionRESTSchema):
     event_id = fields.Integer(dump_only=True)  # XXX needed?
     parent_id = fields.Integer(allow_none=True, load_only=True)
     attachments = fields.Function(TimetableSerializer.get_attachment_data)
+    type = fields.Function(lambda __: get_entry_type(TimetableEntryType.CONTRIBUTION))
