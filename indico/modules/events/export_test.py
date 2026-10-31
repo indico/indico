@@ -119,7 +119,7 @@ def test_event_attachment_export(db, dummy_event):
         assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == b'hello world'
 
 
-def test_event_import(db, dummy_user):
+def test_event_import(db, dummy_user, dummy_check_type):
     data_yaml_content = (Path(__file__).parent / 'tests' / 'export_test_2.yaml').read_text()
     objects_yaml_content = (Path(__file__).parent / 'tests' / 'export_test_2_objects.yaml').read_text()
     data_yaml = BytesIO(data_yaml_content.encode())
@@ -146,6 +146,7 @@ def test_event_import(db, dummy_user):
     e = import_event(tar_buffer, create_users=False)[0]
     # Check that event metadata is fine
     assert e.title == 'dummy#0'
+    assert e.default_check_type == dummy_check_type
     assert e.creator == dummy_user
     assert e.created_dt == as_utc(datetime(2017, 8, 24, 15, 28, 42, 652626))
     assert e.start_dt == as_utc(datetime(2017, 8, 24, 10, 0, 0))
