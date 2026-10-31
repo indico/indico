@@ -414,6 +414,12 @@ class RegistrationFormItem(db.Model):
     def is_active(self):
         return self.is_enabled and not self.is_deleted and self.parent.is_enabled and not self.parent.is_deleted
 
+    @property
+    def is_show_if_field_disabled(self):
+        if not self.show_if_field:
+            return False
+        return not self.show_if_field.is_active
+
     @hybrid_property
     def is_section(self):
         return self.type in {RegistrationFormItemType.section, RegistrationFormItemType.section_pd}
@@ -545,6 +551,7 @@ class RegistrationFormText(RegistrationFormItem):
             show_if_field_values=self.show_if_values,
             show_if_condition_for=[f.id for f in self.condition_for],
             show_if_condition_for_transitive=[f.id for f in self.condition_for_transitive],
+            is_show_if_field_disabled=self.is_show_if_field_disabled,
         )
         return camelize_keys(field_data)
 
