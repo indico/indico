@@ -169,7 +169,7 @@ jinja2==3.1.6
     #   flask
     #   flask-babel
     #   flask-pluginengine
-joserfc==1.7.4
+joserfc==1.7.6
     # via authlib
 jsonschema==4.26.0
     # via -r requirements.in
@@ -247,7 +247,7 @@ pure-eval==0.2.3
     # via
     #   sentry-sdk
     #   stack-data
-pyasn1==0.6.4
+pyasn1==0.6.5
     # via pyasn1-modules
 pyasn1-modules==0.4.2
     # via google-auth
@@ -264,7 +264,7 @@ pygments==2.20.0
     #   ipython-pygments-lexers
 pynpm==0.3.1
     # via pywebpack
-pypdf==6.21.3
+pypdf==6.21.4
     # via -r requirements.in
 pyphen==0.17.2
     # via weasyprint
