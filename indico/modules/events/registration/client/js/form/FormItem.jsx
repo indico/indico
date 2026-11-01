@@ -12,7 +12,7 @@ import {useSelector} from 'react-redux';
 import {Form, Icon, Popup} from 'semantic-ui-react';
 
 import {PluralTranslate, Translate} from 'indico/react/i18n';
-import {Markdown, toClasses} from 'indico/react/util';
+import {RustyMarkdown, toClasses} from 'indico/react/util';
 import {renderPluginComponents} from 'indico/utils/plugins';
 
 import {
@@ -236,11 +236,7 @@ export default function FormItem({
         ) : (
           `Unknown input type: ${inputType}`
         )}
-        {description && (
-          <div styleName="description">
-            <Markdown targetBlank>{description}</Markdown>
-          </div>
-        )}
+        {description && <RustyMarkdown styleName="description" source={description} />}
         {renderPluginComponents(`regform-${inputType}-field-item`, {htmlName, ...inputProps})}
       </div>
       <div styleName="actions">

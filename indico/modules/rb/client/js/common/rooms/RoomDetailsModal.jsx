@@ -17,7 +17,7 @@ import {bindActionCreators} from 'redux';
 import {Button, Grid, Icon, Modal, Header, Message, List, Segment, Popup} from 'semantic-ui-react';
 
 import {Translate, Param} from 'indico/react/i18n';
-import {IndicoPropTypes, Markdown, Responsive, useResponsive} from 'indico/react/util';
+import {IndicoPropTypes, Responsive, RustyMarkdown, useResponsive} from 'indico/react/util';
 import {getWeekday, serializeDate} from 'indico/utils/date';
 
 import * as globalActions from '../../actions';
@@ -340,7 +340,7 @@ function RoomCommentsBox({room}) {
       <Message styleName="message-icon" icon info>
         <Icon name="info" />
         <Message.Content>
-          <Markdown targetBlank>{room.comments}</Markdown>
+          <RustyMarkdown source={room.comments} />
         </Message.Content>
       </Message>
     )
