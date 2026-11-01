@@ -127,7 +127,11 @@ export class Landing extends React.Component {
       : {};
     return (
       <div className="landing-wrapper">
-        <Grid centered styleName="landing-page" columns={1}>
+        <Grid
+          centered
+          styleName={hasUpcomingBookings ? 'landing-page with-upcoming-bookings' : 'landing-page'}
+          columns={1}
+        >
           <Grid.Row styleName="landing-page-form">
             <Card styleName="landing-page-card">
               <Card.Content>
