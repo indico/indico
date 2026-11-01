@@ -96,14 +96,18 @@ export default function ICSCalendarLink({
   const [exportEventSeries, setExportEventSeries] = useState(false);
 
   const copyButton = (
-    <Button
-      icon="copy"
-      title={Translate.string('Copy to clipboard')}
-      onClick={async () => {
-        await navigator.clipboard.writeText(popupState.url);
-        dispatch({type: 'COPIED'});
-      }}
-    />
+    <ind-with-tooltip>
+      <Button
+        icon
+        onClick={async () => {
+          await navigator.clipboard.writeText(popupState.url);
+          dispatch({type: 'COPIED'});
+        }}
+      >
+        <Icon name="copy" />
+        <span data-tip-content>{Translate.string('Copy to clipboard')}</span>
+      </Button>
+    </ind-with-tooltip>
   );
 
   const fetchURL = async (extraParams, controller) => {
@@ -157,10 +161,13 @@ export default function ICSCalendarLink({
         renderButton ? (
           renderButton({open: popupState.open})
         ) : (
-          <Button icon size="small" title={Translate.string('Export')}>
-            <Icon name="calendar alternate outline" />
-            <Icon name="caret down" />
-          </Button>
+          <ind-with-tooltip>
+            <Button icon size="small">
+              <Icon name="calendar alternate outline" />
+              <Icon name="caret down" />
+              <span data-tip-content>{Translate.string('Export')}</span>
+            </Button>
+          </ind-with-tooltip>
         )
       }
       position={popupPosition}
@@ -242,15 +249,19 @@ export default function ICSCalendarLink({
               Download an iCalendar file that you can use in calendaring applications.
             </Translate>
           </span>
-          <Button
-            styleName="download-button"
-            title={Translate.string('Download')}
-            as="a"
-            href={popupState.url}
-            icon="download"
-            loading={!popupState.url}
-            disabled={!popupState.url}
-          />
+          <ind-with-tooltip>
+            <Button
+              styleName="download-button"
+              as="a"
+              href={popupState.url}
+              icon
+              loading={!popupState.url}
+              disabled={!popupState.url}
+            >
+              <Icon name="download" />
+              <span data-tip-content>{Translate.string('Download')}</span>
+            </Button>
+          </ind-with-tooltip>
         </div>
       </Popup.Content>
     </Popup>
