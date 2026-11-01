@@ -21,6 +21,7 @@ __all__ = ('RHAdminBase',)
 def _sidemenu_sections(sender, **kwargs):
     yield SideMenuSection('security', _('Security'), 90, icon='shield')
     yield SideMenuSection('user_management', _('User Management'), 60, icon='users')
+    yield SideMenuSection('affiliations', _('Affiliations'), 60, icon='link')
     yield SideMenuSection('customization', _('Customization'), 50, icon='wrench')
     yield SideMenuSection('integration', _('Integration'), 30, icon='earth')
     yield SideMenuSection('homepage', _('Homepage'), 40, icon='home')
