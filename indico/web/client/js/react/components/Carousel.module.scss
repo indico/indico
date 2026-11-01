@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'design_system';
 
 .carousel {
   padding: 1em 0 0 0;
@@ -24,49 +25,42 @@
   align-items: center;
   min-width: 100%;
   min-height: 100%;
-  transition: margin-left 1s ease-out;
-}
 
-.progress-indicator {
-  transition: background-color 0.25s ease-in;
-  background-color: $pastel-gray;
-  width: 100px;
-  height: 2px;
-  margin: 10px auto;
-
-  &:global(.disabled),
-  &:global(.disabled) .progress-bar {
-    background-color: $light-gray;
-  }
-
-  .progress-bar {
-    height: 100%;
-    background-color: $primary-color;
-    transition: width 0.25s linear;
-    width: 0;
+  &[hidden] {
+    display: none;
   }
 }
 
 .pane-switcher {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
   list-style-type: none;
   padding: 0;
   margin: 0.5em 0 0 0;
 
   .pane-switcher-item {
-    display: inline-block;
+    display: block;
+    padding: 0;
     border: 1px solid $primary-color;
     width: 15px;
     height: 15px;
     border-radius: 100%;
     cursor: pointer;
+    background-color: #fff;
     transition: background-color 0.25s ease-in;
-
-    &:not(:last-child) {
-      margin-right: 0.5em;
-    }
 
     &:global(.active) {
       background-color: $primary-color;
     }
+
+    &:focus-visible {
+      outline: 2px solid $primary-color;
+      outline-offset: 3px;
+    }
   }
+}
+
+.pane-switcher-label {
+  @extend %visually-hidden;
 }

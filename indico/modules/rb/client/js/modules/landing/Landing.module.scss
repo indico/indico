@@ -116,7 +116,7 @@
       :global(.statistics) {
         :global(.value),
         :global(.label) {
-          color: $highlight-color;
+          color: #16735c;
         }
 
         &:not(:last-child) {
@@ -125,10 +125,6 @@
 
         :global(.statistic + .statistic) {
           margin-left: 3em;
-        }
-
-        :global(.statistic:nth-child(even)) > * {
-          color: darken($highlight-color, 20%);
         }
       }
     }
