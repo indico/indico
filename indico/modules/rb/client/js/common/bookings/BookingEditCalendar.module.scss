@@ -5,6 +5,12 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system/visibility';
+
+.visually-hidden {
+  @extend %visually-hidden;
+}
+
 .original-booking-header,
 .new-booking-header {
   align-self: center;

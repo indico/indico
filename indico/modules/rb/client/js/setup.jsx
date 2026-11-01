@@ -26,6 +26,7 @@ import createRBStore from './store';
 
 import 'indico-sui-theme/semantic.css';
 import '../styles/main.scss';
+import '../../../../web/client/js/react/components/NativeModal.module.scss';
 
 function UserSearchTokenProvider({children}) {
   const userSearchToken = useSelector(userSelectors.getSearchToken);

@@ -7,12 +7,16 @@
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Popup, Button} from 'semantic-ui-react';
+import {Button} from 'semantic-ui-react';
 
 import {useTimeout} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
-export default function ClipboardButton({text, successText}) {
+import {ContainedPopup as Popup} from './PopupMountScope';
+
+import './ClipboardButton.module.scss';
+
+export default function ClipboardButton({text, successText, buttonText}) {
   const [copied, setCopied] = useState(false);
   useTimeout(() => setCopied(false), copied ? 2000 : null);
 
@@ -38,6 +42,7 @@ export default function ClipboardButton({text, successText}) {
           style={copied ? {} : {cursor: 'pointer'}}
           disabled={copied}
           circular
+          content={<span styleName="visually-hidden">{buttonText}</span>}
         />
       }
       open={copied}
@@ -50,8 +55,10 @@ export default function ClipboardButton({text, successText}) {
 ClipboardButton.propTypes = {
   text: PropTypes.string.isRequired,
   successText: PropTypes.string,
+  buttonText: PropTypes.string,
 };
 
 ClipboardButton.defaultProps = {
   successText: null,
+  buttonText: Translate.string('Copy to clipboard'),
 };

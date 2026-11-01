@@ -7,18 +7,26 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Icon, Popup} from 'semantic-ui-react';
+import {Icon} from 'semantic-ui-react';
+
+import {ContainedPopup as Popup} from 'indico/react/components/PopupMountScope';
+
+import './RoomFeatureEntry.module.scss';
 
 export default function RoomFeatureEntry({feature, color, size}) {
   const {icon, title, equipment} = feature;
-  const trigger = <Icon name={icon} color={color} size={size} />;
-  if (equipment.length === 1 && equipment[0] === title) {
-    return <Popup trigger={trigger} content={title} position="top center" />;
-  }
+  const content =
+    equipment.length === 1 && equipment[0] === title
+      ? title
+      : `${title} (${equipment.filter(eq => eq !== title).join(', ')})`;
+  const trigger = (
+    <button type="button" styleName="feature-trigger">
+      <Icon name={icon} color={color} size={size} />
+      <span styleName="visually-hidden">{content}</span>
+    </button>
+  );
   return (
-    <Popup trigger={trigger} position="top center">
-      {title} ({equipment.filter(eq => eq !== title).join(', ')})
-    </Popup>
+    <Popup trigger={trigger} content={content} position="top center" on={['hover', 'focus']} />
   );
 }
 

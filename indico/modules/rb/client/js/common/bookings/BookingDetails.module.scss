@@ -7,6 +7,11 @@
 
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'design_system/visibility';
+
+.visually-hidden {
+  @extend %visually-hidden;
+}
 
 :global(.ui.icon.message).message-icon :global(.icon) {
   font-size: 2em;
@@ -36,6 +41,9 @@
 
   .header-text {
     flex: 1;
+    margin: 0;
+    font-size: inherit;
+    line-height: inherit;
 
     @media (max-width: $tablet-width) {
       flex: 3;

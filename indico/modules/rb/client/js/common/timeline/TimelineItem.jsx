@@ -11,9 +11,10 @@ import React from 'react';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {List, Popup, Message} from 'semantic-ui-react';
+import {List, Message} from 'semantic-ui-react';
 
 import {ResponsivePopup} from 'indico/react/components';
+import {ContainedPopup as Popup, PopupMountContext} from 'indico/react/components/PopupMountScope';
 import {Translate, Param, PluralTranslate} from 'indico/react/i18n';
 import {fullyOverlaps, serializeTime} from 'indico/utils/date';
 
@@ -111,6 +112,8 @@ class TimelineItem extends React.Component {
     dayBased: false,
     hideRecurringTooltip: false,
   };
+
+  static contextType = PopupMountContext;
 
   calculateWidth = (startDt, endDt) => {
     const {startHour, endHour} = this.props;
@@ -390,8 +393,10 @@ class TimelineItem extends React.Component {
     const styleName = `timeline-occurrence ${overflowRight ? 'overflow-right' : ''} ${
       overflowLeft ? 'overflow-left' : ''
     }`;
+    const Segment = this.context && popupContent ? 'button' : 'div';
     const segment = (
-      <div
+      <Segment
+        type={Segment === 'button' ? 'button' : undefined}
         className={`${additionalClasses} ${clickable ? 'clickable' : ''}`}
         onClick={() => {
           if (onClickCandidate && bookable && type === 'candidate') {
@@ -402,7 +407,16 @@ class TimelineItem extends React.Component {
         }}
         styleName={styleName}
         style={{left: `${segmentPosition}%`, width: `${segmentWidth}%`}}
-      />
+      >
+        {Segment === 'button' && (
+          <span styleName="visually-hidden">
+            {Translate.string('Timeline item from {startTime} to {endTime}', {
+              startTime: serializeTime(segmentStartDt),
+              endTime: serializeTime(segmentEndDt),
+            })}
+          </span>
+        )}
+      </Segment>
     );
     const PopupComponent = clickable ? ResponsivePopup : Popup;
 
@@ -414,8 +428,9 @@ class TimelineItem extends React.Component {
         position="bottom center"
         header={reservation && reservation.bookedForName}
         disabled={!popupContent}
-        hideOnScroll
+        hideOnScroll={!this.context}
         hoverable
+        on={['hover', 'focus']}
       />
     );
   };

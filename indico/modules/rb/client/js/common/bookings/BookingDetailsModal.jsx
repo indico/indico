@@ -10,9 +10,13 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Button} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
+
 import BookingDetails from './BookingDetails';
 import BookingEdit from './BookingEdit';
 import * as bookingsSelectors from './selectors';
+
+import './BookingDetailsModal.module.scss';
 
 class BookingDetailsModal extends React.Component {
   static propTypes = {
@@ -30,6 +34,14 @@ class BookingDetailsModal extends React.Component {
     mode: 'view',
   };
 
+  componentWillUnmount() {
+    if (this.previousFocus?.isConnected && this.previousFocus !== document.body) {
+      this.previousFocus.focus();
+    }
+  }
+
+  previousFocus = document.activeElement;
+
   render() {
     const {booking, onClose, cancelDate} = this.props;
     const {mode} = this.state;
@@ -41,6 +53,15 @@ class BookingDetailsModal extends React.Component {
         onClick={() => this.setState({mode: mode === 'edit' ? 'view' : 'edit'})}
         primary={mode === 'edit'}
         circular
+        content={
+          <span styleName="visually-hidden">
+            {mode === 'edit' ? (
+              <Translate>Return to booking details</Translate>
+            ) : (
+              <Translate>Edit booking</Translate>
+            )}
+          </span>
+        }
       />
     );
 

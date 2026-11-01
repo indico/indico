@@ -52,15 +52,23 @@ class SpriteImage extends React.Component {
   }
 
   componentDidMount() {
-    // It's OK to call setState(...) here, since the component
-    // has to re-render anyway
-    //
-    // eslint-disable-next-line react/no-did-mount-set-state
-    this.setState({
-      contHeight: this.containerRef.current.offsetHeight,
-      contWidth: this.containerRef.current.offsetWidth,
-    });
+    this.updateDimensions();
+    this.resizeObserver = new ResizeObserver(this.updateDimensions);
+    this.resizeObserver.observe(this.containerRef.current);
   }
+
+  componentWillUnmount() {
+    this.resizeObserver.disconnect();
+  }
+
+  updateDimensions = () => {
+    const contHeight = this.containerRef.current.offsetHeight;
+    const contWidth = this.containerRef.current.offsetWidth;
+    const {contHeight: previousHeight, contWidth: previousWidth} = this.state;
+    if (contHeight !== previousHeight || contWidth !== previousWidth) {
+      this.setState({contHeight, contWidth});
+    }
+  };
 
   render() {
     const {

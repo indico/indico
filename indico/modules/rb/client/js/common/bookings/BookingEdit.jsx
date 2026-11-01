@@ -13,9 +13,11 @@ import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Button, Grid, Icon, Message, Modal, Segment} from 'semantic-ui-react';
+import {Button, Grid, Icon, Message, Segment} from 'semantic-ui-react';
 
 import {Checkbox} from 'indico/react/components';
+import Modal from 'indico/react/components/NativeModal';
+import {PopupMountScope} from 'indico/react/components/PopupMountScope';
 import {FinalField} from 'indico/react/forms';
 import {Param, Plural, PluralTranslate, Singular, Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -101,6 +103,8 @@ class BookingEdit extends React.Component {
       },
     });
   }
+
+  headingRef = React.createRef();
 
   get initialFormValues() {
     const {
@@ -200,74 +204,85 @@ class BookingEdit extends React.Component {
       submitting || submitSucceeded || hasValidationErrors || pristine || conflictingBooking;
 
     return (
-      <Modal size="large" onClose={onClose} closeIcon open>
-        <Modal.Header styleName="booking-edit-modal-header">
-          <Translate>Edit a booking</Translate>
-          {actionButtons()}
-        </Modal.Header>
-        <Modal.Content>
-          <Grid stackable columns={2}>
-            <Grid.Column>
-              <RoomBasicDetails room={room} />
-              {isOngoingBooking && (
-                <Message color="blue" styleName="ongoing-booking-info" icon>
-                  <Icon name="play" />
-                  <Translate>This booking has already started.</Translate>
-                </Message>
-              )}
-              <BookingEditForm
-                booking={booking}
-                formProps={fprops}
-                onBookingPeriodChange={this.updateBookingCalendar}
-                onExtraFieldsChange={extraFields => {
-                  this.setState({extraFields});
-                  // mark form as dirty so the submit button becomes available, since currently
-                  // extra fields from plugins are not integrated w/ final-form
-                  fprops.form.change('extraFieldsChanged', true);
-                }}
-              />
-              <FinalField name="extraFieldsChanged" component={() => null} />
-            </Grid.Column>
-            <Grid.Column stretched={!timelineError}>
-              {timelineError ? (
-                <>
-                  <div>
-                    <Message
-                      icon="times circle outline"
-                      error
-                      content={timelineError}
-                      style={{marginBottom: '2rem'}}
-                    />
-                  </div>
-                  <DummyTimeline rows={10} />
-                </>
-              ) : calendars ? (
-                <BookingEditCalendar
-                  calendars={calendars}
+      <Modal
+        size="large"
+        onClose={onClose}
+        onMount={() => this.headingRef.current?.focus()}
+        closeIcon
+        open
+        title={Translate.string('Edit a booking')}
+      >
+        <PopupMountScope>
+          <Modal.Header styleName="booking-edit-modal-header">
+            <h2 ref={this.headingRef} tabIndex={-1} styleName="modal-heading">
+              <Translate>Edit a booking</Translate>
+            </h2>
+            {actionButtons()}
+          </Modal.Header>
+          <Modal.Content>
+            <Grid stackable columns={2}>
+              <Grid.Column>
+                <RoomBasicDetails room={room} />
+                {isOngoingBooking && (
+                  <Message color="blue" styleName="ongoing-booking-info" icon>
+                    <Icon name="play" />
+                    <Translate>This booking has already started.</Translate>
+                  </Message>
+                )}
+                <BookingEditForm
                   booking={booking}
-                  numberOfCandidates={numberOfCandidates}
-                  numberOfConflicts={numberOfConflicts}
-                  willBookingSplit={willBookingSplit}
-                  isLoading={isLoading}
+                  formProps={fprops}
+                  onBookingPeriodChange={this.updateBookingCalendar}
+                  onExtraFieldsChange={extraFields => {
+                    this.setState({extraFields});
+                    // mark form as dirty so the submit button becomes available, since currently
+                    // extra fields from plugins are not integrated w/ final-form
+                    fprops.form.change('extraFieldsChanged', true);
+                  }}
                 />
-              ) : null}
-              {this.renderConflictsMessage()}
-            </Grid.Column>
-          </Grid>
-        </Modal.Content>
-        <Modal.Actions>
-          <Button
-            type="submit"
-            form="booking-edit-form"
-            disabled={submitBlocked || isLoading}
-            primary
-          >
-            <Translate>Save changes</Translate>
-          </Button>
-          <Button type="button" onClick={onClose}>
-            <Translate>Close</Translate>
-          </Button>
-        </Modal.Actions>
+                <FinalField name="extraFieldsChanged" component={() => null} />
+              </Grid.Column>
+              <Grid.Column stretched={!timelineError}>
+                {timelineError ? (
+                  <>
+                    <div>
+                      <Message
+                        icon="times circle outline"
+                        error
+                        content={timelineError}
+                        style={{marginBottom: '2rem'}}
+                      />
+                    </div>
+                    <DummyTimeline rows={10} />
+                  </>
+                ) : calendars ? (
+                  <BookingEditCalendar
+                    calendars={calendars}
+                    booking={booking}
+                    numberOfCandidates={numberOfCandidates}
+                    numberOfConflicts={numberOfConflicts}
+                    willBookingSplit={willBookingSplit}
+                    isLoading={isLoading}
+                  />
+                ) : null}
+                {this.renderConflictsMessage()}
+              </Grid.Column>
+            </Grid>
+          </Modal.Content>
+          <Modal.Actions>
+            <Button
+              type="submit"
+              form="booking-edit-form"
+              disabled={submitBlocked || isLoading}
+              primary
+            >
+              <Translate>Save changes</Translate>
+            </Button>
+            <Button type="button" onClick={onClose}>
+              <Translate>Close</Translate>
+            </Button>
+          </Modal.Actions>
+        </PopupMountScope>
       </Modal>
     );
   };
