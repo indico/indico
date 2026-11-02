@@ -22,11 +22,11 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableScheduleContribution,
                                                                 RHLegacyTimetableShiftEntries,
                                                                 RHLegacyTimetableSwapEntries)
-from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetable,
+from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetableLegacy,
                                                                 RHManageTimetable, RHManageTimetableEntryInfo,
                                                                 RHManageTimetableLegacy, RHTimetableBreak,
                                                                 RHTimetableBreakCreate, RHTimetableContribution,
-                                                                RHTimetableContributionCreate, RHTimetableREST,
+                                                                RHTimetableContributionCreate, RHTimetableRESTLegacy,
                                                                 RHTimetableScheduleContribution,
                                                                 RHTimetableSessionBlock, RHTimetableSessionBlockCreate,
                                                                 RHTimetableUnscheduleContribution)
@@ -42,9 +42,10 @@ _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
 _bp.add_url_rule('/manage/timetable/<date>/', 'management', RHManageTimetable)
 _bp.add_url_rule('/manage/timetable/<date>/block/<int:session_block_id>/', 'management', RHManageTimetable)
 _bp.add_url_rule('/manage/timetable-legacy/', 'management-legacy', RHManageTimetableLegacy)
-_bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/<int:entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH', 'DELETE'))
-_bp.add_url_rule('/manage/timetable/session/<int:session_id>/', 'manage_session', RHManageSessionTimetable)
+_bp.add_url_rule('/manage/timetable-legacy/', 'timetable_rest', RHTimetableRESTLegacy, methods=('POST',))
+_bp.add_url_rule('/manage/timetable-legacy/<int:entry_id>', 'timetable_rest', RHTimetableRESTLegacy,
+                 methods=('PATCH', 'DELETE'))
+_bp.add_url_rule('/manage/timetable-legacy/session/<int:session_id>/', 'manage_session', RHManageSessionTimetableLegacy)
 
 # Timetable legacy operations
 _bp.add_url_rule('/manage/timetable/add-session', 'add_session', RHLegacyTimetableAddSession, methods=('GET', 'POST'))
