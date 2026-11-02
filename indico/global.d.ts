@@ -28,7 +28,22 @@ declare const Indico: {
     affiliationMeta: object | null;
     avatarURL: string;
     email: string;
-    favoriteUsers: Record<string, User>;
+    favoriteUsers: Record<
+      string,
+      Pick<
+        User,
+        | '_type'
+        | 'affiliation'
+        | 'email'
+        | 'familyName'
+        | 'firstName'
+        | 'id'
+        | 'identifier'
+        | 'name'
+        | 'phone'
+        | 'title'
+      >
+    >;
     firstName: string;
     fullName: string;
     id: number;
