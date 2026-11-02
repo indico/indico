@@ -6,9 +6,11 @@
 // LICENSE file for more details.
 
 import React, {useState} from 'react';
+import {useSelector} from 'react-redux';
 import {Dropdown, Label} from 'semantic-ui-react';
 
 import {getRandomColors} from 'indico/modules/events/timetable/colors';
+import {getEventLocationParent} from 'indico/modules/events/timetable/selectors';
 import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import {FormFieldAdapter} from 'indico/react/forms';
 import {FinalField} from 'indico/react/forms/fields';
@@ -20,7 +22,7 @@ import './SessionSelect.module.scss';
 
 const DEFAULT_DRAFT_ID = -1;
 
-interface CompactSession extends Pick<Session, 'title' | 'colors'> {
+interface CompactSession extends Pick<Session, 'title' | 'colors' | 'childLocationParent'> {
   id: typeof DEFAULT_DRAFT_ID | number;
 }
 
@@ -82,6 +84,7 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
   sessions = [...sessions]; // Avoid mutating the original array when adding draft session
   const [query, setQuery] = useState('');
   const [options, setOptions] = useState<SessionOption[]>(_mapSessionsToOptions(sessions || []));
+  const eventLocationParent = useSelector(getEventLocationParent);
 
   const _onChangeValue = (id: number) => {
     const selectedSession = sessions.find(s => s.id === id);
@@ -102,6 +105,7 @@ export function SessionSelect({value, sessions, onChange}: SessionSelectProps) {
       id: DEFAULT_DRAFT_ID,
       title: query,
       colors: getRandomColors(),
+      childLocationParent: eventLocationParent,
     };
     const draftSessionOption = _mapSessionToOption(draftSession);
 
