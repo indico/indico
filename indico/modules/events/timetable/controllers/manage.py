@@ -93,7 +93,7 @@ class RHManageTimetableLegacy(RHManageTimetableBase):
         )
 
 
-class RHManageSessionTimetable(RHManageTimetableBase):
+class RHManageSessionTimetableLegacy(RHManageTimetableBase):
     """Display session timetable management page."""
 
     session_management_level = SessionManagementLevel.coordinate
@@ -108,7 +108,7 @@ class RHManageSessionTimetable(RHManageTimetableBase):
             'can_manage_blocks': self.session.can_manage_blocks(session.user),
             'can_manage_contributions': self.session.can_manage_contributions(session.user),
         }
-        return WPManageTimetable.render_template(
+        return WPManageTimetableLegacy.render_template(
             'session_management.html',
             self.event,
             event_info=event_info,
@@ -119,7 +119,7 @@ class RHManageSessionTimetable(RHManageTimetableBase):
         )
 
 
-class RHTimetableREST(RHManageTimetableEntryBase):
+class RHTimetableRESTLegacy(RHManageTimetableEntryBase):
     """RESTful timetable actions."""
 
     def _get_contribution_updates(self, data):
