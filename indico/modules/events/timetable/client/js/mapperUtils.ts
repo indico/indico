@@ -121,6 +121,7 @@ const sessionMapperConfig: MapperConfig<Record<string, unknown>, Session> = [
     toTransform: (minutes: number) => minutes * 60,
     fromTransform: (seconds: number) => seconds / 60,
   },
+  {from: 'child_location_parent', to: 'childLocationParent'},
 ];
 
 const personLinkMapperConfig: MapperConfig<Record<string, unknown>, PersonLink> = [
