@@ -9,8 +9,9 @@ import {useCallback, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 
 import * as actions from './actions';
+import {POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {EntryType, Navigation} from './types';
+import {BlockEntry, EntryType, Navigation, SessionBlockId} from './types';
 import {createTimetableURL, parseTimetableURL, useTimetableDispatch} from './utils';
 
 export function NavigationController() {
@@ -20,6 +21,16 @@ export function NavigationController() {
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const entries = useSelector(selectors.getEntries);
+  const sessions = useSelector(selectors.getSessions);
+  const {openModal} = useModal();
+
+  const isPosterSessionBlock = useCallback(
+    (blockId: SessionBlockId) => {
+      const block = entries[blockId] as BlockEntry;
+      return sessions[block.sessionId]?.isPoster ?? false;
+    },
+    [entries, sessions]
+  );
 
   const getValidatedLocation = useCallback(
     (location: Partial<Navigation>): Navigation => {
@@ -55,13 +66,24 @@ export function NavigationController() {
 
   useEffect(() => {
     function navigate(location: Navigation, replaceState: boolean) {
+      const expandedSessionBlockIsPoster =
+        location.expandedSessionBlockId && isPosterSessionBlock(location.expandedSessionBlockId);
       dispatch(actions.setCurrentDate(location.currentDate, eventId, false));
-      dispatch(actions.setExpandedSessionBlock(location.expandedSessionBlockId, eventId, false));
+      if (!expandedSessionBlockIsPoster) {
+        dispatch(actions.setExpandedSessionBlock(location.expandedSessionBlockId, eventId, false));
+      } else {
+        dispatch(actions.setExpandedSessionBlock(null, eventId, false));
+        openModal(POSTER_BLOCK_CONTRIBUTIONS_MODAL, {id: location.expandedSessionBlockId!});
+      }
       if (replaceState) {
         window.history.replaceState(
           null,
           '',
-          createTimetableURL(eventId, location.currentDate, location.expandedSessionBlockId)
+          createTimetableURL(
+            eventId,
+            location.currentDate,
+            expandedSessionBlockIsPoster ? null : location.expandedSessionBlockId
+          )
         );
       }
     }
@@ -93,7 +115,7 @@ export function NavigationController() {
       window.removeEventListener('popstate', popStateHandler);
       window.removeEventListener('load', loadHandler);
     };
-  }, [dispatch, currentDate, eventId, getValidatedLocation]);
+  }, [dispatch, currentDate, eventId, getValidatedLocation, isPosterSessionBlock, openModal]);
 
   return null;
 }
