@@ -12,6 +12,7 @@ import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import moment, {Moment} from 'moment';
 import {useEffect, useRef} from 'react';
+import {useDispatch} from 'react-redux';
 import {SemanticICONS} from 'semantic-ui-react';
 
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
@@ -23,6 +24,7 @@ import {
   EntryUniqueID,
   Navigation,
   SessionBlockId,
+  TimetableDispatch,
 } from './types';
 
 export const DATE_KEY_FORMAT = 'YYYYMMDD';
@@ -34,6 +36,10 @@ export const HOUR_SIZE = minutesToPixels(60);
 export const DAY_SIZE = 24 * HOUR_SIZE;
 export const V_SPACE_BETWEEN_ENTRIES_PX = 1;
 export const DRAG_DURATION_THRESHOLD = 100;
+
+export function useTimetableDispatch(): TimetableDispatch {
+  return useDispatch();
+}
 
 export function snapPixels(x: number) {
   return Math.ceil(x / GRID_SIZE) * GRID_SIZE;

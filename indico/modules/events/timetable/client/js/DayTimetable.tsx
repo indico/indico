@@ -10,8 +10,7 @@ import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import moment, {Moment} from 'moment';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {ThunkDispatch} from 'redux-thunk';
+import {useSelector} from 'react-redux';
 
 import {Translate, Param} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
@@ -39,7 +38,6 @@ import TimetableSidePanel from './TimetableSidePanel';
 import TimetableTabRail from './TimetableTabRail';
 import {useToast} from './ToastContext';
 import {
-  ReduxState,
   TopLevelEntry,
   BlockEntry,
   Entry,
@@ -63,6 +61,7 @@ import {
   minutesToPixels,
   pixelsToMinutes,
   snapMinutes,
+  useTimetableDispatch,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -87,7 +86,7 @@ const TopLevelEntries = React.memo(function TopLevelEntries({
   dt: Moment;
   entries: TopLevelEntry[];
 }) {
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   // (Ajob) In session block view, children become top-level entries
 
   const parent = useSelector(selectors.getExpandedSessionBlock);
@@ -193,7 +192,7 @@ export function DayTimetable({
   scrollPosition = 0,
 }: DayTimetableProps) {
   const toast = useToast();
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   const eventStartDt = useSelector(selectors.getEventStartDt);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const calendarRef = useRef<HTMLDivElement | null>(null);

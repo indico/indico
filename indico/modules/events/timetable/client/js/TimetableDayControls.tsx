@@ -8,7 +8,6 @@
 import moment, {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import {ThunkDispatch} from 'redux-thunk';
 import {Button, Header, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -16,7 +15,7 @@ import {Translate} from 'indico/react/i18n';
 import * as actions from './actions';
 import * as selectors from './selectors';
 import {ReduxState} from './types';
-import {getEntryColors} from './utils';
+import {getEntryColors, useTimetableDispatch} from './utils';
 
 import './TimetableDayControls.module.scss';
 
@@ -73,7 +72,7 @@ function TimetableDayControls({
   currentDayIdx,
   eventStart,
 }: TimetableDayControlsProps) {
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   const eventId = useSelector(selectors.getEventId);
 
   const daysBarRef = useRef<HTMLDivElement | null>(null);

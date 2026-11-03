@@ -20,7 +20,6 @@ import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 import _ from 'lodash';
 import {Moment} from 'moment';
 import {Dispatch} from 'redux';
-import {ThunkDispatch} from 'redux-thunk/es';
 
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 
@@ -48,6 +47,7 @@ import {
   Attachment,
   EventType,
   ChildEntry,
+  TimetableDispatch,
 } from './types';
 import {getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -276,10 +276,7 @@ export function setSessionData(data: any): SetSessionDataAction {
 }
 
 export function editSession(sessionId: number, payload: Record<string, unknown>) {
-  return async (
-    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
-    getState: () => ReduxState
-  ) => {
+  return async (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -309,10 +306,7 @@ export function editSession(sessionId: number, payload: Record<string, unknown>)
 
 // TODO: (Ajob) Implement interface for raw data session (e.g. uses ColorSchema)
 export function createSession(session: any) {
-  return async (
-    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
-    getState: () => ReduxState
-  ) => {
+  return async (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -332,7 +326,7 @@ export function createSession(session: any) {
 }
 
 export function deleteSession(sessionId: number) {
-  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -357,7 +351,7 @@ export function changeEntryLayout(
   date: string,
   sessionBlockId?: number
 ) {
-  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {
       staticData,
       entries: {entries: stateEntries},
@@ -431,7 +425,7 @@ export function setExpandedSessionBlock(
 }
 
 export function resizeEntry(entry: Entry, duration: number, date: string) {
-  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {staticData} = getState();
     const eventId = staticData.eventId;
     const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
@@ -478,7 +472,7 @@ export function deleteUnscheduledContrib(id: number, eventId: number) {
 }
 
 export function deleteScheduledContrib(id: number) {
-  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {staticData} = getState();
     const eventId = staticData.eventId;
     const contribURL = contributionURL({event_id: eventId, contrib_id: id});
@@ -499,7 +493,7 @@ export function addUnscheduledContrib(entry: UnscheduledContribEntry) {
 }
 
 export function deleteBlock(entry: BlockEntry, eventId: number) {
-  return (dispatch: ThunkDispatch<ReduxState, unknown, Action>, getState: () => ReduxState) => {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {staticData, entries} = getState();
     const eventType = staticData.eventType;
     const entryURL = sessionBlockURL({event_id: eventId, block_id: entry.objId});
@@ -528,7 +522,7 @@ export function scheduleEntry(
       ? {event_id: eventId, block_id: entry.sessionBlockId?.slice(1)}
       : {event_id: eventId}
   );
-  const updateFunc = async (dispatch: ThunkDispatch<ReduxState, unknown, Action>) => {
+  const updateFunc = async (dispatch: TimetableDispatch) => {
     const resp = await indicoAxios.post(scheduleURL, {
       contribs: [{contrib_id: entry.objId, start_dt: entry.startDt.toISOString()}],
     });
@@ -557,7 +551,7 @@ export function scheduleEntry(
 
 export function unscheduleEntry(entry: ContribEntry, eventId: number) {
   const entryURL = unscheduleContributionURL({event_id: eventId, contrib_id: entry.objId});
-  const updateFunc = async (dispatch: ThunkDispatch<ReduxState, unknown, Action>) => {
+  const updateFunc = async (dispatch: TimetableDispatch) => {
     const resp = await indicoAxios.post(entryURL);
     const respEntry = mapDataToEntry(resp.data);
     dispatch({
@@ -585,10 +579,7 @@ function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {
 }
 
 export function createEntry(entryType: EntryType, payload: any) {
-  return async (
-    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
-    getState: () => ReduxState
-  ) => {
+  return async (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -652,10 +643,7 @@ export function updateEntry(
   customPayload: any,
   optimistic = true
 ) {
-  return async (
-    dispatch: ThunkDispatch<ReduxState, unknown, Action>,
-    getState: () => ReduxState
-  ) => {
+  return async (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {
       staticData: {eventId},
     } = getState();
@@ -759,7 +747,7 @@ const requestQueue = new RequestQueue();
  * @param action Action to dispatch immediately before the request.
  */
 export function synchronizedAjaxAction(
-  requestFunc: (dispatch: ThunkDispatch<ReduxState, unknown, Action>) => Promise<any>,
+  requestFunc: (dispatch: TimetableDispatch) => Promise<any>,
   action?: Action
 ) {
   return (dispatch: Dispatch) => {
