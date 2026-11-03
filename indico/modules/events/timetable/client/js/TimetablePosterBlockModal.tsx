@@ -9,7 +9,7 @@ import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 
 import React from 'react';
 import {useSelector} from 'react-redux';
-import {Button, Label, Modal, Segment} from 'semantic-ui-react';
+import {Button, Icon, Label, Modal, Popup, Segment} from 'semantic-ui-react';
 
 import {useTimetableDispatch} from 'indico/modules/events/timetable/utils';
 import {Param, Translate} from 'indico/react/i18n';
@@ -19,7 +19,7 @@ import * as actions from './actions';
 import {mapDataToEntry} from './mapperUtils';
 import {DRAFT_ENTRY_MODAL, POSTER_BLOCK_CONTRIBUTIONS_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {BlockEntry, ContribEntry, EntryType, ReduxState, SessionBlockId} from './types';
+import {BlockEntry, ChildEntry, ContribEntry, EntryType, ReduxState, SessionBlockId} from './types';
 
 import './TimetablePosterBlockModal.module.scss';
 
@@ -29,7 +29,7 @@ interface TimetablePosterBlockModalProps {
 }
 
 interface PosterContributionProps {
-  entry: ContribEntry;
+  entry: ChildEntry;
   block: BlockEntry;
 }
 
@@ -57,12 +57,27 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) =
   };
 
   const onDelete = async () => {
-    dispatch(actions.unscheduleEntry(entry, eventId));
+    if (entry.type === EntryType.Contribution) {
+      dispatch(actions.unscheduleEntry(entry, eventId));
+    } else {
+      dispatch(actions.deleteBreak(entry, eventId));
+    }
   };
 
   return (
     <Segment styleName="contrib">
-      {entry.title}
+      <span>
+        {entry.title}{' '}
+        {entry.type === EntryType.Break && (
+          <Popup
+            trigger={<Icon name="warning sign" color="yellow" />}
+            content={Translate.string('Breaks should not be part of poster sessions')}
+            position="right center"
+            offset={[0, 10]}
+            inverted
+          />
+        )}
+      </span>
       <div>
         <Button
           type="button"
@@ -74,8 +89,12 @@ const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) =
         />
         <Button
           type="button"
-          icon="calendar"
-          title={Translate.string('Unschedule')}
+          icon={entry.type === EntryType.Break ? 'trash' : 'calendar'}
+          title={
+            entry.type === EntryType.Break
+              ? Translate.string('Delete')
+              : Translate.string('Unschedule')
+          }
           basic
           size="small"
           onClick={onDelete}
@@ -112,6 +131,7 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,
       entry: draftEntry,
+      isChildOfPoster: true,
       onClose: () => {
         dispatch(actions.setDraftEntry(null));
         openModal(POSTER_BLOCK_CONTRIBUTIONS_MODAL, {id: block.id});
@@ -140,7 +160,7 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
       <Modal.Content styleName="modal-content">
         <Segment.Group styleName="contribs">
           {children.map(c => (
-            <PosterContribution key={c.id} entry={c as ContribEntry} block={block} />
+            <PosterContribution key={c.id} entry={c} block={block} />
           ))}
         </Segment.Group>
       </Modal.Content>
