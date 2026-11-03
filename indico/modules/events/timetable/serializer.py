@@ -12,6 +12,7 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionReferenceSchema,
                                                          ContributionTypeSchema)
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
@@ -256,7 +257,8 @@ def serialize_event_info(event, *, user=None):
             'contributions': [serialize_unscheduled_contribution(c, can_manage_event=can_manage_event)
                               for c in Contribution.query.with_parent(event).filter_by(is_scheduled=False)],
             'customFields': custom_fields,
-            'contribution_types': contribution_types}
+            'contribution_types': contribution_types,
+            'allowed_contribution_keywords': sorted(global_event_settings.get('allowed_contribution_keywords'))}
 
 
 def serialize_session(sess):

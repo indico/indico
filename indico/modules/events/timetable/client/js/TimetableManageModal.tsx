@@ -168,6 +168,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   };
 
   const customFields = useSelector(selectors.getCustomContribFields);
+  const allowedKeywords = useSelector(selectors.getAllowedContribKeywords);
   const contributionTypes = useSelector(selectors.getContributionTypes);
   const currentDay = useSelector(selectors.getCurrentDate).format(DATE_KEY_FORMAT);
   const sessionsObj = useSelector(selectors.getSessions);
@@ -184,6 +185,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         locationParent={snakifyKeys(entry.locationParent)}
         sessionBlock={parent}
         customFields={customFields}
+        allowedKeywords={allowedKeywords}
         contributionTypes={contributionTypes}
       />
     ),
