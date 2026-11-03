@@ -280,7 +280,8 @@ class EmailRegistrantsForm(IndicoForm):
         event = self.regform.event
         super().__init__(*args, **kwargs)
         self.sender_address.choices = list(
-            event.get_allowed_sender_emails(plugin_ctx={'regform': self.regform}).items()
+            event.get_allowed_sender_emails(plugin_ctx={'regform': self.regform,
+                                                        'email_context': 'registration'}).items()
         )
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
 

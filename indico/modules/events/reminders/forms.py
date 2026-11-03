@@ -93,7 +93,8 @@ class ReminderForm(IndicoForm):
             inject_validators(self, 'message', [DataRequired()])
         super().__init__(*args, **kwargs)
         allowed_senders = self.event.get_allowed_sender_emails(include_noreply=True,
-                                                               extra=self.reply_to_address.object_data)
+                                                               extra=self.reply_to_address.object_data,
+                                                               plugin_ctx={'email_context': 'reminder'})
         self.reply_to_address.choices = list(allowed_senders.items())
         if self.event.type_ == EventType.lecture:
             del self.include_summary
