@@ -9,6 +9,7 @@ import createSessionURL from 'indico-url:sessions.api_create_session';
 import sessionURL from 'indico-url:sessions.api_manage_session';
 import breakCreateURL from 'indico-url:timetable.tt_break_create';
 import breakURL from 'indico-url:timetable.tt_break_rest';
+import childLocationsURL from 'indico-url:timetable.tt_child_locations';
 import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import unscheduleContributionURL from 'indico-url:timetable.tt_contrib_unschedule';
@@ -16,6 +17,7 @@ import scheduleContribURL from 'indico-url:timetable.tt_schedule';
 import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
+import _ from 'lodash';
 import {Moment} from 'moment';
 import {Dispatch} from 'redux';
 import {ThunkDispatch} from 'redux-thunk/es';
@@ -45,6 +47,7 @@ import {
   EntryUniqueID,
   Attachment,
   EventType,
+  ChildEntry,
 } from './types';
 import {getEntryUniqueId, getEntryURLByObjId} from './utils';
 
@@ -75,6 +78,7 @@ export const CREATE_ENTRY = 'Create entry';
 export const UPDATE_UNSCHEDULED_ENTRY = 'Update unscheduled entry';
 export const UPDATE_ENTRY = 'Update entry';
 export const SET_ENTRY_ATTACHMENTS = 'Set entry attachments';
+export const UPDATE_LOCATION_DATA = 'Update location data';
 
 interface SetTimetableDataAction {
   type: typeof SET_TIMETABLE_DATA;
@@ -151,6 +155,11 @@ interface SetEntryAttachments {
   attachments: Attachment[];
   id: EntryUniqueID;
   sessionId: number | null;
+}
+
+interface UpdateLocationData {
+  type: typeof UPDATE_LOCATION_DATA;
+  data: Record<EntryUniqueID, any>;
 }
 
 interface DeleteBreakAction {
@@ -240,6 +249,7 @@ export type Action =
   | CreateEntryAction
   | UpdateEntryAction
   | SetEntryAttachments
+  | UpdateLocationData
   | DeleteBreakAction
   | DeleteUnscheduledContribAction
   | DeleteScheduledContribAction
@@ -275,10 +285,25 @@ export function editSession(sessionId: number, payload: Record<string, unknown>)
     } = getState();
     const url = sessionURL({event_id: eventId, session_id: sessionId});
     const resp = await indicoAxios.patch(url, payload);
-    return dispatch({
+    const locResp = payload.location_data
+      ? await indicoAxios.get(childLocationsURL({event_id: eventId, session_id: sessionId}))
+      : null;
+
+    dispatch({
       type: EDIT_SESSION,
       session: mapDataToSession(resp.data),
     });
+    if (locResp) {
+      dispatch({
+        type: UPDATE_LOCATION_DATA,
+        data: Object.fromEntries(
+          Object.entries(locResp.data).map(([id, data]) => [
+            id,
+            mapDataToEntry(data as Record<string, any>),
+          ])
+        ),
+      });
+    }
   };
 }
 
@@ -356,8 +381,30 @@ export function changeEntryLayout(
       return;
     }
 
-    return dispatch(
-      synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
+    const updateFunc = async () => {
+      const resp = await indicoAxios.patch(entryURL, entryData);
+      if (
+        (entryBeforeChanges as ChildEntry).sessionBlockId !== (entry as ChildEntry).sessionBlockId
+      ) {
+        const newData = mapDataToEntry(resp.data);
+        const changes: Record<string, any> = {};
+        if (!_.isEqual(newData.locationData, entry.locationData)) {
+          changes.locationData = newData.locationData;
+        }
+        if (!_.isEqual(newData.locationData, entry.locationData)) {
+          changes.locationParent = newData.locationParent;
+        }
+        if (Object.keys(changes).length) {
+          dispatch({
+            type: UPDATE_LOCATION_DATA,
+            data: {[entry.id]: changes},
+          });
+        }
+      }
+    };
+
+    dispatch(
+      synchronizedAjaxAction(updateFunc, {
         type: CHANGE_ENTRY_LAYOUT,
         date,
         entry,
@@ -481,26 +528,46 @@ export function scheduleEntry(
       ? {event_id: eventId, block_id: entry.sessionBlockId?.slice(1)}
       : {event_id: eventId}
   );
+  const updateFunc = async (dispatch: ThunkDispatch<ReduxState, unknown, Action>) => {
+    const resp = await indicoAxios.post(scheduleURL, {
+      contribs: [{contrib_id: entry.objId, start_dt: entry.startDt.toISOString()}],
+    });
+    // TODO it would be nicer to actually sync the whole contrib with the data
+    // from the server and not just the location information
+    dispatch({
+      type: UPDATE_LOCATION_DATA,
+      data: Object.fromEntries(
+        resp.data.map((c: any) => {
+          const ce = mapDataToEntry(c);
+          return [ce.id, {locationData: ce.locationData}];
+        })
+      ),
+    });
+  };
   // TODO only pass contribId and none of the other stuff here?!
-  return synchronizedAjaxAction(
-    () =>
-      indicoAxios.post(scheduleURL, {
-        contribs: [{contrib_id: entry.objId, start_dt: entry.startDt.toISOString()}],
-      }),
-    {
-      type: SCHEDULE_ENTRY,
-      id: entry.id,
-      startDt: entry.startDt,
-      sessionBlockId: isChildEntry(entry) ? entry.sessionBlockId! : null,
-      sessionId: entry.sessionId!,
-      layoutOverrides,
-    }
-  );
+  return synchronizedAjaxAction(updateFunc, {
+    type: SCHEDULE_ENTRY,
+    id: entry.id,
+    startDt: entry.startDt,
+    sessionBlockId: isChildEntry(entry) ? entry.sessionBlockId! : null,
+    sessionId: entry.sessionId!,
+    layoutOverrides,
+  });
 }
 
 export function unscheduleEntry(entry: ContribEntry, eventId: number) {
   const entryURL = unscheduleContributionURL({event_id: eventId, contrib_id: entry.objId});
-  return synchronizedAjaxAction(() => indicoAxios.post(entryURL), {
+  const updateFunc = async (dispatch: ThunkDispatch<ReduxState, unknown, Action>) => {
+    const resp = await indicoAxios.post(entryURL);
+    const respEntry = mapDataToEntry(resp.data);
+    dispatch({
+      type: UPDATE_LOCATION_DATA,
+      data: {
+        [respEntry.id]: {locationData: respEntry.locationData},
+      },
+    });
+  };
+  return synchronizedAjaxAction(updateFunc, {
     type: UNSCHEDULE_ENTRY,
     entry,
   });
@@ -555,6 +622,29 @@ export function _updateEntry(
   return {type: UPDATE_ENTRY, entryType, entry, currentDay, changes};
 }
 
+async function _updateEntryLocationData(
+  entryType: EntryType,
+  entry: Entry,
+  eventId: number,
+  customPayload: any
+): Promise<UpdateLocationData | undefined> {
+  if (entryType !== EntryType.SessionBlock || customPayload.location_data === undefined) {
+    return;
+  }
+  const locResp = await indicoAxios.get(
+    childLocationsURL({event_id: eventId, session_id: entry.sessionId, block_id: entry.objId})
+  );
+  return {
+    type: UPDATE_LOCATION_DATA,
+    data: Object.fromEntries(
+      Object.entries(locResp.data).map(([id, data]) => [
+        id,
+        mapDataToEntry(data as Record<string, any>),
+      ])
+    ),
+  };
+}
+
 export function updateEntry(
   entryType: EntryType,
   entry: Entry,
@@ -576,16 +666,26 @@ export function updateEntry(
     }[entryType];
 
     if (optimistic) {
+      // XXX we do not have optimistic update cases where we need to deal with location changes
       const action = synchronizedAjaxAction(
         () => indicoAxios.patch(updateURL, customPayload),
         _updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload))
       );
-      return dispatch(action);
+      dispatch(action);
     } else {
       // eslint-disable-next-line no-use-before-define
       await requestQueue.ensureEmpty();
       await indicoAxios.patch(updateURL, customPayload);
-      return dispatch(_updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload)));
+      const updateLocationDataAction = await _updateEntryLocationData(
+        entryType,
+        entry,
+        eventId,
+        customPayload
+      );
+      dispatch(_updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload)));
+      if (updateLocationDataAction) {
+        dispatch(updateLocationDataAction);
+      }
     }
   };
 }
@@ -658,11 +758,14 @@ const requestQueue = new RequestQueue();
  * @param requestFunc Function that does the AJAX request (typically an indicoAxios call).
  * @param action Action to dispatch immediately before the request.
  */
-export function synchronizedAjaxAction(requestFunc: () => Promise<object>, action?: Action) {
+export function synchronizedAjaxAction(
+  requestFunc: (dispatch: ThunkDispatch<ReduxState, unknown, Action>) => Promise<any>,
+  action?: Action
+) {
   return (dispatch: Dispatch) => {
     if (action) {
       dispatch(action);
     }
-    requestQueue.submitRequest(requestFunc);
+    requestQueue.submitRequest(() => requestFunc(dispatch));
   };
 }

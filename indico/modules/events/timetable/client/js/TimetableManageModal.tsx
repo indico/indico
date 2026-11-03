@@ -8,6 +8,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import React, {useState, useEffect} from 'react';
+import {FormRenderProps} from 'react-final-form';
 import {useDispatch, useSelector} from 'react-redux';
 import {ThunkDispatch} from 'redux-thunk';
 import {Button, Divider, Header, Segment} from 'semantic-ui-react';
@@ -26,7 +27,7 @@ import {mapDataToEntry, mapEntryToData, mapSessionToData} from './mapperUtils';
 import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
 import {useToast} from './ToastContext';
-import {ReduxState, BlockEntry, EntryType, Session} from './types';
+import {ReduxState, BlockEntry, EntryType, Session, LocationParent} from './types';
 import {DATE_KEY_FORMAT, getDateKey} from './utils';
 
 // Generic models
@@ -97,6 +98,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
   const entries = useSelector(selectors.getCurrentEntries);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
+  const [sessionLocationParent, setSessionLocationParent] = useState<LocationParent | null>(null);
   // Within this timetable we only care about the database ID,
   // not the unique ID generated for the timetable
   const {objId, sessionBlockId = expandedSessionBlock?.objId} = entry;
@@ -139,7 +141,9 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     keywords: entry.keywords || [],
     references: entry.references || [],
     // TODO: (Ajob) Clean up the location data
-    location_data: snakifyKeys(entry.locationData) || {inheriting: false},
+    location_data: sessionLocationParent
+      ? snakifyKeys({...sessionLocationParent.location_data, inheriting: true})
+      : snakifyKeys(entry.locationData),
     // TODO: (Ajob) Check how we can clean up the required format
     //       as it seems like Contributions need it to be without tzinfo
     start_dt: initialStartDt,
@@ -188,11 +192,17 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
       ? {
           [EntryType.SessionBlock]: (
             <>
-              {!isEditing && <FinalSessionSelect sessions={sessions} required />}
+              {!isEditing && (
+                <FinalSessionSelect
+                  sessions={sessions}
+                  onChange={sess => setSessionLocationParent(sess.childLocationParent ?? null)}
+                  required
+                />
+              )}
               <SessionBlockFormFields
                 eventId={eventId}
                 extraOptions={extraOptions}
-                locationParent={snakifyKeys(entry.locationParent)}
+                locationParent={snakifyKeys(sessionLocationParent ?? entry.locationParent)}
               />
             </>
           ),
@@ -209,7 +219,6 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
     ),
   };
 
-  // TODO: (Ajob) Implement properly in next issue on editing existing entries
   const [activeType, setActiveType] = useState<EntryType>(
     isEditing ? entry.type : Object.keys(forms)[0]
   );
@@ -297,6 +306,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
 
   const changeForm = (key: EntryType) => {
     setActiveType(key);
+    setSessionLocationParent(null);
   };
 
   useEffect(() => {
@@ -334,31 +344,36 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
         />
       }
     >
-      {!isEditing && (
+      {({form}: FormRenderProps) => (
         <>
-          <Segment textAlign="center">
-            <Header as="h4">
-              <Translate>Entry Type</Translate>
-            </Header>
-            <div>
-              {Object.keys(forms).map(key => (
-                <Button
-                  key={key}
-                  type="button"
-                  onClick={() => {
-                    changeForm(key as EntryType);
-                  }}
-                  primary={activeType === key}
-                >
-                  {typeLongNames[key as EntryType]}
-                </Button>
-              ))}
-            </div>
-          </Segment>
-          <Divider />
+          {!isEditing && (
+            <>
+              <Segment textAlign="center">
+                <Header as="h4">
+                  <Translate>Entry Type</Translate>
+                </Header>
+                <div>
+                  {Object.keys(forms).map(key => (
+                    <Button
+                      key={key}
+                      type="button"
+                      onClick={() => {
+                        changeForm(key as EntryType);
+                        form.change('session_object', undefined);
+                      }}
+                      primary={activeType === key}
+                    >
+                      {typeLongNames[key as EntryType]}
+                    </Button>
+                  ))}
+                </div>
+              </Segment>
+              <Divider />
+            </>
+          )}
+          {forms[activeType]}
         </>
       )}
-      {forms[activeType]}
     </FinalModalForm>
   );
 };
