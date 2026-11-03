@@ -12,7 +12,7 @@ import typesURL from 'indico-url:sessions.types_rest';
 
 import {FormApi} from 'final-form';
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux/es';
+import {useDispatch, useSelector} from 'react-redux';
 import {Dimmer, Loader} from 'semantic-ui-react';
 
 import {SessionForm} from 'indico/modules/events/sessions/SessionForm';

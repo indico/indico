@@ -7,16 +7,15 @@
 
 import moment from 'moment';
 import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {ThunkDispatch} from 'redux-thunk';
+import {useSelector} from 'react-redux';
 
 import * as actions from './actions';
 import {DayTimetable} from './DayTimetable';
 import {NavigationController} from './NavigationController';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {EntryType, ReduxState} from './types';
-import {minutesToPixels} from './utils';
+import {EntryType} from './types';
+import {minutesToPixels, useTimetableDispatch} from './utils';
 
 import './timetable.scss';
 import './Timetable.module.scss';
@@ -84,7 +83,7 @@ export default function Timetable() {
 }
 
 function GlobalEvents() {
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   const eventId = useSelector(selectors.getEventId);
   const selectedEntry = useSelector(selectors.getSelectedEntry);
 
