@@ -25,7 +25,10 @@ export const UNSCHEDULED_CONTRIB_CREATE_MODAL = 'Create unscheduled contribution
 export const UNSCHEDULED_CONTRIB_EDIT_MODAL = 'Edit unscheduled contribution';
 
 type ModalState =
-  | {type: typeof DRAFT_ENTRY_MODAL; payload: {eventId: number; entry; onClose?}}
+  | {
+      type: typeof DRAFT_ENTRY_MODAL;
+      payload: {eventId: number; entry; onClose?; isChildOfPoster?: boolean};
+    }
   | {type: typeof POSTER_BLOCK_CONTRIBUTIONS_MODAL; payload: {id: SessionBlockId}}
   | {type: typeof SESSION_CREATE_MODAL; payload: {onClose?: () => void}}
   | {type: typeof SESSION_EDIT_MODAL; payload: {sessionId: number; onClose?: () => void}}
@@ -70,6 +73,7 @@ function ModalRoot({modal, closeModal}: ModalRootInterface) {
         <TimetableManageModal
           eventId={payload.eventId}
           entry={payload.entry}
+          isChildOfPoster={payload?.isChildOfPoster}
           onClose={() => {
             closeModal();
             payload.onClose?.();
