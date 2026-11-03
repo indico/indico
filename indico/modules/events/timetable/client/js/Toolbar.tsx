@@ -10,6 +10,7 @@ import React, {useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {Button, Icon} from 'semantic-ui-react';
 
+import {ReduxState} from 'indico/modules/events/timetable/types';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
@@ -32,6 +33,9 @@ export default function Toolbar() {
   const currentDate = useSelector(selectors.getCurrentDate);
   const currentEntries = useSelector(selectors.getCurrentEntries);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
+  const expandedSessionBlockIsPoster = useSelector((state: ReduxState) =>
+    expandedSessionBlock ? selectors.isPosterSessionBlock(state, expandedSessionBlock?.id) : false
+  );
   const defaultContributionDuration = useSelector(selectors.getDefaultContribDurationMinutes);
   const eventLocationParent = useSelector(selectors.getEventLocationParent);
   const currentDayIdx = getDiffInDays(eventStart, currentDate);
@@ -68,6 +72,7 @@ export default function Toolbar() {
     openModal(DRAFT_ENTRY_MODAL, {
       eventId,
       entry: draftEntry,
+      isChildOfPoster: expandedSessionBlockIsPoster,
       onClose: () => {
         dispatch(actions.setDraftEntry(null));
       },
