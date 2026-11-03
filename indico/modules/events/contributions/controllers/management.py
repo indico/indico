@@ -51,6 +51,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
                                                                  EmailRolesSendMixin)
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
@@ -410,6 +411,13 @@ class RHAPIContributionTypes(RHManageContributionsBase):
         # TODO: Use a more appropriate permission here so that someone with access to this
         # specific contribution (but not all of them) can use this endpoint
         return ContributionTypeSchema(many=True).jsonify(self.event.contribution_types)
+
+
+class RHAPIContributionAllowedKeywords(RHManageContributionsBase):
+    def _process(self):
+        # TODO: Use a more appropriate permission here so that someone with access to this
+        # specific contribution (but not all of them) can use this endpoint
+        return jsonify(sorted(global_event_settings.get('allowed_contribution_keywords')))
 
 
 class RHAPIContributionPersonLinkFieldParams(RHManageContributionBase):

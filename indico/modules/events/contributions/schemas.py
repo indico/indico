@@ -8,7 +8,7 @@
 import hashlib
 from operator import attrgetter
 
-from marshmallow import EXCLUDE, fields, post_dump
+from marshmallow import EXCLUDE, ValidationError, fields, post_dump, post_load, validates
 from marshmallow_sqlalchemy import column2field
 
 from indico.core.marshmallow import mm
@@ -19,12 +19,14 @@ from indico.modules.events.contributions.models.fields import (ContributionField
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.person_link_schemas import ContributionPersonLinkSchema as _ContributionPersonLinkSchema
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.schemas import BasicSessionBlockSchema, BasicSessionSchema
 from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
+from indico.util.i18n import _
 from indico.util.locations import LocationDataSchema
 from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList, not_empty
 from indico.web.flask.util import url_for
@@ -197,3 +199,19 @@ class ContributionRESTSchema(CustomFieldsMixin, mm.SQLAlchemyAutoSchema):
     duration = fields.TimeDelta(required=True)
     _description = fields.String(attribute='description')
     type = ModelField(ContributionType, with_parent='event', data_key='type_id', allow_none=True)
+
+    @validates('keywords')
+    def _validate_keywords(self, value):
+        if not (allowed_keywords := set(global_event_settings.get('allowed_contribution_keywords'))):
+            return
+        contrib = self.context.get('object')
+        existing_keywords = set(contrib.keywords) if contrib else set()
+        keywords = set(value)
+        if not (keywords <= (allowed_keywords | existing_keywords)):
+            raise ValidationError(_('Invalid keyword found'))
+
+    @post_load
+    def _sort_keywords(self, data, **kwargs):
+        if 'keywords' in data:
+            data['keywords'] = sorted(set(data['keywords']))
+        return data
