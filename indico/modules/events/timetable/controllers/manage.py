@@ -502,6 +502,8 @@ class RHTimetableChildLocations(RHManageTimetableBase):
     """Return location data for children of a session or block."""
 
     normalize_url_spec = {
+        # It doesn't really matter here, but we want to avoid `self.session_block`
+        # ever being for a different session than `self.session`
         'locators': {lambda self: self.obj},
     }
 
