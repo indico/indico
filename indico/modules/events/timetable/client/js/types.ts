@@ -238,6 +238,7 @@ interface StaticData {
   eventType: EventType;
   customFields: CustomField[];
   contributionTypes: ContributionType[];
+  allowedContributionKeywords: string[];
 }
 
 export interface Navigation {

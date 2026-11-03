@@ -52,6 +52,7 @@ import {getCurrentDateLocalStorage} from './utils';
           eventLocationParent: eventInfo.location_parent,
           customFields: camelizeKeys(eventInfo.customFields),
           contributionTypes: eventInfo.contribution_types,
+          allowedContributionKeywords: eventInfo.allowed_contribution_keywords,
         },
         navigation: {
           isDraft: eventInfo.is_draft,

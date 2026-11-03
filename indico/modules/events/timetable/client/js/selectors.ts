@@ -136,6 +136,10 @@ export const getCustomContribFields = createSelector(
   getStaticData,
   staticData => staticData.customFields
 );
+export const getAllowedContribKeywords = createSelector(
+  getStaticData,
+  staticData => staticData.allowedContributionKeywords
+);
 export const getContributionTypes = createSelector(
   getStaticData,
   staticData => staticData.contributionTypes

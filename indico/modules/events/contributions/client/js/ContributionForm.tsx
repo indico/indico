@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import contribAllowedKeywordsURL from 'indico-url:contributions.api_contrib_allowed_keywords';
 import contribFieldsURL from 'indico-url:contributions.api_contrib_fields';
 import locationParentContribURL from 'indico-url:contributions.api_contrib_location_parent';
 import contribPersonLinkFieldParamsURL from 'indico-url:contributions.api_contrib_person_link_params';
@@ -58,6 +59,7 @@ interface CustomField {
 interface ContributionFormProps {
   eventId: number;
   personLinkFieldParams?: Record<string, any>;
+  allowedKeywords: string[];
   locationParent?: Record<string, any>;
   customFields: CustomField[];
   contributionTypes: ContributionType[];
@@ -77,6 +79,7 @@ interface ContributionFormFieldsProps {
   customFields?: CustomField[];
   contributionTypes?: ContributionType[];
   extraOptions?: Record<string, any>;
+  allowedKeywords: string[];
   [key: string]: any; // Allow additional props
 }
 
@@ -88,6 +91,7 @@ export function ContributionFormFields({
   customFields = [],
   contributionTypes = [],
   extraOptions = {},
+  allowedKeywords = [],
 }: ContributionFormFieldsProps) {
   const customFieldNames = customFields.map(f => `custom_fields.custom_${f.id}`);
   const customFieldsSection = customFields.map(
@@ -224,11 +228,26 @@ export function ContributionFormFields({
         label={Translate.string('Location')}
         locationParent={locationParent}
       />
-      <FinalTagList
-        name="keywords"
-        label={Translate.string('Keywords')}
-        placeholder={Translate.string('Please enter a keyword')}
-      />
+      {allowedKeywords.length ? (
+        <FinalDropdown
+          name="keywords"
+          label={Translate.string('Keywords')}
+          multiple
+          selection
+          options={[...new Set([...allowedKeywords, ...initialValues.keywords])].map(keyword => ({
+            value: keyword,
+            text: keyword,
+            key: keyword,
+          }))}
+          placeholder={Translate.string('Please choose a keyword')}
+        />
+      ) : (
+        <FinalTagList
+          name="keywords"
+          label={Translate.string('Keywords')}
+          placeholder={Translate.string('Please enter a keyword')}
+        />
+      )}
       <CollapsibleContainer
         title={
           <span style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}>
@@ -265,6 +284,7 @@ function ContributionForm({
   contributionTypes = [],
   onSubmit,
   initialValues = {},
+  allowedKeywords = [],
   sessionBlock = null,
   loading,
   editing = false,
@@ -318,14 +338,13 @@ function ContributionForm({
     >
       <ContributionFormFields
         eventId={eventId}
-        {...{
-          locationParent,
-          initialValues,
-          sessionBlock,
-          customFields,
-          contributionTypes,
-          personLinkFieldParams,
-        }}
+        locationParent={locationParent}
+        initialValues={initialValues}
+        sessionBlock={sessionBlock}
+        customFields={customFields}
+        contributionTypes={contributionTypes}
+        personLinkFieldParams={personLinkFieldParams}
+        allowedKeywords={allowedKeywords}
       />
     </FinalModalForm>
   );
@@ -344,6 +363,10 @@ export function ContributionEditForm({
 }) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
     contribPersonLinkFieldParamsURL({event_id: eventId, contrib_id: contribId}),
+    {camelize: true}
+  );
+  const {data: allowedKeywords, loading: allowedKeywordsLoading} = useIndicoAxios(
+    contribAllowedKeywordsURL({event_id: eventId}),
     {camelize: true}
   );
   const {data: fields, loading: fieldsLoading} = useIndicoAxios(
@@ -378,12 +401,14 @@ export function ContributionEditForm({
     locationParentLoading ||
     fieldsLoading ||
     personLinkFieldParamsLoading ||
+    allowedKeywordsLoading ||
     contributionTypesLoading;
 
   return (
     <ContributionForm
       eventId={eventId}
       personLinkFieldParams={personLinkFieldParams}
+      allowedKeywords={allowedKeywords}
       locationParent={locationParent}
       customFields={fields}
       contributionTypes={contributionTypes}
@@ -416,6 +441,10 @@ export function ContributionCreateForm({
 }) {
   const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
     personLinkFieldParamsURL({event_id: eventId}),
+    {camelize: true}
+  );
+  const {data: allowedKeywords, loading: allowedKeywordsLoading} = useIndicoAxios(
+    contribAllowedKeywordsURL({event_id: eventId}),
     {camelize: true}
   );
   const {data: fields, loading: fieldsLoading} = useIndicoAxios(
@@ -459,6 +488,7 @@ export function ContributionCreateForm({
     defaultDurationLoading ||
     fieldsLoading ||
     personLinkFieldParamsLoading ||
+    allowedKeywordsLoading ||
     contributionTypesLoading;
 
   const defaultValuesByType = {
@@ -484,6 +514,7 @@ export function ContributionCreateForm({
     <ContributionForm
       eventId={eventId}
       personLinkFieldParams={personLinkFieldParams}
+      allowedKeywords={allowedKeywords}
       locationParent={locationParent}
       customFields={fields ?? []}
       contributionTypes={contributionTypes}
