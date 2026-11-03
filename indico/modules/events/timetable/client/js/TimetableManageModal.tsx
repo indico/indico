@@ -9,8 +9,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import React, {useState, useEffect} from 'react';
 import {FormRenderProps} from 'react-final-form';
-import {useDispatch, useSelector} from 'react-redux';
-import {ThunkDispatch} from 'redux-thunk';
+import {useSelector} from 'react-redux';
 import {Button, Divider, Header, Segment} from 'semantic-ui-react';
 
 import {ContributionFormFields} from 'indico/modules/events/contributions/ContributionForm';
@@ -27,8 +26,8 @@ import {mapDataToEntry, mapEntryToData, mapSessionToData} from './mapperUtils';
 import * as selectors from './selectors';
 import {FinalSessionSelect} from './SessionSelect';
 import {useToast} from './ToastContext';
-import {ReduxState, BlockEntry, EntryType, Session, LocationParent} from './types';
-import {DATE_KEY_FORMAT, getDateKey} from './utils';
+import {BlockEntry, EntryType, Session, LocationParent} from './types';
+import {DATE_KEY_FORMAT, getDateKey, useTimetableDispatch} from './utils';
 
 // Generic models
 
@@ -95,7 +94,7 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   onSubmit = () => null,
 }) => {
   const toast = useToast();
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   const entries = useSelector(selectors.getCurrentEntries);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const [sessionLocationParent, setSessionLocationParent] = useState<LocationParent | null>(null);

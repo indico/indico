@@ -13,8 +13,7 @@ import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
-import {ThunkDispatch} from 'redux-thunk';
+import {useSelector} from 'react-redux';
 import {Button, Card, Icon, List, Popup, Label, Header, PopupProps, Image} from 'semantic-ui-react';
 
 import {PluralTranslate, Translate} from 'indico/react/i18n';
@@ -36,7 +35,7 @@ import {
   SessionBlockId,
   AttachmentUpdatedEventDetail,
 } from './types';
-import {getIconByEntryType, getEntryColors} from './utils';
+import {getIconByEntryType, getEntryColors, useTimetableDispatch} from './utils';
 
 import './EntryPopup.module.scss';
 import './Entry.module.scss';
@@ -61,7 +60,7 @@ function EntryPopupContent({
   entry: BreakEntry | ContribEntry | BlockEntry;
   onClose: () => void;
 }) {
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   const {objId, type, title, duration, startDt, sessionId} = entry;
   const eventId = useSelector(selectors.getEventId);
   const eventType = useSelector(selectors.getEventType);

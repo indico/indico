@@ -8,10 +8,10 @@
 import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {ThunkDispatch} from 'redux-thunk';
+import {useSelector} from 'react-redux';
 import {Button, Label, Modal, Segment} from 'semantic-ui-react';
 
+import {useTimetableDispatch} from 'indico/modules/events/timetable/utils';
 import {Param, Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
@@ -34,7 +34,7 @@ interface PosterContributionProps {
 }
 
 const PosterContribution: React.FC<PosterContributionProps> = ({entry, block}) => {
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   const {openModal} = useModal();
   const eventId = useSelector(selectors.getEventId);
 
@@ -89,7 +89,7 @@ export const TimetablePosterBlockModal: React.FC<TimetablePosterBlockModalProps>
   id,
   onClose,
 }) => {
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   const {openModal} = useModal();
   const eventId = useSelector(selectors.getEventId);
   const block = useSelector(selectors.getCurrentDayEntries).find(

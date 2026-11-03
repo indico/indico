@@ -6,6 +6,9 @@
 // LICENSE file for more details.
 
 import {Moment} from 'moment';
+import {ThunkDispatch} from 'redux-thunk';
+
+import type {Action} from 'indico/modules/events/timetable/actions';
 
 export enum EntryType {
   Contribution = 'contrib',
@@ -255,3 +258,5 @@ export interface AttachmentUpdatedEventDetail {
   type: EntryType;
   id: number;
 }
+
+export type TimetableDispatch = ThunkDispatch<ReduxState, unknown, Action>;

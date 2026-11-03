@@ -7,14 +7,13 @@
 
 import moment, {Moment} from 'moment';
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux/es';
-import {ThunkDispatch} from 'redux-thunk';
+import {useSelector} from 'react-redux';
 import {Icon} from 'semantic-ui-react';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
 import {ReduxState, BlockEntry, Entry, Colors, EntryUniqueID} from './types';
-import {getDateKey} from './utils';
+import {getDateKey, useTimetableDispatch} from './utils';
 
 import './Entry.module.scss';
 
@@ -33,7 +32,7 @@ export function EntryMoveButtons({
   sessionBlockId,
   colors,
 }: EntryMoveButtonsProps) {
-  const dispatch: ThunkDispatch<ReduxState, unknown, actions.Action> = useDispatch();
+  const dispatch = useTimetableDispatch();
   const currentDate = useSelector(selectors.getCurrentDate);
   const dtKey = getDateKey(currentDate);
   const entries = useSelector((state: ReduxState) => selectors.getDayEntries(state));
