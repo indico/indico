@@ -83,6 +83,7 @@ export interface Session {
   title: string;
   isPoster: boolean;
   defaultContribDurationMinutes: number;
+  childLocationParent: LocationParent;
   colors: Colors;
   attachments: Attachment[];
 }

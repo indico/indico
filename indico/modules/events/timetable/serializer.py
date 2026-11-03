@@ -8,11 +8,15 @@
 from flask import has_request_context, session
 from sqlalchemy.orm import defaultload
 
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionReferenceSchema,
                                                          ContributionTypeSchema)
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.util import should_show_draft_warning
+from indico.util.iterables import materialize_iterable
 from indico.util.locations import LocationDataSchema, LocationParentSchema
 from indico.web.flask.util import url_for
 
@@ -25,7 +29,7 @@ def get_entry_type(entry_type):
     elif entry_type == TimetableEntryType.BREAK:
         return 'break'
     else:
-        raise ValueError
+        raise ValueError(f'Unexpected type: {entry_type}')
 
 
 def get_unique_key(entry):
@@ -36,7 +40,7 @@ def get_unique_key(entry):
     elif entry.type == TimetableEntryType.BREAK:
         return f'b{entry.break_.id}'
     else:
-        raise ValueError
+        raise ValueError(f'Unexpected type: {entry.type}')
 
 
 def get_color_data(obj):
@@ -137,7 +141,7 @@ class TimetableSerializer:
                      'is_poster': block.session.is_poster,
                      'pdf': url_for('sessions.export_session_timetable', block.session),
                      'url': url_for('sessions.display_session', block.session),
-                     'location_data': LocationDataSchema().dump(block),
+                     'location_data': LocationDataSchema().dump(block.location_data),
                      'child_location_parent': LocationParentSchema().dump(block.child_location_parent)})
         return data
 
@@ -155,7 +159,7 @@ class TimetableSerializer:
                      'person_links': [self._get_person_data(x) for x in contribution.person_links],
                      'code': contribution.code,
                      'session_id': block.session_id if block else None,
-                     'location_data': LocationDataSchema().dump(contribution),
+                     'location_data': LocationDataSchema().dump(contribution.location_data),
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
                      'references': ContributionReferenceSchema(many=True).dump(contribution.references),
@@ -179,7 +183,7 @@ class TimetableSerializer:
                      'duration': break_.duration.seconds,
                      'session_id': block.session_id if block else None,
                      'title': break_.title,
-                     'location_data': LocationDataSchema().dump(break_),
+                     'location_data': LocationDataSchema().dump(break_.location_data),
                      **get_color_data(break_)})
         return data
 
@@ -229,7 +233,7 @@ def serialize_unscheduled_contribution(contribution, *, can_manage_event=False):
             'title': contribution.title,
             'url': url_for('contributions.display_contribution', contribution),
             'references': ContributionReferenceSchema(many=True).dump(contribution.references),
-            'location_data': LocationDataSchema().dump(contribution),
+            'location_data': LocationDataSchema().dump(contribution.location_data),
             'board_number': contribution.board_number}
 
 
@@ -265,5 +269,27 @@ def serialize_session(sess):
         'url': url_for('sessions.display_session', sess),
         'default_contribution_duration': sess.default_contribution_duration.total_seconds(),
         'attachments': TimetableSerializer.get_attachment_data(sess),
+        'child_location_parent': LocationParentSchema().dump(sess.child_location_parent),
         **get_color_data(sess)
     }
+
+
+@materialize_iterable(dict)
+def serialize_child_location_updates(obj: Session | SessionBlock):
+    """Serialize a list of possible updates to child objects."""
+    from indico.modules.events.timetable.schemas import SessionBlockSchema
+    match obj:
+        case Session() as sess:
+            for block in sess.blocks:
+                yield (
+                    get_unique_key(block.timetable_entry),
+                    SessionBlockSchema(only=('child_location_parent',)).dump(block),
+                )
+                yield from serialize_child_location_updates(block).items()
+            for contrib in Contribution.query.with_parent(sess).filter_by(is_scheduled=False):
+                yield f'c{contrib.id}', {'location_data': LocationDataSchema().dump(contrib.location_data)}
+        case SessionBlock() as block:
+            for child in block.timetable_entry.children:
+                yield get_unique_key(child), {'location_data': LocationDataSchema().dump(child.object.location_data)}
+        case _:
+            raise ValueError(f'Unexpected object: {type(obj)}')

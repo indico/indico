@@ -57,11 +57,12 @@ export default function Toolbar() {
       moment(e.startDt).add(e.duration, 'minutes')
     );
     const newDt = moment.min(maxDt, moment.max(minDt, ...currentEntryEndDts));
+    const locationParent = expandedSessionBlock?.childLocationParent ?? eventLocationParent;
     const draftEntry = {
       startDt: newDt,
       duration: defaultContributionDuration,
-      locationParent: eventLocationParent,
-      locationData: {...eventLocationParent.location_data, inheriting: true},
+      locationParent,
+      locationData: {...locationParent.location_data, inheriting: true},
     };
     dispatch(actions.setDraftEntry(draftEntry));
     openModal(DRAFT_ENTRY_MODAL, {
