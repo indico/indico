@@ -119,14 +119,6 @@
     <div class="action-menu">
         <div class="toolbar">
             {% if event.can_manage(session.user) %}
-                {% if event.is_unlisted %}
-                    <span class="hide-if-locked group"
-                          id="event-action-publish-container"
-                          data-event-id="{{ event.id }}"
-                          {{ 'data-pending-request' if event.pending_move_request }}></span>
-                   </a>
-                {% endif %}
-
                 {% block event_clone_actions scoped %}
                     <div class="group">
                         <button class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
@@ -177,6 +169,6 @@
     </div>
 
     <script>
-        setupEventManagementActionMenu();
+        $(document).ready(() => setupEventManagementActionMenu());
     </script>
 {% endmacro %}
