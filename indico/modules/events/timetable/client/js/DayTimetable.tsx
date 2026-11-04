@@ -795,7 +795,12 @@ export function DayTimetable({
   const limitsGradient = `linear-gradient(180deg, ${limitsGradientArg})`;
 
   return (
-    <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar} scrollBounds={scrollBounds}>
+    <DnDProvider
+      onDrop={handleDragEnd}
+      modifier={restrictToCalendar}
+      scrollBounds={scrollBounds}
+      scrollParent={wrapperRef.current}
+    >
       <div styleName="side-panel-container">
         <TimetableTabRail />
         <TimetableSidePanel />
