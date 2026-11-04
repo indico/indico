@@ -9,14 +9,16 @@ import locationParentURL from 'indico-url:contributions.api_contribs_location_pa
 import breakCreateURL from 'indico-url:timetable.tt_break_create';
 import breakEditURL from 'indico-url:timetable.tt_break_rest';
 
-import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {Field} from 'react-final-form';
 import {Button, Dimmer, Loader} from 'semantic-ui-react';
 
-import {FinalLocationField, FinalSessionColorPicker} from 'indico/react/components';
+import {
+  FinalLocationField,
+  FinalSessionColorPicker,
+  StartEndDurationFields,
+  stripEndDt,
+} from 'indico/react/components';
 import {FinalInput, FinalTextArea} from 'indico/react/forms';
-import {FinalDateTimePicker, FinalDuration} from 'indico/react/forms/fields';
 import {FinalModalForm, handleSubmitError} from 'indico/react/forms/final-form';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -35,7 +37,6 @@ interface BreakFormProps {
 
 interface BreakFormFieldsProps {
   locationParent?: LocationParentObj;
-  initialValues: Record<string, any>;
   extraOptions?: Record<string, any>;
   hasParent?: boolean;
   [key: string]: any; // Allow additional props
@@ -50,7 +51,6 @@ export function BreakFormFields({
     room_name: '',
     address: '',
   },
-  initialValues = {},
   extraOptions = {},
   hasParent = false,
 }: BreakFormFieldsProps) {
@@ -60,32 +60,7 @@ export function BreakFormFields({
     <>
       <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
       <FinalTextArea name="description" label={Translate.string('Description')} />
-      {initialValues.start_dt ? (
-        <>
-          <Field name="duration" subscription={{value: true}}>
-            {({input: {value: duration}}) => (
-              <FinalDateTimePicker
-                name="start_dt"
-                label={Translate.string('Start date')}
-                minStartDt={minStartDt}
-                maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
-                required
-              />
-            )}
-          </Field>
-          <Field name="start_dt" subscription={{value: true}}>
-            {({input: {value: startDt}}) => (
-              <FinalDuration
-                name="duration"
-                label={Translate.string('Duration')}
-                max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
-              />
-            )}
-          </Field>
-        </>
-      ) : (
-        <FinalDuration name="duration" label={Translate.string('Duration')} />
-      )}
+      <StartEndDurationFields minStartDt={minStartDt} maxEndDt={maxEndDt} />
       <FinalLocationField
         name="location_data"
         label={Translate.string('Location')}
@@ -111,7 +86,7 @@ export function BreakForm({
   ...rest
 }: BreakFormProps) {
   const handleSubmit = (formData: any) => {
-    onSubmit(formData);
+    onSubmit(stripEndDt(formData));
   };
 
   if (loading) {
