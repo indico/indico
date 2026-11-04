@@ -65,9 +65,15 @@ class App extends React.Component {
     fetchInitialData();
   }
 
-  onSidebarHide = () => {
+  sidebarTriggerRef = React.createRef();
+
+  onSidebarHide = (_event, {restoreFocus = true} = {}) => {
     document.body.classList.remove('scrolling-disabled');
-    this.setState({userActionsVisible: false});
+    this.setState({userActionsVisible: false}, () => {
+      if (restoreFocus) {
+        this.sidebarTriggerRef.current?.focus();
+      }
+    });
   };
 
   renderContent() {
@@ -75,7 +81,20 @@ class App extends React.Component {
     const {userActionsVisible} = this.state;
     return (
       <Sidebar.Pushable styleName="rb-pushable">
-        <SidebarMenu visible={userActionsVisible} onClickOption={this.onSidebarHide} />
+        <SidebarMenu
+          visible={userActionsVisible}
+          onClickOption={this.onSidebarHide}
+          onBlur={event => {
+            if (
+              userActionsVisible &&
+              event.relatedTarget &&
+              !event.currentTarget.contains(event.relatedTarget) &&
+              event.relatedTarget !== this.sidebarTriggerRef.current
+            ) {
+              this.onSidebarHide(event, {restoreFocus: false});
+            }
+          }}
+        />
         <Sidebar.Pusher dimmed={userActionsVisible} styleName="rb-pusher">
           <div styleName="rb-content">
             <Switch>
@@ -151,15 +170,17 @@ class App extends React.Component {
             </div>
             <div styleName="rb-menu-bar-side-right">
               <SidebarTrigger
+                triggerRef={this.sidebarTriggerRef}
                 onClick={evt => {
+                  evt.stopPropagation();
+                  if (userActionsVisible) {
+                    this.onSidebarHide();
+                    return;
+                  }
                   document.body.classList.add('scrolling-disabled');
                   this.setState({
                     userActionsVisible: true,
                   });
-                  // XXX: for some reason react 17 immediately closes the sidebar again after
-                  // opening it, but stopping the click event from propagating avoids this, so it's
-                  // likely related to the changes in event handling
-                  evt.stopPropagation();
                 }}
                 active={userActionsVisible}
               />
