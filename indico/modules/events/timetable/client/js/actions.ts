@@ -567,7 +567,7 @@ export function unscheduleEntry(entry: ContribEntry, eventId: number) {
   });
 }
 
-export function setActivePanel(panel: SidePanelView) {
+export function setActivePanel(panel: SidePanelView): SetActivePanelAction {
   return {
     type: SET_ACTIVE_PANEL,
     panel,

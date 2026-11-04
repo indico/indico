@@ -7,7 +7,7 @@
 
 import moment, {Moment} from 'moment';
 import React, {useCallback, useEffect, useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {Button, Header, Label} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -27,7 +27,7 @@ interface TimetableDayControlsProps {
 }
 
 function SessionBlockToolbar() {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const eventId = useSelector(selectors.getEventId);
   const expandedSessionBlock = useSelector(selectors.getExpandedSessionBlock);
   const {title, sessionId} = expandedSessionBlock ?? {};
