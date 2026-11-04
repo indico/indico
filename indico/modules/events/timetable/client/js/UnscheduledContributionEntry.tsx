@@ -7,10 +7,8 @@
 
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
 
-import moment, {Moment} from 'moment';
 import React from 'react';
-import {createPortal} from 'react-dom';
-import {useSelector, useDispatch} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {Button} from 'semantic-ui-react';
 
 import {handleSubmitError} from 'indico/react/forms/final-form';
@@ -18,10 +16,8 @@ import {Translate} from 'indico/react/i18n';
 import {indicoAxios} from 'indico/utils/axios';
 
 import * as actions from './actions';
-import {useDraggable, useDroppableData} from './dnd';
-import {pointerInside} from './dnd/utils';
+import {useDraggable} from './dnd';
 import {EntryTitle} from './Entry';
-import {formatTimeRange} from './i18n';
 import {mapDataToEntry} from './mapperUtils';
 import {UNSCHEDULED_CONTRIB_EDIT_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
@@ -29,41 +25,30 @@ import {ContribEntry, ContribId, EntryType, ReduxState} from './types';
 import {
   getEntryColors,
   minutesToPixels,
-  pixelsToMinutes,
-  snapMinutes,
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
+  useTimetableDispatch,
 } from './utils';
 import './Entry.module.scss';
 
 export function DraggableUnscheduledContributionEntry({
   id,
   objId,
-  dt,
   title,
   duration,
   sessionId,
 }: {
   id: ContribId;
   objId: number;
-  dt: Moment;
   title: string;
   duration: number;
   sessionId?: number;
 }) {
-  const droppableData = useDroppableData({id: 'calendar'});
-
   const draggableId = `unscheduled-${id}`;
   const {
     listeners: _listeners,
     setNodeRef,
-    transform,
     isDragging,
-    rect,
-    initialScroll,
-    mouse,
-    offset,
-    ref,
   } = useDraggable({
     id: draggableId,
     fixed: true,
@@ -80,70 +65,8 @@ export function DraggableUnscheduledContributionEntry({
     },
   };
 
-  let timeRange = `${duration} minutes`;
-  if (transform && droppableData && ref.current) {
-    const r = droppableData.node.current.getBoundingClientRect();
-    if (pointerInside(mouse, r)) {
-      const mousePositionY = mouse.y - r.top - window.scrollY;
-
-      const start = snapMinutes(pixelsToMinutes(mousePositionY - offset.y));
-      const startDt = moment(dt).startOf('day').add(start, 'minutes');
-      const newEnd = moment(startDt).add(duration, 'minutes');
-      timeRange = formatTimeRange(moment.locale().replace('_', '-'), startDt, newEnd);
-    }
-  }
-
-  let style: React.CSSProperties = {};
-
-  if (transform) {
-    style = {
-      ...style,
-      transform: `translate(${transform.x}px, ${transform.y}px)`,
-      zIndex: 900,
-      position: 'fixed',
-      top: rect.top - initialScroll.top,
-      left: rect.left - initialScroll.left,
-      width: rect.width,
-      height: rect.height,
-      borderRadius: 8,
-    };
-  }
-
-  if (transform) {
-    const portal = createPortal(
-      <div ref={setNodeRef} style={style}>
-        <UnscheduledContributionEntry
-          title={title}
-          timeRange={timeRange}
-          duration={duration}
-          sessionId={sessionId}
-          isDragging={isDragging}
-          objId={objId}
-          id={id}
-        />
-      </div>,
-      document.body
-    );
-
-    return (
-      <div style={{cursor: isDragging ? 'grabbing' : 'grab', userSelect: 'none'}}>
-        <div
-          style={{
-            border: '3px dashed #e0e1e2',
-            borderRadius: '3px',
-            width: rect.width,
-            height: rect.height,
-            pointerEvents: 'none',
-            cursor: isDragging ? 'grabbing' : 'grab',
-          }}
-        />
-        {portal}
-      </div>
-    );
-  }
-
   return (
-    <div ref={setNodeRef} {...listeners}>
+    <div ref={setNodeRef} {...listeners} style={{opacity: isDragging ? 0 : 1}}>
       <UnscheduledContributionEntry
         title={title}
         timeRange={`${duration} minutes`}
@@ -175,8 +98,8 @@ export function UnscheduledContributionEntry({
   isDragging?: boolean;
 }) {
   const {openModal} = useModal();
-  const dispatch = useDispatch<any>();
-  const contrib = useSelector(selectors.getUnscheduled).find(c => c.id === id);
+  const dispatch = useTimetableDispatch();
+  const contrib = useSelector(selectors.getUnscheduled).find(c => c.id === id)!;
 
   const session = useSelector((state: ReduxState) => selectors.getSessionById(state, sessionId));
   const colors = getEntryColors({type: EntryType.Contribution}, session);

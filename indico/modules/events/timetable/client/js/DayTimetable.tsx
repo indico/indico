@@ -46,6 +46,7 @@ import {
   Session,
   ContribEntry,
   AttachmentUpdatedEventDetail,
+  UnscheduledContribEntry,
 } from './types';
 import {
   DAY_SIZE,
@@ -131,10 +132,16 @@ const TopLevelEntries = React.memo(function TopLevelEntries({
   );
 });
 
-function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
+function DragPlaceholderContainer({
+  entries,
+  unscheduledEntries,
+}: {
+  entries: TopLevelEntry[];
+  unscheduledEntries: UnscheduledContribEntry[];
+}) {
   const {dragged, transform, ref, overlappingDroppables} = useDraggedData();
   const draggedEntry = useMemo(() => {
-    if (!dragged || dragged.startsWith('unscheduled')) {
+    if (!dragged) {
       return undefined;
     }
     for (const entry of entries) {
@@ -148,14 +155,20 @@ function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
         }
       }
     }
-  }, [dragged, entries]);
+    for (const entry of unscheduledEntries) {
+      // remove "unscheduled-" prefix
+      if (entry.id === dragged.substring(12)) {
+        return entry;
+      }
+    }
+  }, [dragged, entries, unscheduledEntries]);
   const overSidepanel = useMemo(
     () => overlappingDroppables.find(over => over.id === 'sidepanel'),
     [overlappingDroppables]
   );
   const width = useMemo(
     () =>
-      overSidepanel && dragged && dragged.startsWith('c')
+      overSidepanel && dragged && (dragged.startsWith('c') || dragged.startsWith('unscheduled-c'))
         ? `${overSidepanel.rect.width}px`
         : `${ref?.current?.clientWidth ?? 0}px`,
     [ref, overSidepanel, dragged]
@@ -172,6 +185,7 @@ function DragPlaceholderContainer({entries}: {entries: TopLevelEntry[]}) {
           setDuration={() => null}
           setNodeRef={() => null}
           transform={transform}
+          startDt={moment()}
           {...draggedEntry}
           y={0}
           sessionId={draggedEntry.sessionId ?? undefined}
@@ -403,7 +417,7 @@ export function DayTimetable({
     } else {
       // TODO(tomas): use something better than 'unscheduled-' prefix
       const contribId = parseInt(who.slice('unscheduled-c'.length), 10);
-      const fromContrib: ContribEntry | undefined = unscheduled.find(
+      const fromContrib = unscheduled.find(
         c => c.id === getEntryUniqueId(EntryType.Contribution, contribId)
       );
 
@@ -784,7 +798,7 @@ export function DayTimetable({
     <DnDProvider onDrop={handleDragEnd} modifier={restrictToCalendar} scrollBounds={scrollBounds}>
       <div styleName="side-panel-container">
         <TimetableTabRail />
-        <TimetableSidePanel dt={dt} />
+        <TimetableSidePanel />
       </div>
       <div styleName="controls-container">
         <TimetableDayControls
@@ -841,7 +855,7 @@ export function DayTimetable({
           </div>
         </div>
       </div>
-      <DragPlaceholderContainer entries={entries} />
+      <DragPlaceholderContainer entries={entries} unscheduledEntries={unscheduled} />
     </DnDProvider>
   );
 }

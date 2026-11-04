@@ -25,6 +25,7 @@ import {
   isChildEntry,
   Entries,
   isBlockEntry,
+  UnscheduledContribEntry,
 } from './types';
 import {
   DAY_SIZE,
@@ -295,7 +296,10 @@ export const getIsExpanded = createSelector(
   navigation => navigation.isExpanded
 );
 
-function appendSessionAttributes(entries: any[], sessions: Record<string, Session>) {
+function appendSessionAttributes<EntryType extends Entry | UnscheduledContribEntry>(
+  entries: EntryType[],
+  sessions: Record<string, Session>
+): EntryType[] {
   return entries.map(e => {
     if (!e.sessionId) {
       return e;
