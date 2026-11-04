@@ -94,6 +94,7 @@ function resetDraggableState(draggableData: DraggableData, id: string) {
     [id]: {
       ...draggable,
       transform: null,
+      scroll: null,
       rect: null,
     },
   };
@@ -122,6 +123,7 @@ function setTransformOnScroll(
     [id]: {
       ...draggable,
       transform,
+      scroll: currentScrollPosition,
     },
   };
 }
@@ -430,16 +432,15 @@ export function DnDProvider({
         x: state.current.scrollPosition.x + deltaX,
         y: state.current.scrollPosition.y + deltaY,
       };
-      setDraggableData(d => {
-        const newDraggable = setTransformOnScroll(
+      setDraggableData(d =>
+        setTransformOnScroll(
           d,
           state.current.activeDraggable,
           state.current.transformSinceMouseMove,
           state.current.scrollPosition,
           modifier
-        );
-        return newDraggable;
-      });
+        )
+      );
     },
     [draggables, draggableData, modifier]
   );
@@ -598,9 +599,24 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
 
 export function useDraggedData() {
   const dragged = useContextSelector(DnDContext, ctx => ctx.dragged);
-  const transform = useContextSelector(DnDContext, ctx =>
-    ctx.dragged ? ctx.draggableData[ctx.dragged]?.transform : undefined
-  );
+  // Return a transform that includes the scroll position
+  const transform = useContextSelector(DnDContext, ctx => {
+    if (!ctx.dragged) {
+      return undefined;
+    }
+    const baseTransform = ctx.draggableData[ctx.dragged]?.transform;
+    const scrollTransform = ctx.draggableData[ctx.dragged]?.scroll;
+    if (!scrollTransform) {
+      return baseTransform;
+    }
+    if (!baseTransform) {
+      return undefined;
+    }
+    return {
+      x: baseTransform.x + scrollTransform.x,
+      y: baseTransform.y + scrollTransform.y,
+    };
+  });
   const ref = useContextSelector(DnDContext, ctx =>
     ctx.dragged ? ctx.draggables[ctx.dragged]?.node : undefined
   );
