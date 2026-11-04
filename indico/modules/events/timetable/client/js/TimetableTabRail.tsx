@@ -6,11 +6,11 @@
 // LICENSE file for more details.
 
 import React from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import './TimetableTabRail.module.scss';
+import {useSelector} from 'react-redux';
 import {Icon, Menu} from 'semantic-ui-react';
 
 import PublicationStateSwitch from 'indico/modules/events/contributions/PublicationStateSwitch';
+import {useTimetableDispatch} from 'indico/modules/events/timetable/utils';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
@@ -18,8 +18,10 @@ import {LegacyTimetableSwitchButton} from './LegacyTimetableSwitchButton';
 import * as selectors from './selectors';
 import {SidePanelView} from './types';
 
+import './TimetableTabRail.module.scss';
+
 function TimetableTabRail() {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const showUnscheduled = useSelector(selectors.showUnscheduled);
   const showSessions = useSelector(selectors.showSessions);
   const activePanel = useSelector(selectors.getActivePanel);

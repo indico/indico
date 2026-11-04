@@ -6,15 +6,15 @@
 // LICENSE file for more details.
 
 import {useCallback, useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
 import * as actions from './actions';
 import * as selectors from './selectors';
 import {EntryType, Navigation} from './types';
-import {createTimetableURL, parseTimetableURL} from './utils';
+import {createTimetableURL, parseTimetableURL, useTimetableDispatch} from './utils';
 
 export function NavigationController() {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const eventId = useSelector(selectors.getEventId);
   const currentDate = useSelector(selectors.getCurrentDate);
   const eventEndDt = useSelector(selectors.getEventEndDt);

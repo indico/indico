@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 import React, {useEffect, useRef, useState, useMemo} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
 import {PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
@@ -30,6 +30,7 @@ import {
   getEntryColors,
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
+  useTimetableDispatch,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -44,7 +45,7 @@ interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
 }
 
 export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const {listeners: _listeners, setNodeRef, isDragging, ref} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
     selectors.makeIsSelectedSelector()(state, id)
