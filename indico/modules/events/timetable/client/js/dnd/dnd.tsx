@@ -254,11 +254,13 @@ export function DnDProvider({
   onDrop,
   modifier = ({transform}) => transform,
   scrollBounds,
+  scrollParent,
 }: {
   children: React.ReactNode;
   onDrop: OnDrop;
   modifier?: Modifier;
   scrollBounds?: ScrollBounds;
+  scrollParent?: HTMLElement;
 }) {
   const [droppables, setDroppables] = useState<Droppables>({});
   const [draggables, setDraggables] = useState<Draggables>({});
@@ -278,10 +280,8 @@ export function DnDProvider({
     state,
     draggables,
     bounds: scrollBounds,
-    enabled:
-      // TODO: does not really work atm
-      state.current.activeDraggable === null ||
-      !state.current.activeDraggable.startsWith('unscheduled'),
+    enabled: true,
+    scrollParent,
   });
 
   const registerDroppable = useCallback((id: string, node: HTMLRef) => {
@@ -321,13 +321,16 @@ export function DnDProvider({
       }
 
       const {x, y, offsetX, offsetY} = where;
-      const scrollParent = getScrollParent(draggable.node.current); // TODO: this should be getTotalScroll()
+      const computedScrollParent = getScrollParent(draggable.node.current); // TODO: this should be getTotalScroll()
       state.current = {
         state: 'mousedown',
         initialMousePosition: {x, y},
         scrollPosition: {x: 0, y: 0},
         transformSinceMouseMove: {x: 0, y: 0},
-        initialScrollPosition: {x: scrollParent.scrollLeft, y: scrollParent.scrollTop},
+        initialScrollPosition: {
+          x: computedScrollParent.scrollLeft,
+          y: computedScrollParent.scrollTop,
+        },
         initialOffset: {x: offsetX, y: offsetY},
         activeDraggable: id,
       };
