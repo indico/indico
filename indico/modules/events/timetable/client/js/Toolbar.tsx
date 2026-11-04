@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 import React, {useRef} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {Button, Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
@@ -15,12 +15,12 @@ import {Translate} from 'indico/react/i18n';
 import * as actions from './actions';
 import {DRAFT_ENTRY_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
-import {getDiffInDays} from './utils';
+import {getDiffInDays, useTimetableDispatch} from './utils';
 
 import './Toolbar.module.scss';
 
 export default function Toolbar() {
-  const dispatch = useDispatch();
+  const dispatch = useTimetableDispatch();
   const {openModal} = useModal();
 
   const ref = useRef(null);
