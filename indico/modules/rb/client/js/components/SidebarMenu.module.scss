@@ -47,10 +47,16 @@
 }
 
 .sidebar-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  align-self: center;
+  aspect-ratio: 1;
   padding: 0;
   border: 0;
   background: none;
   font: inherit;
+  line-height: 1;
   transition:
     color 0.25s ease-in,
     transform 0.25s ease-in;
@@ -73,7 +79,7 @@
 
 .sidebar-button:focus-visible {
   outline: 2px solid currentcolor;
-  outline-offset: -2px;
+  outline-offset: 4px;
 }
 
 .override {
