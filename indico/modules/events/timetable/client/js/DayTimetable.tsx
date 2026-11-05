@@ -820,7 +820,8 @@ export function DayTimetable({
           >
             <TimeGutter minHour={minHour} maxHour={maxHour} />
             <DnDCalendar>
-              <div ref={calendarRef}>
+              {/* #timetable-calendar is used as an alignment reference by DraggableUnscheduledContributionEntry */}
+              <div ref={calendarRef} id="timetable-calendar">
                 <Lines minHour={minHour} maxHour={maxHour} />
                 <HoverGuide hoverY={hoverGuideY} minHour={minHour} dt={dt} />
                 <TopLevelEntries dt={dt} entries={entries} />
