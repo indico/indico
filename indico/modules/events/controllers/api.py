@@ -11,10 +11,9 @@ from werkzeug.exceptions import Forbidden, NotFound
 from indico.core.config import config
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import AbstractState
-from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.persons.util import check_person_link_email
 from indico.modules.events.schemas import ReferenceTypeSchema
-from indico.modules.events.util import get_all_reference_types, get_object_from_args, get_person_link_field_params
+from indico.modules.events.util import get_all_reference_types, get_object_from_args
 from indico.util.marshmallow import LowercaseString, ModelField, UUIDString
 from indico.web.args import use_kwargs
 from indico.web.rh import RH, RHProtected
@@ -86,8 +85,3 @@ class RHAPIReferenceTypes(RH):
 
     def _process(self):
         return ReferenceTypeSchema(many=True).jsonify(get_all_reference_types())
-
-
-class RHAPIPersonLinkFieldParams(RHEventBase):
-    def _process_GET(self):
-        return jsonify(get_person_link_field_params(self.event))

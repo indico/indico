@@ -5,16 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import contribAllowedKeywordsURL from 'indico-url:contributions.api_contrib_allowed_keywords';
-import contribFieldsURL from 'indico-url:contributions.api_contrib_fields';
-import locationParentContribURL from 'indico-url:contributions.api_contrib_location_parent';
-import contribPersonLinkFieldParamsURL from 'indico-url:contributions.api_contrib_person_link_params';
-import contribTypesURL from 'indico-url:contributions.api_contrib_types';
-import defaultDurationURL from 'indico-url:contributions.api_contribs_duration';
-import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
+import createContribFormMetadataURL from 'indico-url:contributions.api_contrib_create_form_metadata';
+import editContribFormMetadataURL from 'indico-url:contributions.api_contrib_edit_form_metadata';
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
-import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
 import {FormApi} from 'final-form';
 import _ from 'lodash';
@@ -361,24 +355,8 @@ export function ContributionEditForm({
   onSubmit?: (formData: any, form: any) => void;
   onClose: () => void;
 }) {
-  const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
-    contribPersonLinkFieldParamsURL({event_id: eventId, contrib_id: contribId}),
-    {camelize: true}
-  );
-  const {data: allowedKeywords, loading: allowedKeywordsLoading} = useIndicoAxios(
-    contribAllowedKeywordsURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: fields, loading: fieldsLoading} = useIndicoAxios(
-    contribFieldsURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: contributionTypes, loading: contributionTypesLoading} = useIndicoAxios(
-    contribTypesURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
-    locationParentContribURL({event_id: eventId, contrib_id: contribId})
+  const {data: metadata, loading: metadataLoading} = useIndicoAxios(
+    editContribFormMetadataURL({event_id: eventId, contrib_id: contribId})
   );
   const contribURL = contributionURL(snakifyKeys({eventId, contribId}));
   const {data: contrib, loading: contribLoading} = useIndicoAxios(contribURL);
@@ -396,13 +374,15 @@ export function ContributionEditForm({
     await new Promise(() => {});
   };
 
-  const loading =
-    contribLoading ||
-    locationParentLoading ||
-    fieldsLoading ||
-    personLinkFieldParamsLoading ||
-    allowedKeywordsLoading ||
-    contributionTypesLoading;
+  const loading = contribLoading || metadataLoading;
+
+  const {
+    locationParent,
+    allowedKeywords,
+    personLinkFieldParams,
+    fields,
+    types: contributionTypes,
+  } = camelizeKeys(metadata ?? {});
 
   return (
     <ContributionForm
@@ -439,28 +419,18 @@ export function ContributionCreateForm({
   onClose: () => void;
   onCreate?: (contrib: any) => void;
 }) {
-  const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
-    personLinkFieldParamsURL({event_id: eventId}),
-    {camelize: true}
+  const {data: metadata, loading} = useIndicoAxios(
+    createContribFormMetadataURL({event_id: eventId})
   );
-  const {data: allowedKeywords, loading: allowedKeywordsLoading} = useIndicoAxios(
-    contribAllowedKeywordsURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: fields, loading: fieldsLoading} = useIndicoAxios(
-    contribFieldsURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: contributionTypes, loading: contributionTypesLoading} = useIndicoAxios(
-    contribTypesURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: defaultDuration, loading: defaultDurationLoading} = useIndicoAxios(
-    defaultDurationURL({event_id: eventId})
-  );
-  const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
-    locationParentURL({event_id: eventId})
-  );
+
+  const {
+    locationParent,
+    defaultDuration,
+    allowedKeywords,
+    personLinkFieldParams,
+    fields,
+    types: contributionTypes,
+  } = camelizeKeys(metadata ?? {});
 
   const handleSubmit = async (formData: any) => {
     try {
@@ -483,13 +453,6 @@ export function ContributionCreateForm({
   const locationData = locationParent
     ? {...locationParent.location_data, inheriting: true}
     : {inheriting: false};
-  const loading =
-    locationParentLoading ||
-    defaultDurationLoading ||
-    fieldsLoading ||
-    personLinkFieldParamsLoading ||
-    allowedKeywordsLoading ||
-    contributionTypesLoading;
 
   const defaultValuesByType = {
     text: '',

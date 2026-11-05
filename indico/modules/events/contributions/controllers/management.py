@@ -227,8 +227,8 @@ class RHCreateContribution(RHManageContributionsBase):
         return jsonify_template('events/contributions/forms/contribution.html', form=form, can_manage=True)
 
 
-class RHEditContribution(RHManageContributionBase):
-    """Edit a contribution.
+class RHEditContributionBase(RHManageContributionBase):
+    """Base RH for editing a specific contribution.
 
     If configured in the contribution settings, editing is also
     allowed for the submitters.
@@ -238,6 +238,10 @@ class RHEditContribution(RHManageContributionBase):
         if not self.contrib.can_edit(session.user):
             raise Forbidden
         check_event_locked(self, self.event)
+
+
+class RHEditContribution(RHEditContributionBase):
+    """Edit a contribution."""
 
     def _process(self):
         can_manage = self.contrib.can_manage(session.user)
@@ -376,53 +380,35 @@ class RHAPIContributionCreate(RHManageContributionsBase):
         return ContributionRESTSchema(context={'event': self.event}).jsonify(contrib)
 
 
-class RHAPIContributionsInheritedLocation(RHManageContributionsBase):
-    """API for the location parent of the event."""
+class ContributionFormMetadataMixin:
+    def _get_metadata(self, contrib: Contribution = None):
+        return {
+            'allowed_keywords': sorted(global_event_settings.get('allowed_contribution_keywords')),
+            'default_duration': int(contribution_settings.get(self.event, 'default_duration').total_seconds()),
+            'person_link_field_params': get_contribution_person_link_field_params(self.event, contrib),
+            'location_parent': LocationParentSchema().dump(contrib.location_parent if contrib else self.event),
+            # XXX If you ever copy this for a future react-based abstract submission dialog, make sure to filter
+            # the list of contribution types to non-private ones!
+            'types': ContributionTypeSchema(many=True).dump(self.event.contribution_types),
+            # TODO: Skip restricted fields when using this outside management (e.g. editing a contribution as a speaker)
+            # TODO: Check if we really need all the fields on the client side. is_active and position are probably not
+            # needed since we never return inactive ones and the list is already properly sorted by position.
+            'fields': ContributionFieldSchema(many=True).dump(self.event.contribution_fields.filter_by(is_active=True)),
+        }
 
-    def _process_GET(self):
-        if Contribution.allow_location_inheritance:
-            return LocationParentSchema().jsonify(self.event)
-        return jsonify(None)
 
+class RHAPICreateContributionFormMetadata(ContributionFormMetadataMixin, RHManageContributionsBase):
+    """Return metadata needed in the contribution creation form."""
 
-class RHAPIContributionInheritedLocation(RHManageContributionBase):
-    """API for the location parent of the event."""
-
-    def _process_GET(self):
-        if self.contrib.allow_location_inheritance:
-            return LocationParentSchema().jsonify(self.contrib.location_parent)
-        return jsonify(None)
-
-
-class RHAPIContributionDefaultDuration(RHManageContributionsBase):
     def _process(self):
-        return jsonify(contribution_settings.get(self.event, 'default_duration').seconds)
+        return jsonify(self._get_metadata())
 
 
-class RHAPIContributionFields(RHManageContributionsBase):
+class RHAPIEditContributionFormMetadata(ContributionFormMetadataMixin, RHEditContributionBase):
+    """Return metadata needed in the contribution edit form."""
+
     def _process(self):
-        # TODO: Skip restricted fields when using this outside management (e.g. editing a contribution as a speaker)
-        # TODO: Check if we really need all the fields on the client side.
-        return ContributionFieldSchema(many=True).jsonify(self.event.contribution_fields.filter_by(is_active=True))
-
-
-class RHAPIContributionTypes(RHManageContributionsBase):
-    def _process(self):
-        # TODO: Use a more appropriate permission here so that someone with access to this
-        # specific contribution (but not all of them) can use this endpoint
-        return ContributionTypeSchema(many=True).jsonify(self.event.contribution_types)
-
-
-class RHAPIContributionAllowedKeywords(RHManageContributionsBase):
-    def _process(self):
-        # TODO: Use a more appropriate permission here so that someone with access to this
-        # specific contribution (but not all of them) can use this endpoint
-        return jsonify(sorted(global_event_settings.get('allowed_contribution_keywords')))
-
-
-class RHAPIContributionPersonLinkFieldParams(RHManageContributionBase):
-    def _process_GET(self):
-        return jsonify(get_contribution_person_link_field_params(self.contrib))
+        return jsonify(self._get_metadata(self.contrib))
 
 
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):

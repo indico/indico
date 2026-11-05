@@ -79,18 +79,10 @@ _bp.add_url_rule('/api/contributions/<int:contrib_id>', 'api_manage_contrib', ma
                  methods=('GET', 'PATCH'))
 _bp.add_url_rule('/api/contributions/create', 'api_create_contrib', management.RHAPIContributionCreate,
                  methods=('POST',))
-_bp.add_url_rule('/api/contributions/location-parent', 'api_contribs_location_parent',
-                 management.RHAPIContributionsInheritedLocation)
-_bp.add_url_rule('/api/contributions/<int:contrib_id>/location-parent', 'api_contrib_location_parent',
-                 management.RHAPIContributionInheritedLocation)
-_bp.add_url_rule('/api/contributions/duration', 'api_contribs_duration',
-                 management.RHAPIContributionDefaultDuration)
-_bp.add_url_rule('/api/contributions/fields', 'api_contrib_fields', management.RHAPIContributionFields)
-_bp.add_url_rule('/api/contributions/types', 'api_contrib_types', management.RHAPIContributionTypes)
-_bp.add_url_rule('/api/contributions/allowed-keywords', 'api_contrib_allowed_keywords',
-                 management.RHAPIContributionAllowedKeywords)
-_bp.add_url_rule('/api/contributions/<int:contrib_id>/person-link-params', 'api_contrib_person_link_params',
-                 management.RHAPIContributionPersonLinkFieldParams)
+_bp.add_url_rule('/api/contributions/form-metadata', 'api_contrib_create_form_metadata',
+                 management.RHAPICreateContributionFormMetadata)
+_bp.add_url_rule('/api/contributions/<int:contrib_id>/form-metadata', 'api_contrib_edit_form_metadata',
+                 management.RHAPIEditContributionFormMetadata)
 
 # Contribution RESTful endpoints
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/references/', 'create_contrib_reference_rest',
