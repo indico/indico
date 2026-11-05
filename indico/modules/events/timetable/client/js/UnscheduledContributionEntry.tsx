@@ -28,6 +28,7 @@ import {
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
   useTimetableDispatch,
+  GRID_SIZE,
 } from './utils';
 import './Entry.module.scss';
 
@@ -49,6 +50,7 @@ export function DraggableUnscheduledContributionEntry({
     listeners: _listeners,
     setNodeRef,
     isDragging,
+    ref,
   } = useDraggable({
     id: draggableId,
     fixed: true,
@@ -61,7 +63,12 @@ export function DraggableUnscheduledContributionEntry({
         return;
       }
 
-      _listeners.onMouseDown(event);
+      const calendar = document.getElementById('timetable-calendar');
+      const calendarTop = calendar?.getBoundingClientRect?.()?.top ?? 0;
+      const entryTop = ref.current.getBoundingClientRect().top;
+      const pixelDiff = calendarTop - entryTop;
+      const yAdjustment = pixelDiff % GRID_SIZE;
+      _listeners.onMouseDown(event, yAdjustment);
     },
   };
 
