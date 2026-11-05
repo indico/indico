@@ -193,6 +193,14 @@ function SidebarMenu({
                 />
                 <Icon name={icon} color={iconColor} />
                 {text}
+                {active && (
+                  <span styleName="active-indicator">
+                    <span styleName="visually-hidden">
+                      {' '}
+                      <Translate>active</Translate>
+                    </span>
+                  </span>
+                )}
               </Menu.Item>
             );
           }
