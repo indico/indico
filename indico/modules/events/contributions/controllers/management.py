@@ -363,8 +363,8 @@ class RHAPIContribution(RHManageContributionBase):
 
     @use_rh_args(ContributionRESTSchema, partial=True)
     def _process_PATCH(self, data):
-        # TODO: quick hack to get the person_link data in the right format
-        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
+        if (person_links := data.pop('person_links', None)) is not None:
+            data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data, data.pop('custom_fields', None))
 
@@ -374,7 +374,6 @@ class RHAPIContribution(RHManageContributionBase):
 class RHAPIContributionCreate(RHManageContributionsBase):
     @use_rh_args(ContributionRESTSchema)
     def _process_POST(self, data):
-        # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         contrib = create_contribution(self.event, data, data.pop('custom_fields', None))
         return ContributionRESTSchema(context={'event': self.event}).jsonify(contrib)
