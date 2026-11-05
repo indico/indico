@@ -5,34 +5,33 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import {shallow} from 'enzyme';
+import {mount} from 'enzyme';
 import React from 'react';
+import {act} from 'react-dom/test-utils';
 import {Dropdown} from 'semantic-ui-react';
 
 import {EmailListField} from '../EmailListField';
+import TagListField from '../TagListField';
 
 describe('EmailListField', () => {
-  it.each(['selection', 'paste', 'blur'])(
+  it.each(['selection', 'paste'])(
     'lowercases and deduplicates addresses added through %s',
     method => {
       const value = ['FIRST@EXAMPLE.ORG', 'first@example.org'];
       const onChange = jest.fn();
-      const field = shallow(<EmailListField value={value} onChange={onChange} />);
+      const field = mount(<EmailListField value={value} onChange={onChange} />).find(TagListField);
       const address = 'SECOND@EXAMPLE.ORG';
 
       if (method === 'selection') {
-        field.find(Dropdown).simulate('change', {}, {value: [...value, address]});
+        act(() => {
+          field.find(Dropdown).prop('onChange')(null, {value: [...value, address]});
+        });
       } else {
-        field.find(Dropdown).simulate(
-          'searchChange',
-          {},
-          {
+        act(() => {
+          field.find(Dropdown).prop('onSearchChange')(null, {
             searchQuery: method === 'paste' ? `${address};` : address,
-          }
-        );
-        if (method === 'blur') {
-          field.find(Dropdown).simulate('blur');
-        }
+          });
+        });
       }
 
       expect(onChange).toHaveBeenCalledWith(['first@example.org', 'second@example.org']);

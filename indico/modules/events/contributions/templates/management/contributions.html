@@ -83,6 +83,9 @@
                         data-ajax-dialog>
                     {%- trans %}New contribution{% endtrans -%}
                 </button>
+                <ind-create-contribution
+                    event-id="{{ event.id }}"
+                    search-token="{{ make_user_search_token() }}"></ind-create-contribution>
                 <button class="i-button js-enable-if-checked icon-remove disabled hide-if-locked"
                         title="{% trans %}Remove{% endtrans %}"
                         data-method="POST"

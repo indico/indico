@@ -22,9 +22,14 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableScheduleContribution,
                                                                 RHLegacyTimetableShiftEntries,
                                                                 RHLegacyTimetableSwapEntries)
-from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetable,
+from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetableLegacy,
                                                                 RHManageTimetable, RHManageTimetableEntryInfo,
-                                                                RHTimetableREST)
+                                                                RHManageTimetableLegacy, RHTimetableBreak,
+                                                                RHTimetableBreakCreate, RHTimetableChildLocations,
+                                                                RHTimetableContribution, RHTimetableContributionCreate,
+                                                                RHTimetableRESTLegacy, RHTimetableScheduleContribution,
+                                                                RHTimetableSessionBlock, RHTimetableSessionBlockCreate,
+                                                                RHTimetableUnscheduleContribution)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -34,9 +39,13 @@ _bp = IndicoBlueprint('timetable', __name__, template_folder='templates', virtua
 
 # Management
 _bp.add_url_rule('/manage/timetable/', 'management', RHManageTimetable)
-_bp.add_url_rule('/manage/timetable/', 'timetable_rest', RHTimetableREST, methods=('POST',))
-_bp.add_url_rule('/manage/timetable/<int:entry_id>', 'timetable_rest', RHTimetableREST, methods=('PATCH', 'DELETE'))
-_bp.add_url_rule('/manage/timetable/session/<int:session_id>/', 'manage_session', RHManageSessionTimetable)
+_bp.add_url_rule('/manage/timetable/<date>/', 'management', RHManageTimetable)
+_bp.add_url_rule('/manage/timetable/<date>/block/<int:session_block_id>/', 'management', RHManageTimetable)
+_bp.add_url_rule('/manage/timetable-legacy/', 'management-legacy', RHManageTimetableLegacy)
+_bp.add_url_rule('/manage/timetable-legacy/', 'timetable_rest', RHTimetableRESTLegacy, methods=('POST',))
+_bp.add_url_rule('/manage/timetable-legacy/<int:entry_id>', 'timetable_rest', RHTimetableRESTLegacy,
+                 methods=('PATCH', 'DELETE'))
+_bp.add_url_rule('/manage/timetable-legacy/session/<int:session_id>/', 'manage_session', RHManageSessionTimetableLegacy)
 
 # Timetable legacy operations
 _bp.add_url_rule('/manage/timetable/add-session', 'add_session', RHLegacyTimetableAddSession, methods=('GET', 'POST'))
@@ -66,6 +75,28 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
     _bp.add_url_rule('/add-session-block', 'add_session_block', RHLegacyTimetableAddSessionBlock,
                      methods=('GET', 'POST'))
     _bp.add_url_rule('/clone-contribution', 'clone_contribution', RHCloneContribution, methods=('POST',))
+
+# TODO: (Ajob) Replace API routes below with generic
+_bp.add_url_rule('/timetable/break', 'tt_break_create', RHTimetableBreakCreate, methods=('POST',))
+_bp.add_url_rule('/timetable/break/<int:break_id>', 'tt_break_rest', RHTimetableBreak,
+                 methods=('GET', 'PATCH', 'DELETE'))
+
+_bp.add_url_rule('/timetable/contrib', 'tt_contrib_create', RHTimetableContributionCreate, methods=('POST',))
+_bp.add_url_rule('/timetable/contrib/<int:contrib_id>', 'tt_contrib_rest', RHTimetableContribution,
+                 methods=('GET', 'PATCH', 'DELETE'))
+_bp.add_url_rule('/timetable/contrib/<int:contrib_id>/unschedule', 'tt_contrib_unschedule',
+                 RHTimetableUnscheduleContribution, methods=('POST',))
+_bp.add_url_rule('/timetable/<int:block_id>/schedule', 'tt_schedule', RHTimetableScheduleContribution,
+                 methods=('POST',))
+_bp.add_url_rule('/timetable/schedule', 'tt_schedule', RHTimetableScheduleContribution,
+                 methods=('POST',))
+_bp.add_url_rule('/timetable/session-block', 'tt_session_block_create', RHTimetableSessionBlockCreate,
+                 methods=('POST',))
+_bp.add_url_rule('/timetable/session-block/<int:block_id>', 'tt_session_block_rest', RHTimetableSessionBlock,
+                 methods=('GET', 'PATCH', 'DELETE'))
+_bp.add_url_rule('/timetable/child-locations/<int:session_id>/', 'tt_child_locations', RHTimetableChildLocations)
+_bp.add_url_rule('/timetable/child-locations/<int:session_id>/<int:block_id>', 'tt_child_locations',
+                 RHTimetableChildLocations)
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)

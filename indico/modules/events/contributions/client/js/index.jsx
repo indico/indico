@@ -22,13 +22,16 @@ import 'indico/react/components/AffiliationPopup';
 import EditableSubmissionButton from 'indico/modules/events/editing/editing/EditableSubmissionButton';
 import PaperSubmissionButton from 'indico/modules/events/papers/components/PaperSubmissionButton';
 import {IButton, ICSCalendarLink} from 'indico/react/components';
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {Translate} from 'indico/react/i18n';
 import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
 import {camelizeKeys} from 'indico/utils/case';
 import {$T} from 'indico/utils/i18n';
 
+import {CreateContributionButton, EditContributionButton} from './ContributionForm';
 import PublicationButton from './PublicationButton';
 import PublicationSwitch from './PublicationSwitch';
+
 import './MyContributions';
 import './MyTimetable';
 import './ScheduleContributionIcon';
@@ -79,6 +82,45 @@ document.addEventListener('DOMContentLoaded', () => {
     calendarContainer
   );
 });
+
+customElements.define(
+  'ind-edit-contribution',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(
+        <UserSearchTokenContext.Provider value={this.getAttribute('search-token')}>
+          <EditContributionButton
+            eventId={+this.getAttribute('event-id')}
+            contribId={+this.getAttribute('contrib-id')}
+          />
+        </UserSearchTokenContext.Provider>,
+        this
+      );
+    }
+
+    disconnectedCallback() {
+      ReactDOM.unmountComponentAtNode(this);
+    }
+  }
+);
+
+customElements.define(
+  'ind-create-contribution',
+  class extends HTMLElement {
+    connectedCallback() {
+      ReactDOM.render(
+        <UserSearchTokenContext.Provider value={this.getAttribute('search-token')}>
+          <CreateContributionButton eventId={+this.getAttribute('event-id')} />
+        </UserSearchTokenContext.Provider>,
+        this
+      );
+    }
+
+    disconnectedCallback() {
+      ReactDOM.unmountComponentAtNode(this);
+    }
+  }
+);
 
 (function(global) {
   global.setupEditableSubmissionButton = async function setupEditableSubmissionButton() {

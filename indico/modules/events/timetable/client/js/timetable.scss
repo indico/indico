@@ -1,0 +1,160 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+main.main {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  flex-shrink: unset;
+  overflow: hidden;
+
+  & > div:not(.main-breadcrumb) {
+    flex-grow: 1;
+    overflow: hidden;
+
+    & > .full-width-content-wrapper {
+      height: 100%;
+
+      & > div {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+
+        #event-side-menu {
+          padding-bottom: 2em;
+          padding-right: 0.5em; // avoid the scrollbar overlapping the right border of the menu
+        }
+
+        & > div.layout-side-menu {
+          min-height: unset;
+
+          &:first-child {
+            background: transparent !important;
+          }
+
+          &:last-child {
+            height: 0;
+            flex-grow: 1;
+
+            & > div.content-column {
+              height: 100%;
+
+              & > div.management-page {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+
+                & > header {
+                  margin-bottom: 0;
+                }
+
+                & > div.page-content {
+                  flex-grow: 1;
+                  display: flex;
+                  flex-direction: column;
+                  overflow: hidden;
+                  // Not exactly -60px because side button also has 5px margin
+                  margin-top: -80px;
+
+                  & > #timetable-container {
+                    height: 100%;
+                    overflow-y: auto;
+                    flex-grow: 1;
+
+                    & > div {
+                      height: 100%;
+
+                      & > div:last-child {
+                        height: 100%;
+                        width: 100%;
+                        flex-grow: 1;
+                        overflow: hidden;
+
+                        & > div.wrapper {
+                          width: 100%;
+                          overflow-y: scroll;
+                          // extra space for the scrollbar
+                          padding-right: 10px;
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+div.footer {
+  display: none;
+}
+
+// New timetable
+body:has(#timetable-container) {
+  footer.footer {
+    display: none;
+  }
+
+  main.main {
+    .layout-side-menu {
+      margin-right: 0;
+
+      &:nth-child(2) {
+        > .menu-column {
+          // Add vertical scroll to Indico sidebar, but only on the timetable management page
+          overflow-y: auto;
+          position: relative;
+          margin-right: 2px;
+          scrollbar-width: thin;
+        }
+      }
+
+      .page-content {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+
+      .timetable-sidepanel-management-toggle {
+        height: 100%;
+        min-width: 1.4rem;
+        padding: 0;
+        border: none;
+        font-size: 0.5rem;
+        margin-left: 5px;
+
+        &::before {
+          margin-right: 0;
+        }
+      }
+    }
+
+    &.side-panel-closed {
+      .layout-side-menu,
+      .timetable-sidepanel-management-toggle {
+        margin-left: 0;
+      }
+
+      .menu-column {
+        width: 0;
+        overflow: hidden;
+        margin: 0;
+        padding: 0;
+      }
+    }
+  }
+}

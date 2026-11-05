@@ -261,6 +261,10 @@
                                 {{ render_attachment_info(contrib) }}
                                 <td class="i-table actions-column hide-if-locked">
                                     <div class="group right entry-action-buttons vertical-aligner">
+                                        <ind-edit-contribution
+                                            event-id="{{ event.id }}"
+                                            contrib-id="{{ contrib.id }}"
+                                            search-token="{{ make_user_search_token() }}"></ind-edit-contribution>
                                         <a href="#" class="icon-edit i-link highlight js-dialog-action"
                                            data-href="{{ url_for('.manage_update_contrib', contrib, flash=true) }}"
                                            data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"

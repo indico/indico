@@ -1,0 +1,39 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'base/palette' as *;
+
+// Separate variables to allow customization.
+$primary-color: $dark-blue;
+$bg-color: $white;
+$toolbar-bg-color: $raincloud-gray;
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: sticky;
+  top: 0;
+  background-color: $bg-color;
+  border-bottom: 2px solid rgba($raincloud-gray, 0.8);
+  padding: 15px 10px 0 10px;
+  // Makes sure there is spacing when there is no timetable bar (e.g. single day)
+  min-height: 64px;
+
+  > .actions-bar {
+    margin: 0 5px;
+
+    > .right {
+      margin-left: auto;
+    }
+  }
+
+  .actions-bar {
+    display: flex;
+    align-items: center;
+  }
+}
