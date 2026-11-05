@@ -51,6 +51,8 @@
   align-items: center;
   justify-content: center;
   align-self: center;
+  flex-shrink: 0;
+  width: 3.5em;
   aspect-ratio: 1;
   padding: 0;
   border: 0;
