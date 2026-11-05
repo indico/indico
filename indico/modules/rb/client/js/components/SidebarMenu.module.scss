@@ -85,7 +85,19 @@
 }
 
 .override {
+  position: relative;
   cursor: pointer;
+}
+
+.active-indicator {
+  position: absolute;
+  top: 0.5em;
+  right: 0.5em;
+  width: 1em;
+  height: 1em;
+  border: 0.125em solid $white;
+  border-radius: 50%;
+  background-color: $red;
 }
 
 .visually-hidden {
