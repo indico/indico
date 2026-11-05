@@ -834,14 +834,6 @@ export function DayTimetable({
   );
 }
 
-function getCalendarTimeFromY(dt: Moment, minHour: number, y: number) {
-  return moment(dt)
-    .startOf('day')
-    .add(minHour, 'hours')
-    .add(pixelsToMinutes(y), 'minutes')
-    .format('LT');
-}
-
 function HoverGuide({hoverY, dt, minHour}: {hoverY: number | null; minHour: number; dt: Moment}) {
   const {dragged} = useDraggedData();
   const isDragging = dragged !== null;
@@ -850,9 +842,15 @@ function HoverGuide({hoverY, dt, minHour}: {hoverY: number | null; minHour: numb
     return null;
   }
 
+  const time = moment(dt)
+    .startOf('day')
+    .add(minHour, 'hours')
+    .add(pixelsToMinutes(hoverY), 'minutes')
+    .format('LT');
+
   return (
     <div styleName="hover-guide" style={{top: hoverY}}>
-      <span styleName="hover-guide-label">{getCalendarTimeFromY(dt, minHour, hoverY)}</span>
+      <span styleName="hover-guide-label">{time}</span>
     </div>
   );
 }
