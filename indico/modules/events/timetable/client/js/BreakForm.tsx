@@ -6,7 +6,6 @@
 // LICENSE file for more details.
 
 import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
-import breakCreateURL from 'indico-url:timetable.tt_break_create';
 import breakEditURL from 'indico-url:timetable.tt_break_rest';
 
 import moment from 'moment';
@@ -177,48 +176,6 @@ export function BreakEditForm({
   );
 }
 
-export function BreakCreateForm({eventId, onClose}: {eventId: number; onClose: () => void}) {
-  const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
-    locationParentURL({event_id: eventId})
-  );
-
-  const handleSubmit = async (formData: any) => {
-    try {
-      await indicoAxios.post(breakCreateURL({event_id: eventId}), formData);
-    } catch (e) {
-      return handleSubmitError(e);
-    }
-    location.reload();
-    // never finish submitting to avoid fields being re-enabled
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    await new Promise(() => {});
-  };
-
-  const locationData = locationParent
-    ? {...locationParent.location_data, inheriting: true}
-    : {inheriting: false};
-  const loading = locationParentLoading;
-
-  const initialValues = loading
-    ? {}
-    : {
-        duration: '',
-        location_data: locationData,
-      };
-
-  return (
-    <BreakForm
-      eventId={eventId}
-      locationParent={locationParent}
-      header={Translate.string('Add new break')}
-      onSubmit={handleSubmit}
-      onClose={onClose}
-      initialValues={initialValues}
-      loading={loading}
-    />
-  );
-}
-
 export function EditBreakButton({
   eventId,
   breakId,
@@ -249,38 +206,6 @@ export function EditBreakButton({
         </Button>
       )}
       {open && <BreakEditForm eventId={eventId} breakId={breakId} onClose={() => setOpen(false)} />}
-    </>
-  );
-}
-
-export function CreateBreakButton({
-  eventId,
-  triggerSelector,
-  ...rest
-}: {
-  eventId: number;
-  triggerSelector?: string;
-}) {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    if (!triggerSelector) {
-      return;
-    }
-    const handler = () => setOpen(true);
-    const element = document.querySelector(triggerSelector);
-    element.addEventListener('click', handler);
-    return () => element.removeEventListener('click', handler);
-  }, [triggerSelector]);
-
-  return (
-    <>
-      {!triggerSelector && (
-        <Button onClick={() => setOpen(true)} {...rest}>
-          <Translate>Create break</Translate>
-        </Button>
-      )}
-      {open && <BreakCreateForm eventId={eventId} onClose={() => setOpen(false)} />}
     </>
   );
 }
