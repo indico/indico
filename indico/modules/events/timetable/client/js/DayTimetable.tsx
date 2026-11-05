@@ -213,7 +213,7 @@ export function DayTimetable({
 
   const [draggingStartPos, setDraggingStartPos] = useState<number | null>(null);
   const [hoverGuideY, setHoverGuideY] = useState<number | null>(null);
-  const isDragging = draggingStartPos !== null;
+  const isDraggingToCreate = draggingStartPos !== null;
   const currentDayIdx = getDiffInDays(eventStartDt, currentDate);
 
   entries = useMemo(() => computeYoffset(entries, minHour), [entries, minHour]);
@@ -236,7 +236,7 @@ export function DayTimetable({
       const offsetY = clientY - wrapperRef.current.getBoundingClientRect().top;
       const isWithinLimitsWithOffset = !isWithinLimits(limits, offsetY);
 
-      if (isDragging || hasSelectedEntry || isWithinLimitsWithOffset) {
+      if (isDraggingToCreate || hasSelectedEntry || isWithinLimitsWithOffset) {
         if (hoverGuideY !== null) {
           setHoverGuideY(null);
         }
@@ -246,14 +246,6 @@ export function DayTimetable({
       const y = getPositionCalendarY(event.clientY);
       setHoverGuideY(y);
     }
-  }
-
-  function getCalendarTimeFromY(y: number) {
-    return moment(dt)
-      .startOf('day')
-      .add(minHour, 'hours')
-      .add(pixelsToMinutes(y), 'minutes')
-      .format('LT');
   }
 
   function showToastIfContribSessionChanged(
@@ -690,7 +682,7 @@ export function DayTimetable({
     }
 
     function onMouseMove(event: MouseEvent) {
-      if (!isDragging || !draftEntry) {
+      if (!isDraggingToCreate || !draftEntry) {
         return;
       }
 
@@ -718,7 +710,7 @@ export function DayTimetable({
         clearTimeout(newEntryTimer);
       }
 
-      if (isDragging) {
+      if (isDraggingToCreate) {
         setDraggingStartPos(null);
       }
     }
@@ -735,7 +727,7 @@ export function DayTimetable({
       wrapper.removeEventListener('mouseup', onMouseUp);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [draftEntry, dt, dispatch, isDragging, minHour, limits, hasSelectedEntry]);
+  }, [draftEntry, dt, dispatch, isDraggingToCreate, minHour, limits, hasSelectedEntry]);
 
   useEffect(() => {
     // We use a ref instead of scrollPosition directly to prevent jumping
@@ -811,11 +803,7 @@ export function DayTimetable({
             <DnDCalendar>
               <div ref={calendarRef}>
                 <Lines minHour={minHour} maxHour={maxHour} />
-                {hoverGuideY !== null && (
-                  <div styleName="hover-guide" style={{top: hoverGuideY}}>
-                    <span styleName="hover-guide-label">{getCalendarTimeFromY(hoverGuideY)}</span>
-                  </div>
-                )}
+                <HoverGuide hoverY={hoverGuideY} minHour={minHour} dt={dt} />
                 <TopLevelEntries dt={dt} entries={entries} />
                 <div
                   styleName="draft"
@@ -843,6 +831,27 @@ export function DayTimetable({
       </div>
       <DragPlaceholderContainer entries={entries} />
     </DnDProvider>
+  );
+}
+
+function HoverGuide({hoverY, dt, minHour}: {hoverY: number | null; minHour: number; dt: Moment}) {
+  const {dragged} = useDraggedData();
+  const isDragging = dragged !== null;
+
+  if (hoverY === null || isDragging) {
+    return null;
+  }
+
+  const time = moment(dt)
+    .startOf('day')
+    .add(minHour, 'hours')
+    .add(pixelsToMinutes(hoverY), 'minutes')
+    .format('LT');
+
+  return (
+    <div styleName="hover-guide" style={{top: hoverY}}>
+      <span styleName="hover-guide-label">{time}</span>
+    </div>
   );
 }
 
