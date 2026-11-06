@@ -31,6 +31,7 @@ from indico.modules.users.schemas import AffiliationSchema
 from indico.util.i18n import _
 from indico.util.locations import LocationDataSchema
 from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList, not_empty
+from indico.util.user import make_user_search_token
 from indico.web.flask.util import url_for
 
 
@@ -99,7 +100,7 @@ class UserContributionSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Contribution
         fields = ('id', 'title', 'description', 'friendly_id', 'code',
-                  'start_dt', 'end_dt', 'url', 'edit_url')
+                  'start_dt', 'end_dt', 'url', 'edit_url', 'edit_search_token')
 
     def _get_edit_url(self, contribution):
         user = self.context['user']
@@ -107,7 +108,14 @@ class UserContributionSchema(mm.SQLAlchemyAutoSchema):
             return None
         return url_for('contributions.manage_update_contrib', contribution, standalone=True)
 
+    def _get_edit_search_token(self, contribution):
+        user = self.context['user']
+        if not contribution.can_edit(user):
+            return None
+        return make_user_search_token()
+
     edit_url = fields.Method('_get_edit_url')
+    edit_search_token = fields.Method('_get_edit_search_token')
 
 
 class ContributionReferenceSchema(mm.SQLAlchemyAutoSchema):

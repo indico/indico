@@ -12,6 +12,7 @@ import ReactDOM from 'react-dom';
 import {Loader, Message} from 'semantic-ui-react';
 
 import {EditContributionButton} from 'indico/modules/events/contributions/ContributionForm';
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
@@ -46,11 +47,13 @@ function editContribution(contribution: Contribution, eventId: number) {
           data-ajax-dialog
           data-reload-after
         />
-        <EditContributionButton
-          eventId={eventId}
-          contribId={contribution.id}
-          className="icon-edit"
-        />
+        <UserSearchTokenContext.Provider value={contribution.edit_search_token}>
+          <EditContributionButton
+            eventId={eventId}
+            contribId={contribution.id}
+            className="icon-edit"
+          />
+        </UserSearchTokenContext.Provider>
       </span>
     );
   }
