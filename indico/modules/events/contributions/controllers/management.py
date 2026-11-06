@@ -9,7 +9,7 @@ import uuid
 from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request, session
-from marshmallow import fields
+from marshmallow import RAISE, fields
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -235,6 +235,7 @@ class RHEditContributionBase(RHManageContributionBase):
     """
 
     def _check_access(self):
+        self.management = self.contrib.can_manage(session.user)
         if not self.contrib.can_edit(session.user):
             raise Forbidden
         check_event_locked(self, self.event)
@@ -357,42 +358,72 @@ class RHContributionREST(RHManageContributionBase):
         return updates
 
 
-class RHAPIContribution(RHManageContributionBase):
+class RHAPIContribution(RHEditContributionBase):
     def _process_GET(self):
-        return ContributionRESTSchema(context={'event': self.event}).jsonify(self.contrib)
+        return ContributionRESTSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context},
+            only=self.only_fields,
+        ).jsonify(self.contrib)
 
-    @use_rh_args(ContributionRESTSchema, partial=True)
+    @property
+    def only_fields(self):
+        return ContributionRESTSchema.get_editable_fields(self.contrib, self.management)
+
+    @property
+    def custom_fields_context(self):
+        return ContributionRESTSchema.get_custom_fields_context(self.event, self.management)
+
+    @use_rh_args(ContributionRESTSchema, rh_only='only_fields', unknown=RAISE, partial=True)
     def _process_PATCH(self, data):
         if (person_links := data.pop('person_links', None)) is not None:
             data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data, data.pop('custom_fields', None))
 
-        return ContributionRESTSchema(context={'event': self.event}).jsonify(self.contrib)
+        return ContributionRESTSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context},
+            only=self.only_fields,
+        ).jsonify(self.contrib)
 
 
 class RHAPIContributionCreate(RHManageContributionsBase):
+    @property
+    def custom_fields_context(self):
+        return ContributionRESTSchema.get_custom_fields_context(self.event, management=True)
+
     @use_rh_args(ContributionRESTSchema)
     def _process_POST(self, data):
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         contrib = create_contribution(self.event, data, data.pop('custom_fields', None))
-        return ContributionRESTSchema(context={'event': self.event}).jsonify(contrib)
+        return ContributionRESTSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context}
+        ).jsonify(contrib)
 
 
 class ContributionFormMetadataMixin:
-    def _get_metadata(self, contrib: Contribution = None):
+    def _get_metadata(self, contrib: Contribution = None, *, management: bool):
+        if contrib and not management:
+            fields = ContributionRESTSchema.get_custom_fields_context(self.event)['allowed_fields']
+            limit_fields = ContributionRESTSchema.get_editable_fields(self.contrib)
+        else:
+            # creation is limited to full managers so we never have to restrict the fields
+            fields = self.event.contribution_fields.filter_by(is_active=True).all()
+            limit_fields = None
+
         return {
             'allowed_keywords': sorted(global_event_settings.get('allowed_contribution_keywords')),
             'default_duration': int(contribution_settings.get(self.event, 'default_duration').total_seconds()),
             'person_link_field_params': get_contribution_person_link_field_params(self.event, contrib),
             'location_parent': LocationParentSchema().dump(contrib.location_parent if contrib else self.event),
+            'limit_fields': limit_fields,
             # XXX If you ever copy this for a future react-based abstract submission dialog, make sure to filter
             # the list of contribution types to non-private ones!
             'types': ContributionTypeSchema(many=True).dump(self.event.contribution_types),
-            # TODO: Skip restricted fields when using this outside management (e.g. editing a contribution as a speaker)
-            # TODO: Check if we really need all the fields on the client side. is_active and position are probably not
-            # needed since we never return inactive ones and the list is already properly sorted by position.
-            'fields': ContributionFieldSchema(many=True).dump(self.event.contribution_fields.filter_by(is_active=True)),
+            'custom_fields': ContributionFieldSchema(
+                # TODO maybe include visiblity here and display it in the dialog so managers know who can see
+                # a custom field?
+                many=True, only=('id', 'title', 'description', 'is_required', 'field_type', 'field_data')
+            ).dump(fields),
         }
 
 
@@ -400,14 +431,14 @@ class RHAPICreateContributionFormMetadata(ContributionFormMetadataMixin, RHManag
     """Return metadata needed in the contribution creation form."""
 
     def _process(self):
-        return jsonify(self._get_metadata())
+        return jsonify(self._get_metadata(management=True))
 
 
 class RHAPIEditContributionFormMetadata(ContributionFormMetadataMixin, RHEditContributionBase):
     """Return metadata needed in the contribution edit form."""
 
     def _process(self):
-        return jsonify(self._get_metadata(self.contrib))
+        return jsonify(self._get_metadata(self.contrib, management=self.management))
 
 
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):

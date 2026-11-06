@@ -55,6 +55,7 @@ interface ContributionFormProps {
   personLinkFieldParams?: Record<string, any>;
   allowedKeywords: string[];
   locationParent?: Record<string, any>;
+  limitFields: string[] | null;
   customFields: CustomField[];
   contributionTypes: ContributionType[];
   onSubmit: (formData: any, form?: any) => void;
@@ -70,6 +71,7 @@ interface ContributionFormFieldsProps {
   locationParent?: Record<string, any>;
   personLinkFieldParams?: Record<string, any>;
   initialValues: Record<string, any>;
+  limitFields: string[] | null;
   customFields?: CustomField[];
   contributionTypes?: ContributionType[];
   extraOptions?: Record<string, any>;
@@ -82,11 +84,14 @@ export function ContributionFormFields({
   locationParent = {inheriting: false},
   personLinkFieldParams = {},
   initialValues = {},
+  limitFields = null,
   customFields = [],
   contributionTypes = [],
   extraOptions = {},
   allowedKeywords = [],
 }: ContributionFormFieldsProps) {
+  const showField = (name: string) =>
+    limitFields === null || limitFields.includes(name) ? true : null;
   const customFieldNames = customFields.map(f => `custom_fields.custom_${f.id}`);
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
@@ -167,9 +172,13 @@ export function ContributionFormFields({
 
   return (
     <>
-      <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
-      <FinalTextArea name="description" label={Translate.string('Description')} />
-      {contributionTypes.length > 0 && (
+      {showField('title') && (
+        <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
+      )}
+      {showField('description') && (
+        <FinalTextArea name="description" label={Translate.string('Description')} />
+      )}
+      {showField('type_id') && contributionTypes.length > 0 && (
         <FinalDropdown
           name="type_id"
           placeholder={Translate.string('No type selected')}
@@ -184,88 +193,108 @@ export function ContributionFormFields({
           nullIfEmpty
         />
       )}
-      {initialValues.start_dt ? (
-        <>
-          <Field name="duration" subscription={{value: true}}>
-            {({input: {value: duration}}) => (
-              <FinalDateTimePicker
-                name="start_dt"
-                label={Translate.string('Start date')}
-                minStartDt={minStartDt}
-                maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
-                required
-              />
-            )}
-          </Field>
-          <Field name="start_dt" subscription={{value: true}}>
-            {({input: {value: startDt}}) => (
-              <FinalDuration
-                name="duration"
-                label={Translate.string('Duration')}
-                max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
-              />
-            )}
-          </Field>
-        </>
-      ) : (
-        <FinalDuration name="duration" label={Translate.string('Duration')} />
-      )}
-      <FinalContributionPersonLinkField
-        name="person_links"
-        label={Translate.string('People')}
-        eventId={eventId}
-        sessionUser={{...Indico.User, userId: Indico.User.id}}
-        {...personLinkFieldParams}
-      />
-      <FinalLocationField
-        name="location_data"
-        label={Translate.string('Location')}
-        locationParent={locationParent}
-      />
-      {allowedKeywords.length ? (
-        <FinalDropdown
-          name="keywords"
-          label={Translate.string('Keywords')}
-          multiple
-          selection
-          options={[...new Set([...allowedKeywords, ...initialValues.keywords])].map(keyword => ({
-            value: keyword,
-            text: keyword,
-            key: keyword,
-          }))}
-          placeholder={Translate.string('Please choose a keyword')}
-        />
-      ) : (
-        <FinalTagList
-          name="keywords"
-          label={Translate.string('Keywords')}
-          placeholder={Translate.string('Please enter a keyword')}
+      {showField('start_dt') &&
+        showField('duration') &&
+        (initialValues.start_dt ? (
+          <>
+            <Field name="duration" subscription={{value: true}}>
+              {({input: {value: duration}}) => (
+                <FinalDateTimePicker
+                  name="start_dt"
+                  label={Translate.string('Start date')}
+                  minStartDt={minStartDt}
+                  maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
+                  required
+                />
+              )}
+            </Field>
+            <Field name="start_dt" subscription={{value: true}}>
+              {({input: {value: startDt}}) => (
+                <FinalDuration
+                  name="duration"
+                  label={Translate.string('Duration')}
+                  max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
+                />
+              )}
+            </Field>
+          </>
+        ) : (
+          <FinalDuration name="duration" label={Translate.string('Duration')} />
+        ))}
+      {showField('person_links') && (
+        <FinalContributionPersonLinkField
+          name="person_links"
+          label={Translate.string('People')}
+          eventId={eventId}
+          sessionUser={{...Indico.User, userId: Indico.User.id}}
+          {...personLinkFieldParams}
         />
       )}
-      <CollapsibleContainer
-        title={
-          <span style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}>
-            <Translate>Advanced</Translate>
-            <Popup
-              trigger={<ErrorMarker fields={[...customFieldNames, 'references']} size="tiny" />}
-            >
-              <Translate>Please expand this section and correct the invalid fields.</Translate>
-            </Popup>
-          </span>
-        }
-        dividing
-      >
-        {customFieldsSection}
-        <FinalReferences
-          name="references"
-          label={Translate.string('External IDs')}
-          description={Translate.string('Manage external resources for this contribution')}
+      {showField('location_data') && (
+        <FinalLocationField
+          name="location_data"
+          label={Translate.string('Location')}
+          locationParent={locationParent}
         />
-        <Form.Group widths="equal">
-          <FinalInput name="board_number" label={Translate.string('Board number')} />
-          <FinalInput name="code" label={Translate.string('Program code')} />
-        </Form.Group>
-      </CollapsibleContainer>
+      )}
+      {showField('keywords') &&
+        (allowedKeywords.length ? (
+          <FinalDropdown
+            name="keywords"
+            label={Translate.string('Keywords')}
+            multiple
+            selection
+            options={[...new Set([...allowedKeywords, ...initialValues.keywords])].map(keyword => ({
+              value: keyword,
+              text: keyword,
+              key: keyword,
+            }))}
+            placeholder={Translate.string('Please choose a keyword')}
+          />
+        ) : (
+          <FinalTagList
+            name="keywords"
+            label={Translate.string('Keywords')}
+            placeholder={Translate.string('Please enter a keyword')}
+          />
+        ))}
+      {(showField('custom_fields') ||
+        showField('references') ||
+        showField('board_number') ||
+        showField('code')) && (
+        <CollapsibleContainer
+          title={
+            <span style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}>
+              <Translate>Advanced</Translate>
+              <Popup
+                trigger={<ErrorMarker fields={[...customFieldNames, 'references']} size="tiny" />}
+              >
+                <Translate>Please expand this section and correct the invalid fields.</Translate>
+              </Popup>
+            </span>
+          }
+          dividing
+        >
+          {showField('custom_fields') && customFieldsSection}
+          {showField('references') && (
+            <FinalReferences
+              name="references"
+              label={Translate.string('External IDs')}
+              description={Translate.string('Manage external resources for this contribution')}
+            />
+          )}
+          {(showField('board_number') || showField('code')) && (
+            <Form.Group widths="equal">
+              {showField('board_number') && (
+                <FinalInput name="board_number" label={Translate.string('Board number')} />
+              )}
+              {showField('code') && (
+                <FinalInput name="code" label={Translate.string('Program code')} />
+              )}
+            </Form.Group>
+          )}
+        </CollapsibleContainer>
+      )}
     </>
   );
 }
@@ -274,6 +303,7 @@ function ContributionForm({
   eventId,
   personLinkFieldParams = {},
   locationParent = {},
+  limitFields = null,
   customFields = [],
   contributionTypes = [],
   onSubmit,
@@ -335,6 +365,7 @@ function ContributionForm({
         locationParent={locationParent}
         initialValues={initialValues}
         sessionBlock={sessionBlock}
+        limitFields={limitFields}
         customFields={customFields}
         contributionTypes={contributionTypes}
         personLinkFieldParams={personLinkFieldParams}
@@ -380,7 +411,8 @@ export function ContributionEditForm({
     locationParent,
     allowedKeywords,
     personLinkFieldParams,
-    fields,
+    limitFields,
+    customFields: fields,
     types: contributionTypes,
   } = camelizeKeys(metadata ?? {});
 
@@ -390,6 +422,7 @@ export function ContributionEditForm({
       personLinkFieldParams={personLinkFieldParams}
       allowedKeywords={allowedKeywords}
       locationParent={locationParent}
+      limitFields={limitFields}
       customFields={fields}
       contributionTypes={contributionTypes}
       header={Translate.string("Edit contribution '{title}'", {title: contrib?.title})}
@@ -428,7 +461,8 @@ export function ContributionCreateForm({
     defaultDuration,
     allowedKeywords,
     personLinkFieldParams,
-    fields,
+    limitFields,
+    customFields: fields,
     types: contributionTypes,
   } = camelizeKeys(metadata ?? {});
 
@@ -479,6 +513,7 @@ export function ContributionCreateForm({
       personLinkFieldParams={personLinkFieldParams}
       allowedKeywords={allowedKeywords}
       locationParent={locationParent}
+      limitFields={limitFields}
       customFields={fields ?? []}
       contributionTypes={contributionTypes}
       header={Translate.string('Add new contribution')}
