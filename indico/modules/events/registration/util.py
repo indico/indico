@@ -1060,6 +1060,7 @@ def _get_email_image(regform, file_uuid):
     with image.open() as f:
         attachment = MIMEImage(f.read(), image.content_type.removeprefix('image/'))
     attachment.add_header('Content-ID', f'<email-image-{image.id}>')
+    attachment.add_header('Content-Disposition', 'inline', filename=image.filename)
     return attachment
 
 
