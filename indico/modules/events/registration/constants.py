@@ -11,8 +11,7 @@ REGISTRATION_PICTURE_SIZE = 1000
 #: Max size of the longest edge for registration pictures thumbnails (px)
 REGISTRATION_PICTURE_THUMBNAIL_SIZE = 120
 
-#: Key of the `File.meta` entry that links an image uploaded for registration emails to its
-#: registration form (the value is the ID of the form)
+#: `File.meta` key that links an image uploaded for registration emails to its registration form
 EMAIL_IMAGE_META_KEY = 'registration_email_image_regform_id'
 
 #: Sentinel UUID used to indicate that the user's profile picture should be used as the
