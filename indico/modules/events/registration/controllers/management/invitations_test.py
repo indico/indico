@@ -231,6 +231,15 @@ def test_send_rejects_images_that_cannot_be_embedded(request, manager_client, du
     url = request.getfixturevalue(url_fixture)
     resp = send(manager_client, dummy_regform, f'<img src="{url}">')
     assert resp.status_code == 422
+    assert resp.json == {'webargs_errors': ['The email contains an image that was not uploaded for this registration '
+                                            'form or no longer exists. Please upload it again.']}
+    assert not smtp.outbox
+
+
+@pytest.mark.parametrize('send', (_invite, _import_invitations, _send_reminder))
+def test_send_keeps_validation_errors_on_body(manager_client, dummy_regform, smtp, send):
+    resp = send(manager_client, dummy_regform, '<img src="/relative.png">')
+    assert resp.status_code == 422
     assert list(resp.json['webargs_errors']) == ['body']
     assert not smtp.outbox
 
@@ -276,7 +285,7 @@ def test_send_rejects_images_over_attachment_limit(manager_client, dummy_regform
             for size in (700, 701)]
     resp = send(manager_client, dummy_regform, ''.join(f'<img src="{url}">' for url in urls))
     assert resp.status_code == 422
-    assert resp.json == {'webargs_errors': {'body': ['Total attachment size too large (max. 1 MB)']}}
+    assert resp.json == {'webargs_errors': ['Total attachment size too large (max. 1 MB)']}
     assert not smtp.outbox
 
 
