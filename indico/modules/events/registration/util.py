@@ -1053,7 +1053,7 @@ def update_regform_item_positions(regform):
 
 @memoize_request
 def _get_email_image(regform, file_uuid):
-    """Load an image as an attachment, shared by the emails of all the recipients in a request."""
+    """Get an image uploaded for the registration form as an email attachment."""
     image = File.query.filter_by(uuid=file_uuid).first()
     if not image or image.meta.get(EMAIL_IMAGE_META_KEY) != regform.id:
         return None
@@ -1065,16 +1065,7 @@ def _get_email_image(regform, file_uuid):
 
 
 def embed_email_images(regform, body):
-    """Turn the images uploaded for a registration form into inline email attachments.
-
-    Only images uploaded for this very form are embedded and external images are left alone.
-    Any other file of this Indico instance is rejected since its signed URL would expire.
-
-    :param regform: the registration form the email is sent for
-    :param body: the HTML body of the email
-    :return: a ``(body, attachments)`` tuple, where ``body`` references the attachments using ``cid:`` URLs
-    :raise ValueError: if the body contains a file that cannot be embedded
-    """
+    """Turn the images uploaded for a registration form into inline email attachments."""
     # a rendered template is `Markup`, which would escape the replacements below
     body = str(body)
     urls = dict.fromkeys(url for el, attrib, url, _pos in lxml_html.fromstring(body).iterlinks()
@@ -1084,6 +1075,7 @@ def embed_email_images(regform, body):
         if not (match := endpoint_for_url(url)) or match[0] != 'files.download_file':
             continue
         if (image := _get_email_image(regform, match[1]['uuid'])) is None:
+            # its signed URL would expire, so it cannot stay in the email
             raise ValueError(_('The email contains an image that was not uploaded for this registration form or no '
                                'longer exists. Please upload it again.'))
         cid = image['Content-ID'].strip('<>')
