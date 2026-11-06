@@ -12,7 +12,7 @@ Improvements
 
 - Only allow logged-in users to generate contribution PDFs (:pr:`7836`)
 - Allow adding images to registration invitation and reminder emails
-  (:pr:`XXXX`, thanks :user:`moliholy, unconventionaldotdev`)
+  (:pr:`7864`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
