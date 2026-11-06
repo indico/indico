@@ -253,8 +253,9 @@ export const getConfig = (
         // eslint-disable-next-line no-throw-literal
         throw {message: `Upload failed: ${msg}`, remove: true};
       }
+      const [reason = 'Upload failed'] = _.get(error, 'response.data.webargs_errors.upload', []);
       // eslint-disable-next-line no-throw-literal
-      throw {message: 'Upload failed', remove: true};
+      throw {message: reason, remove: true};
     }
   },
   smart_paste: false,
