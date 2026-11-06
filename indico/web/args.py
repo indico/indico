@@ -145,11 +145,16 @@ def use_rh_args(schema_cls, **kwargs):
         rh_context_attrs, mapped_attrs = rh_context_attrs[:-1], rh_context_attrs[-1]
         assert not mapped_attrs.keys() & set(rh_context_attrs)
 
+    rh_only_attr = schema_kwargs.pop('rh_only', None)
+
     def factory(req):
         context = dict(default_context)
         context.update((arg, getattr(g.rh, arg, None)) for arg in rh_context_attrs)
         context.update((ctx_name, getattr(g.rh, rh_name, None)) for ctx_name, rh_name in mapped_attrs.items())
-        return schema_cls(context=context, **schema_kwargs)
+        rh_kwargs = {}
+        if rh_only_attr:
+            rh_kwargs['only'] = getattr(g.rh, rh_only_attr)
+        return schema_cls(context=context, **schema_kwargs, **rh_kwargs)
 
     return parser.use_args(factory, **webargs_kwargs)
 
