@@ -28,8 +28,8 @@ from indico.modules.events.registration.models.invitations import (InvitationSta
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.schemas import (InvitationImportSchema, InvitationUserSchema,
                                                         NewInvitationSchema, RegistrationInvitationSchema)
-from indico.modules.events.registration.util import (create_invitation, import_invitations_from_user_records,
-                                                     import_user_records_from_csv)
+from indico.modules.events.registration.util import (create_invitation, embed_email_images,
+                                                     import_invitations_from_user_records, import_user_records_from_csv)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.files.models.files import File
 from indico.modules.files.util import validate_upload_file_size
@@ -340,8 +340,12 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
-                                   template=tpl, html=True)
+                try:
+                    html_body, images = embed_email_images(self.regform, tpl.get_body())
+                    email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
+                                       subject=tpl.get_subject(), body=html_body, attachments=images, html=True)
+                except ValueError as exc:
+                    abort(422, messages={'body': [str(exc)]})
             send_email(email, self.event, 'Registration', session.user)
             self.regform.log(
                 EventLogRealm.management, LogKind.other, 'Registration', 'Invitation reminders sent', session.user,

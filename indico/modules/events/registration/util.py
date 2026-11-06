@@ -11,10 +11,12 @@ import dataclasses
 import itertools
 import uuid
 from datetime import datetime
+from email.mime.image import MIMEImage
 from io import BytesIO
 from operator import attrgetter
 
 from flask import json, session
+from lxml import html as lxml_html
 from marshmallow import RAISE, ValidationError, fields, validates
 from PIL import Image, ImageOps
 from qrcode import QRCode, constants
@@ -33,7 +35,8 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.constants import (PROFILE_PICTURE_SENTINEL, REGISTRATION_PICTURE_SIZE,
+from indico.modules.events.registration.constants import (EMAIL_IMAGE_META_KEY, PROFILE_PICTURE_SENTINEL,
+                                                          REGISTRATION_PICTURE_SIZE,
                                                           REGISTRATION_PICTURE_THUMBNAIL_SIZE)
 from indico.modules.events.registration.fields.accompanying import AccompanyingPersonsField
 from indico.modules.events.registration.fields.affiliation import AffiliationMode
@@ -49,10 +52,12 @@ from indico.modules.events.registration.models.registrations import (Registratio
                                                                      RegistrationVisibility)
 from indico.modules.events.registration.notifications import (notify_invitation, notify_registration_creation,
                                                               notify_registration_modification)
+from indico.modules.files.models.files import File
 from indico.modules.logs import LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.modules.users.models.users import ProfilePictureSource
 from indico.modules.users.util import get_user_by_email
+from indico.util.caching import memoize_request
 from indico.util.countries import get_country_reverse
 from indico.util.date_time import format_datetime, now_utc
 from indico.util.i18n import _
@@ -60,6 +65,7 @@ from indico.util.signals import make_interceptable, named_objects_from_signal, v
 from indico.util.spreadsheets import CSVFieldDelimiter, csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
 from indico.web.args import parser
+from indico.web.flask.util import endpoint_for_url
 
 
 @dataclasses.dataclass
@@ -1043,6 +1049,45 @@ def update_regform_item_positions(regform):
         for child in section.children:
             child_active = child.is_enabled and not child.is_deleted
             child.position = next(positions if child_active else disabled_positions)
+
+
+@memoize_request
+def _get_email_image(regform, file_uuid):
+    """Load an image as an attachment, shared by the emails of all the recipients in a request."""
+    image = File.query.filter_by(uuid=file_uuid).first()
+    if not image or image.meta.get(EMAIL_IMAGE_META_KEY) != regform.id:
+        return None
+    with image.open() as f:
+        attachment = MIMEImage(f.read(), image.content_type.removeprefix('image/'))
+    attachment.add_header('Content-ID', f'<email-image-{image.id}>')
+    return attachment
+
+
+def embed_email_images(regform, body):
+    """Turn the images uploaded for a registration form into inline email attachments.
+
+    Only images uploaded for this very form are embedded and external images are left alone.
+    Any other file of this Indico instance is rejected since its signed URL would expire.
+
+    :param regform: the registration form the email is sent for
+    :param body: the HTML body of the email
+    :return: a ``(body, attachments)`` tuple, where ``body`` references the attachments using ``cid:`` URLs
+    :raise ValueError: if the body contains a file that cannot be embedded
+    """
+    body = str(body)  # a rendered template is `Markup`, which would escape the replacements below
+    urls = {url for el, attrib, url, _pos in lxml_html.fromstring(body).iterlinks()
+            if (el.tag, attrib) == ('img', 'src')}
+    attachments = {}
+    for url in urls:
+        if not (match := endpoint_for_url(url)) or match[0] != 'files.download_file':
+            continue
+        if (image := _get_email_image(regform, match[1]['uuid'])) is None:
+            raise ValueError(_('The email contains an image that was not uploaded for this registration form or no '
+                               'longer exists. Please upload it again.'))
+        cid = image['Content-ID'].strip('<>')
+        attachments[cid] = image
+        body = body.replace(f'src="{url}"', f'src="cid:{cid}"')
+    return body, list(attachments.values())
 
 
 def create_invitation(regform, user, email_sender, email_subject, email_body, *, skip_moderation, skip_access_check,
