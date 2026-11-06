@@ -46,7 +46,11 @@ function editContribution(contribution: Contribution, eventId: number) {
           data-ajax-dialog
           data-reload-after
         />
-        <EditContributionButton eventId={eventId} contribId={contribution.id} />
+        <EditContributionButton
+          eventId={eventId}
+          contribId={contribution.id}
+          className="icon-edit"
+        />
       </span>
     );
   }

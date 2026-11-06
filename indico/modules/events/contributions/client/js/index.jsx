@@ -92,6 +92,7 @@ customElements.define(
           <EditContributionButton
             eventId={+this.getAttribute('event-id')}
             contribId={+this.getAttribute('contrib-id')}
+            className={this.getAttribute('button-class')}
           />
         </UserSearchTokenContext.Provider>,
         this
