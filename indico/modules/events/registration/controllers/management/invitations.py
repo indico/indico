@@ -5,17 +5,22 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import os
+
 from flask import jsonify, request, session
 from marshmallow import fields
+from PIL import Image
 from sqlalchemy.orm import joinedload
 from webargs import validate
 from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.registration.constants import EMAIL_IMAGE_META_KEY
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.fields.affiliation import AffiliationMode
 from indico.modules.events.registration.models.invitations import (InvitationState, MockRegistrationInvitation,
@@ -26,6 +31,8 @@ from indico.modules.events.registration.schemas import (InvitationImportSchema, 
 from indico.modules.events.registration.util import (create_invitation, import_invitations_from_user_records,
                                                      import_user_records_from_csv)
 from indico.modules.events.registration.views import WPManageRegistration
+from indico.modules.files.models.files import File
+from indico.modules.files.util import validate_upload_file_size
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.i18n import _
 from indico.util.marshmallow import (LowercaseString, Principal, make_validate_indico_placeholders, no_endpoint_links,
@@ -35,6 +42,29 @@ from indico.web.args import use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
+
+
+EMAIL_IMAGE_TYPES = frozenset({'jpeg', 'png', 'gif'})
+
+
+def _get_image_type(stream):
+    try:
+        with Image.open(stream) as image:
+            image_type = image.format.lower()
+    except (OSError, Image.DecompressionBombError):
+        return None
+    stream.seek(0)
+    # XXX: mpo is basically JPEG and JPEGs from some cameras are (wrongfully) detected as mpo
+    return 'jpeg' if image_type == 'mpo' else image_type
+
+
+def _exceeds_email_attachment_limit(upload):
+    if config.MAX_EMAIL_ATTACHMENT_SIZE is None:
+        return False
+    upload.seek(0, os.SEEK_END)
+    size = upload.tell()
+    upload.seek(0)
+    return size > config.MAX_EMAIL_ATTACHMENT_SIZE * 1024 * 1024
 
 
 def _has_pending_invitations(invitations):
@@ -217,6 +247,27 @@ class RHRegistrationFormImportInvitesUpload(RHManageRegFormBase):
         if not rows:
             abort(422, messages={'file': [_('The uploaded CSV file is empty')]})
         return InvitationUserSchema(many=True).jsonify(rows)
+
+
+class RHRegistrationFormInvitationImageUpload(RHManageRegFormBase):
+    """Upload an image to embed in the emails sent to invitees."""
+
+    @use_kwargs({'upload': fields.Raw(required=True)}, location='files')
+    def _process(self, upload):
+        if not validate_upload_file_size(upload):
+            abort(422, messages={'upload': [_('The uploaded file is too large')]})
+        if _exceeds_email_attachment_limit(upload):
+            abort(422, messages={'upload': [_('The image is too large to be sent by email (max. {} MB)')
+                                            .format(config.MAX_EMAIL_ATTACHMENT_SIZE)]})
+        image_type = _get_image_type(upload.stream)
+        if image_type not in EMAIL_IMAGE_TYPES:
+            abort(422, messages={'upload': [_('Only JPG, PNG and GIF images are allowed')]})
+        context = ('event', self.event.id, 'regform', self.regform.id, 'email-images')
+        image = File.create_from_stream(upload.stream, upload.filename, f'image/{image_type}', context)
+        # the uuid is still a string until the file is reloaded, which breaks the signed url
+        db.session.refresh(image)
+        image.meta = {EMAIL_IMAGE_META_KEY: self.regform.id}
+        return jsonify(url=image.signed_download_url)
 
 
 class RHRegistrationFormInvitationPreview(RHManageRegFormBase):
