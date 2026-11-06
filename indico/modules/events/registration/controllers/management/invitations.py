@@ -347,7 +347,7 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
                     email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
                                        subject=tpl.get_subject(), body=html_body, attachments=images, html=True)
                 except ValueError as exc:
-                    abort(422, messages={'body': [str(exc)]})
+                    abort(422, messages=[str(exc)])
             send_email(email, self.event, 'Registration', session.user)
             self.regform.log(
                 EventLogRealm.management, LogKind.other, 'Registration', 'Invitation reminders sent', session.user,

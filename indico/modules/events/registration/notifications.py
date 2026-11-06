@@ -34,7 +34,7 @@ def notify_invitation(invitation, subject, body, sender_address, *, bcc_addresse
         email = make_email(invitation.email, sender_address=sender_address, subject=template.get_subject(),
                            body=email_body, attachments=images, html=True, bcc_list=bcc)
     except ValueError as exc:
-        abort(422, messages={'body': [str(exc)]})
+        abort(422, messages=[str(exc)])
     send_email(email, invitation.registration_form.event, 'Registration', user)
 
 
