@@ -21,6 +21,8 @@ Bugfixes
 - Add missing checks for timetable draft mode (:pr:`7821`)
 - Take the user from the API token into account when serializing attachments
   in the timetable export API (:pr:`7822`)
+- Fix list rows still being edited getting lost when saving a form (:pr:`7702`, thanks
+  :user:`moliholy, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^

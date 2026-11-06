@@ -177,7 +177,33 @@ import {$T} from 'indico/utils/i18n';
           e.preventDefault();
           $(this).closest('tr').find('.js-cancel-edit').trigger('click');
         }
+      })
+      .on('change input', '.js-table-input', () => {
+        updatePendingRows();
       });
+
+    function isBlankRow(row) {
+      return !row
+        .find('.js-table-input')
+        .toArray()
+        .some(input => (input.type === 'checkbox' ? input.checked : !!input.value.trim()));
+    }
+
+    // a row being edited is not part of the form data, so the form has to be told about it
+    function updatePendingRows() {
+      let pending = false;
+      widgetBody
+        .children('tr')
+        .has('.js-table-input')
+        .each((i, tr) => {
+          const row = $(tr);
+          const unsaved = !!row.data('hasItem') || !isBlankRow(row);
+          const msg = unsaved ? $T.gettext('Please save or cancel this row first.') : '';
+          row.find('.js-table-input')[0].setCustomValidity(msg);
+          pending = pending || unsaved;
+        });
+      widget.attr('data-pending-changes', pending ? '' : null);
+    }
 
     function fixWidths() {
       if (!options.sortable) {
@@ -201,6 +227,7 @@ import {$T} from 'indico/utils/i18n';
         widget.find('tbody.ui-sortable').sortable('refresh');
       }
       fixWidths();
+      updatePendingRows();
       addButton.prop('disabled', !!widget.find('.js-table-input').length);
       if (moveTooltips === undefined || moveTooltips) {
         repositionTooltips();
