@@ -14,7 +14,7 @@ Improvements
 - Include the event's category path in iCalendar exports (:issue:`7711`, :pr:`7885`,
   thanks :user:`titcsl`)
 - Allow adding images to registration invitation and reminder emails
-  (:pr:`XXXX`, thanks :user:`moliholy, unconventionaldotdev`)
+  (:pr:`7864`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
