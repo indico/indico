@@ -119,6 +119,14 @@
     <div class="action-menu">
         <div class="toolbar">
             {% if event.can_manage(session.user) %}
+                {% if event.is_unlisted and request.endpoint != 'event_management.settings' %}
+                    {# the settings page shows it in the unlisted event alert instead #}
+                    <span class="hide-if-locked group"
+                          id="event-action-publish-container"
+                          data-event-id="{{ event.id }}"
+                          {{ 'data-pending-request' if event.pending_move_request }}></span>
+                {% endif %}
+
                 {% block event_clone_actions scoped %}
                     <div class="group">
                         <button class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
@@ -169,6 +177,6 @@
     </div>
 
     <script>
-        $(document).ready(() => setupEventManagementActionMenu());
+        domReady.then(setupEventManagementActionMenu);
     </script>
 {% endmacro %}

@@ -15,8 +15,6 @@ Improvements
 Bugfixes
 ^^^^^^^^
 
-- Move the publish button into the unlisted event alert on the settings page
-  (:issue:`7797`)
 - Keep date pickers and other fixed-position popups beside their fields in modal dialogs
   (:pr:`7845`, thanks :user:`foxbunny`)
 - Enable CSRF check on oauth authorization endpoint (:pr:`7818`)
