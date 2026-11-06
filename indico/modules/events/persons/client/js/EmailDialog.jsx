@@ -5,9 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import {FORM_ERROR} from 'final-form';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {FormSpy} from 'react-final-form';
 import {Form, Button, Message, Input, Popup, Icon} from 'semantic-ui-react';
 
@@ -103,6 +104,7 @@ export function EmailDialog({
   const maxEmailAttachmentSize = Indico.FileRestrictions.MaxEmailAttachmentSize;
   const allowAttachments = !!attachmentsUploadURL;
   const [preview, setPreview] = useState(null);
+  const editorRef = useRef(null);
 
   const togglePreview = async (values, contextOverride = null) => {
     const {body, subject} = values;
@@ -188,6 +190,9 @@ export function EmailDialog({
           label={Translate.string('Email body')}
           required
           config={{images: !!imageUploadURL, forceAbsoluteURLs: true, imageUploadURL}}
+          onInit={(evt, editor) => {
+            editorRef.current = editor;
+          }}
         />
         {placeholders.length > 0 && (
           <Form.Field>
@@ -236,6 +241,19 @@ export function EmailDialog({
       initialValuesEqual={_.isEqual}
       onClose={onClose}
       onSubmit={async (values, ...rest) => {
+        const editor = imageUploadURL ? editorRef.current : null;
+        if (editor) {
+          const uploads = await editor.uploadImages();
+          if (!uploads.every(({status}) => status)) {
+            setPreview(null);
+            return {
+              [FORM_ERROR]: Translate.string(
+                'The image could not be uploaded and has been removed. Check the email and send it again.'
+              ),
+            };
+          }
+          values = {...values, body: editor.getContent()};
+        }
         const transformedValues = allowAttachments
           ? {...values, attachments: Object.values(values.attachments || {}).flat()}
           : values;
