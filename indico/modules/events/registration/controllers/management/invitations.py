@@ -45,18 +45,18 @@ from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
 
 
-EMAIL_IMAGE_TYPES = frozenset({'jpeg', 'png', 'gif'})
-
-
 def _get_image_type(stream):
     try:
         with Image.open(stream) as image:
             image_type = image.format.lower()
-    except (OSError, Image.DecompressionBombError):
-        return None
-    stream.seek(0)
+    except (OSError, ValueError, Image.DecompressionBombError):
+        image_type = None
     # XXX: mpo is basically JPEG and JPEGs from some cameras are (wrongfully) detected as mpo
-    return 'jpeg' if image_type == 'mpo' else image_type
+    image_type = 'jpeg' if image_type == 'mpo' else image_type
+    if image_type not in {'jpeg', 'png', 'gif'}:
+        abort(422, messages={'upload': [_('Only JPG, PNG and GIF images are allowed')]})
+    stream.seek(0)
+    return image_type
 
 
 def _exceeds_email_attachment_limit(upload):
@@ -261,8 +261,6 @@ class RHRegistrationFormInvitationImageUpload(RHManageRegFormBase):
             abort(422, messages={'upload': [_('The image is too large to be sent by email (max. {} MB)')
                                             .format(config.MAX_EMAIL_ATTACHMENT_SIZE)]})
         image_type = _get_image_type(upload.stream)
-        if image_type not in EMAIL_IMAGE_TYPES:
-            abort(422, messages={'upload': [_('Only JPG, PNG and GIF images are allowed')]})
         context = ('event', self.event.id, 'regform', self.regform.id, 'email-images')
         filename = secure_client_filename(upload.filename)
         image = File.create_from_stream(upload.stream, filename, f'image/{image_type}', context)
