@@ -1,6 +1,6 @@
 {% macro render_privacy_info_button(event, privacy_info) -%}
     {% set data_controller_exists = privacy_info.data_controller_name or privacy_info.data_controller_email %}
-    {% if data_controller_exists or privacy_info.privacy_policy_urls|length > 1 %}
+    {% if data_controller_exists or (privacy_info.privacy_policy_urls and privacy_info.privacy_policy_urls|length > 1) %}
         <div class="privacy-dropdown" tabindex="-1">
             <button class="mini ui blue icon button"
                     title="{% trans %}Event privacy information{% endtrans %}">
@@ -32,7 +32,7 @@
                        data-close-button>
                         {% trans %}Privacy notice{% endtrans %}
                     </a>
-                {% elif privacy_info.privacy_policy_urls|length == 1 %}
+                {% elif privacy_info.privacy_policy_urls and privacy_info.privacy_policy_urls|length == 1 %}
                     <a class="item"
                        href="{{ privacy_info.privacy_policy_urls[0].url }}"
                        target="_blank"

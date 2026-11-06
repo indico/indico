@@ -41,6 +41,25 @@ class CategorySettingsProxy(SettingsProxyBase):
         """
         return get_all_settings(CategorySetting, None, self, no_defaults, category_id=category)
 
+    def get_all_multi(self, categories, no_defaults=False):
+        """Retrieve all settings of multiple categories using a single query.
+
+        :param categories: A collection of Categories (or their IDs)
+        :param no_defaults: Only return existing settings and ignore defaults.
+        :return: Dict mapping category IDs to dicts containing their settings
+        """
+        from indico.modules.categories import Category
+        ids = {int(c.id if isinstance(c, Category) else c) for c in categories}
+        if not ids:
+            return {}
+        settings = {id_: {} for id_ in ids}
+        for setting in self.query.filter(CategorySetting.category_id.in_(ids)):
+            if not self.strict or setting.name in self.defaults:
+                settings[setting.category_id][setting.name] = self._convert_to_python(setting.name, setting.value)
+        if no_defaults:
+            return settings
+        return {id_: (dict(self.defaults) | values) for id_, values in settings.items()}
+
     @_category_or_id
     def get(self, category, name, default=SettingsProxyBase.default_sentinel):
         """Retrieve the value of a single setting.
@@ -94,3 +113,12 @@ class CategorySettingsProxy(SettingsProxyBase):
         """
         CategorySetting.delete_all(self.module, category_id=category)
         self._flush_cache()
+
+
+category_privacy_settings = CategorySettingsProxy('privacy', {
+    'data_controller_name': '',
+    'data_controller_email': '',
+    'privacy_policy_urls': [],
+    'privacy_policy': '',
+    'lock_privacy_data': False,
+})
