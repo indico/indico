@@ -420,7 +420,8 @@ class RHProfilePicturePreview(RHUserBase):
             return send_file('avatar.svg', BytesIO(avatar.encode()), mimetype='image/svg+xml',
                              no_cache=True, inline=True, safe=False)
         elif source == ProfilePictureSource.custom:
-            metadata = self.user.picture_metadata
+            if not (metadata := self.user.picture_metadata):
+                raise NotFound
             return send_file('avatar.png', BytesIO(self.user.picture), mimetype=metadata['content_type'],
                              no_cache=True, inline=True)
         elif not config.DISABLE_GRAVATAR:
