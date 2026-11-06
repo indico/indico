@@ -18,7 +18,7 @@ Improvements
 - Allow referencing registration fields by internal name in document templates (:pr:`7907`,
   thanks :user:`duartegalvao, unconventionaldotdev`)
 - Allow adding images to registration invitation and reminder emails
-  (:pr:`XXXX`, thanks :user:`moliholy, unconventionaldotdev`)
+  (:pr:`7864`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
