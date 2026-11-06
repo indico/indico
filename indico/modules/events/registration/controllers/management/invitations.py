@@ -34,6 +34,7 @@ from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.files.models.files import File
 from indico.modules.files.util import validate_upload_file_size
 from indico.modules.logs import EventLogRealm, LogKind
+from indico.util.fs import secure_client_filename
 from indico.util.i18n import _
 from indico.util.marshmallow import (LowercaseString, Principal, make_validate_indico_placeholders, no_endpoint_links,
                                      no_relative_urls, not_empty)
@@ -263,7 +264,8 @@ class RHRegistrationFormInvitationImageUpload(RHManageRegFormBase):
         if image_type not in EMAIL_IMAGE_TYPES:
             abort(422, messages={'upload': [_('Only JPG, PNG and GIF images are allowed')]})
         context = ('event', self.event.id, 'regform', self.regform.id, 'email-images')
-        image = File.create_from_stream(upload.stream, upload.filename, f'image/{image_type}', context)
+        filename = secure_client_filename(upload.filename)
+        image = File.create_from_stream(upload.stream, filename, f'image/{image_type}', context)
         # the uuid is still a string until the file is reloaded, which breaks the signed url
         db.session.refresh(image)
         image.meta = {EMAIL_IMAGE_META_KEY: self.regform.id}
