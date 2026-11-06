@@ -11,7 +11,6 @@ import sqlalchemy as sa
 from alembic import op
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
-from indico.modules.events.editing.models.editable import EditableType
 
 
 # revision identifiers, used by Alembic.
@@ -25,6 +24,11 @@ class _InitialRevisionState(int, Enum):
     new = 1
     ready_for_review = 2
     needs_submitter_confirmation = 3
+
+
+class _EditableType(Enum):
+    paper = 1
+    slides = 2
 
 
 class _FinalRevisionState(int, Enum):
@@ -41,7 +45,7 @@ def upgrade():
         'editables',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('contribution_id', sa.Integer(), nullable=False, index=True),
-        sa.Column('type', PyIntEnum(EditableType), nullable=False),
+        sa.Column('type', PyIntEnum(_EditableType), nullable=False),
         sa.Column('editor_id', sa.Integer(), nullable=True, index=True),
         sa.Column('published_revision_id', sa.Integer(), nullable=True, index=True),
         sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
