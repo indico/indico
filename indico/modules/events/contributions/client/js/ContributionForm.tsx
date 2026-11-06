@@ -72,9 +72,9 @@ interface ContributionFormFieldsProps {
   locationParent?: Record<string, any>;
   personLinkFieldParams?: Record<string, any>;
   initialValues: Record<string, any>;
-  limitFields: string[] | null;
+  limitFields?: string[] | null;
   customFields?: CustomField[];
-  ignoreRequiredCustomFields: boolean;
+  ignoreRequiredCustomFields?: boolean;
   contributionTypes?: ContributionType[];
   extraOptions?: Record<string, any>;
   allowedKeywords: string[];
