@@ -17,6 +17,7 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.files.models.files import File
 from indico.testing.fixtures.storage import MemoryStorage
 from indico.testing.util import extract_emails
+from indico.util.i18n import get_current_locale
 
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
@@ -311,6 +312,14 @@ def test_invitation_names_identical_images_after_first_one(manager_client, dummy
     assert _invite(manager_client, dummy_regform, body).status_code == 200
     image, = _get_images(extract_emails(smtp, one=True, to='invitee@example.test'))
     assert image.get_filename() == filenames[0]
+
+
+def test_reminder_reports_image_errors_in_the_locale_of_the_manager(manager_client, dummy_event, dummy_regform,
+                                                                    deleted_image_url, monkeypatch):
+    dummy_event.default_locale = 'fr_FR'
+    monkeypatch.setattr('indico.modules.events.registration.util._', lambda __: str(get_current_locale()))
+    resp = _send_reminder(manager_client, dummy_regform, f'<img src="{deleted_image_url}">')
+    assert resp.json == {'webargs_errors': ['en_GB']}
 
 
 def test_image_is_loaded_once_per_request(app_context, manager_client, dummy_regform, png_image, smtp, file_selects,
