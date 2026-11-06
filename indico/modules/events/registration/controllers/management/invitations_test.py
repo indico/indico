@@ -84,6 +84,14 @@ def test_image_upload_ignores_filename_extension(manager_client, dummy_regform, 
 def test_image_upload_rejects_non_images(manager_client, dummy_regform, data, filename):
     resp = _upload_image(manager_client, dummy_regform, data, filename)
     assert resp.status_code == 422
+    assert resp.json == {'webargs_errors': {'upload': ['Only JPG, PNG and GIF images are allowed']}}
+    assert not File.query.has_rows()
+
+
+def test_image_upload_rejects_png_with_non_ascii_chunk_type(manager_client, dummy_regform, png_image):
+    resp = _upload_image(manager_client, dummy_regform, png_image.replace(b'IDAT', b'\xffDAT'))
+    assert resp.status_code == 422
+    assert resp.json == {'webargs_errors': {'upload': ['Only JPG, PNG and GIF images are allowed']}}
     assert not File.query.has_rows()
 
 
