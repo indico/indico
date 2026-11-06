@@ -12,6 +12,7 @@
     creator_id: !!python/tuple
     - userref
     - 00000000-0000-4000-8000-00000000000a
+    default_check_type_id: Check type
     default_page_id: null
     description: ''
     end_dt: !!python/tuple

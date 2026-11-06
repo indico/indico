@@ -5,11 +5,12 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
-from indico.modules.events.controllers.admin import (RHAutoLinker, RHAutoLinkerConfig, RHCreateEventLabel,
-                                                     RHCreateReferenceType, RHDataRetentionSettings, RHDeleteEventLabel,
-                                                     RHDeleteReferenceType, RHEditEventLabel, RHEditReferenceType,
-                                                     RHEventLabels, RHReferenceTypes, RHUnlistedEvents,
-                                                     RHUpdateAllowedKeywords)
+from indico.modules.events.controllers.admin import (RHAutoLinker, RHAutoLinkerConfig, RHCheckTypes, RHCreateCheckType,
+                                                     RHCreateEventLabel, RHCreateReferenceType, RHDataRetentionSettings,
+                                                     RHDeleteCheckType, RHDeleteEventLabel, RHDeleteReferenceType,
+                                                     RHEditCheckType, RHEditEventLabel, RHEditReferenceType,
+                                                     RHEventLabels, RHReferenceTypes, RHToggleDefaultCheckType,
+                                                     RHUnlistedEvents, RHUpdateAllowedKeywords)
 from indico.modules.events.controllers.api import RHEventCheckEmail, RHSingleEventAPI
 from indico.modules.events.controllers.creation import RHCreateEvent, RHPrepareEvent
 from indico.modules.events.controllers.display import (RHAutoLinkerRules, RHDisplayPrivacyPolicy, RHEventAccessKey,
@@ -33,6 +34,9 @@ _bp.add_url_rule('/admin/autolinker/', 'autolinker_admin', RHAutoLinker)
 _bp.add_url_rule('/admin/data-retention/', 'data_retention', RHDataRetentionSettings,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/autolinker/config', 'autolinker_config', RHAutoLinkerConfig, methods=('POST',))
+_bp.add_url_rule('/admin/check-types/', 'check_types', RHCheckTypes, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/check-types/create', 'create_check_type', RHCreateCheckType, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/check-types/toggle', 'toggle_default_check_type', RHToggleDefaultCheckType, methods=('POST',))
 
 # Single reference type
 _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>/edit', 'update_reference_type', RHEditReferenceType,
@@ -44,6 +48,12 @@ _bp.add_url_rule('/admin/external-id-types/<int:reference_type_id>', 'delete_ref
 _bp.add_url_rule('/admin/event-labels/<int:event_label_id>/edit', 'update_event_label', RHEditEventLabel,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/event-labels/<int:event_label_id>', 'delete_event_label', RHDeleteEventLabel,
+                 methods=('DELETE',))
+
+# Single check type
+_bp.add_url_rule('/admin/check-types/<int:check_type_id>/edit', 'update_check_type', RHEditCheckType,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/check-types/<int:check_type_id>', 'delete_check_type', RHDeleteCheckType,
                  methods=('DELETE',))
 
 # Auto-linker rules
