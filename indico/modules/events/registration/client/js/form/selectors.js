@@ -91,6 +91,17 @@ export const getNestedSections = createSelector(
     }))
 );
 
+/** Get the nested form structure of all sections and their items, including disabled ones. */
+export const getAllNestedSections = createSelector(
+  getFlatSections,
+  getSectionItemMapping,
+  (sections, sectionFields) =>
+    _.sortBy(Object.values(sections), ['position', 'id']).map(section => ({
+      ...section,
+      items: sectionFields.get(section.id),
+    }))
+);
+
 export const getFieldLabelLookup = createSelector(
   getItems,
   items => {
