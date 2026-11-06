@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import emailImageUploadURL from 'indico-url:event_registration.api_invitations_image_upload';
 import emailMetadataURL from 'indico-url:event_registration.api_invitations_reminders_metadata';
 import emailPreviewURL from 'indico-url:event_registration.api_invitations_reminders_preview';
 import emailSendURL from 'indico-url:event_registration.api_invitations_reminders_send';
@@ -25,6 +26,7 @@ export default function EmailPendingInvitationsButton({
   const metadataURL = emailMetadataURL({event_id: eventId, reg_form_id: regformId});
   const previewURL = emailPreviewURL({event_id: eventId, reg_form_id: regformId});
   const sendURL = emailSendURL({event_id: eventId, reg_form_id: regformId});
+  const imageUploadURL = emailImageUploadURL({event_id: eventId, reg_form_id: regformId});
 
   return (
     <>
@@ -41,6 +43,7 @@ export default function EmailPendingInvitationsButton({
           metadataURL={metadataURL}
           previewURL={previewURL}
           sendURL={sendURL}
+          imageUploadURL={imageUploadURL}
           selectedInvitations={selectedInvitations}
           onClose={() => setOpen(false)}
         />
