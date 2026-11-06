@@ -183,7 +183,7 @@ def test_invitation_embeds_uploaded_image(manager_client, dummy_regform, png_ima
     url = _upload_image(manager_client, dummy_regform, png_image).json['url']
     assert _invite(manager_client, dummy_regform, f'<img src="{url}">').status_code == 200
     msg = extract_emails(smtp, one=True, to='invitee@example.test')
-    cid = f'email-image-{File.query.one().id}'
+    cid = f'email-image-{File.query.one().md5}'
     html = _get_html(msg)
     assert f'src="cid:{cid}"' in html
     assert url not in html
@@ -239,7 +239,7 @@ def test_invitation_import_embeds_uploaded_image(manager_client, dummy_regform, 
     url = _upload_image(manager_client, dummy_regform, png_image).json['url']
     assert _import_invitations(manager_client, dummy_regform, f'<img src="{url}">').status_code == 200
     msg = extract_emails(smtp, one=True, to='invitee@example.test')
-    cid = f'email-image-{File.query.one().id}'
+    cid = f'email-image-{File.query.one().md5}'
     assert f'src="cid:{cid}"' in _get_html(msg)
     image, = _get_images(msg)
     assert image['Content-ID'] == f'<{cid}>'
@@ -260,7 +260,7 @@ def test_reminder_embeds_uploaded_image(manager_client, dummy_regform, png_image
     url = _upload_image(manager_client, dummy_regform, png_image).json['url']
     assert _send_reminder(manager_client, dummy_regform, f'<img src="{url}">').status_code == 200
     msg = extract_emails(smtp, one=True, to='invitee@example.test')
-    cid = f'email-image-{File.query.one().id}'
+    cid = f'email-image-{File.query.one().md5}'
     assert f'src="cid:{cid}"' in _get_html(msg)
     image, = _get_images(msg)
     assert image['Content-ID'] == f'<{cid}>'
@@ -272,11 +272,36 @@ def test_send_rejects_images_over_attachment_limit(manager_client, dummy_regform
                                                    send):
     patch_indico_config('MAX_EMAIL_ATTACHMENT_SIZE', 1)
     # each image fits within the limit on its own, so only the email as a whole can exceed it
-    urls = [_upload_image(manager_client, dummy_regform, png_image + bytes(700 * 1024)).json['url'] for __ in range(2)]
+    urls = [_upload_image(manager_client, dummy_regform, png_image + bytes(size * 1024)).json['url']
+            for size in (700, 701)]
     resp = send(manager_client, dummy_regform, ''.join(f'<img src="{url}">' for url in urls))
     assert resp.status_code == 422
     assert resp.json == {'webargs_errors': {'body': ['Total attachment size too large (max. 1 MB)']}}
     assert not smtp.outbox
+
+
+def test_invitation_attaches_identical_images_once(manager_client, dummy_regform, patch_indico_config, png_image, smtp):
+    patch_indico_config('MAX_EMAIL_ATTACHMENT_SIZE', 1)
+    # the image fits within the limit once, but not twice
+    data = png_image + bytes(700 * 1024)
+    urls = [_upload_image(manager_client, dummy_regform, data).json['url'] for __ in range(2)]
+    assert urls[0] != urls[1]
+    resp = _invite(manager_client, dummy_regform, ''.join(f'<img src="{url}">' for url in urls))
+    assert resp.status_code == 200
+    msg = extract_emails(smtp, one=True, to='invitee@example.test')
+    image, = _get_images(msg)
+    cid = image['Content-ID'].strip('<>')
+    assert _get_html(msg).count(f'src="cid:{cid}"') == 2
+
+
+@pytest.mark.parametrize('filenames', (('first.png', 'second.png'), ('second.png', 'first.png')))
+def test_invitation_names_identical_images_after_first_one(manager_client, dummy_regform, png_image, smtp, filenames):
+    urls = {filename: _upload_image(manager_client, dummy_regform, png_image, filename).json['url']
+            for filename in ('first.png', 'second.png')}
+    body = ''.join(f'<img src="{urls[filename]}">' for filename in filenames)
+    assert _invite(manager_client, dummy_regform, body).status_code == 200
+    image, = _get_images(extract_emails(smtp, one=True, to='invitee@example.test'))
+    assert image.get_filename() == filenames[0]
 
 
 def test_image_is_loaded_once_per_request(app_context, manager_client, dummy_regform, png_image, smtp, file_selects,

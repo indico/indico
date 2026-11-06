@@ -1059,7 +1059,7 @@ def _get_email_image(regform, file_uuid):
         return None
     with image.open() as f:
         attachment = MIMEImage(f.read(), image.content_type.removeprefix('image/'))
-    attachment.add_header('Content-ID', f'<email-image-{image.id}>')
+    attachment.add_header('Content-ID', f'<email-image-{image.md5}>')
     attachment.add_header('Content-Disposition', 'inline', filename=image.filename)
     return attachment
 
@@ -1075,9 +1075,10 @@ def embed_email_images(regform, body):
     :return: a ``(body, attachments)`` tuple, where ``body`` references the attachments using ``cid:`` URLs
     :raise ValueError: if the body contains a file that cannot be embedded
     """
-    body = str(body)  # a rendered template is `Markup`, which would escape the replacements below
-    urls = {url for el, attrib, url, _pos in lxml_html.fromstring(body).iterlinks()
-            if (el.tag, attrib) == ('img', 'src')}
+    # a rendered template is `Markup`, which would escape the replacements below
+    body = str(body)
+    urls = dict.fromkeys(url for el, attrib, url, _pos in lxml_html.fromstring(body).iterlinks()
+                         if (el.tag, attrib) == ('img', 'src'))
     attachments = {}
     for url in urls:
         if not (match := endpoint_for_url(url)) or match[0] != 'files.download_file':
@@ -1086,7 +1087,7 @@ def embed_email_images(regform, body):
             raise ValueError(_('The email contains an image that was not uploaded for this registration form or no '
                                'longer exists. Please upload it again.'))
         cid = image['Content-ID'].strip('<>')
-        attachments[cid] = image
+        attachments.setdefault(cid, image)
         body = body.replace(f'src="{url}"', f'src="cid:{cid}"')
     return body, list(attachments.values())
 
