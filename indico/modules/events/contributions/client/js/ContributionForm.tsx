@@ -536,13 +536,21 @@ export function ContributionCreateForm({
   );
 }
 
-export function EditContributionButton({eventId, contribId}: {eventId: number; contribId: number}) {
+export function EditContributionButton({
+  eventId,
+  contribId,
+  className,
+}: {
+  eventId: number;
+  contribId: number;
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <a
-        className="icon-edit i-link highlight"
+        className={className}
         title={Translate.string('Edit contribution (new React-based dialog)')}
         onClick={evt => {
           evt.preventDefault();
