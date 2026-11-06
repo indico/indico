@@ -25,7 +25,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Make the room-booking sidebar and its information dialogs usable with a keyboard,
+  including on short screens and with enlarged text (:pr:`7860`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
