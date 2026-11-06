@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import inviteImageUploadURL from 'indico-url:event_registration.api_invitations_image_upload';
 import inviteImportURL from 'indico-url:event_registration.api_invitations_import';
 import inviteMetadataURL from 'indico-url:event_registration.api_invitations_metadata';
 import invitationPreviewURL from 'indico-url:event_registration.invitation_preview';
@@ -362,6 +363,7 @@ export default function InviteDialog({eventId, regformId, onClose, onSuccess}) {
         senders={metadata.senders}
         placeholders={metadata.placeholders}
         previewURL={invitationPreviewURL({event_id: eventId, reg_form_id: regformId})}
+        imageUploadURL={inviteImageUploadURL({event_id: eventId, reg_form_id: regformId})}
         getPreviewPayload={values => allModes[mode].getPreviewPayload(values)}
         recipientsField={recipientsField}
         initialFormValues={initialFormValues}
