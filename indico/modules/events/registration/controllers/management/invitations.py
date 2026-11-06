@@ -342,12 +342,14 @@ class RHRegistrationFormRemindersSend(RHPendingInvitationsBase):
             bcc.update(bcc_addresses)
             with self.event.force_event_locale():
                 tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-                try:
-                    html_body, images = embed_email_images(self.regform, tpl.get_body())
-                    email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
-                                       subject=tpl.get_subject(), body=html_body, attachments=images, html=True)
-                except ValueError as exc:
-                    abort(422, messages=[str(exc)])
+                rendered_body = tpl.get_body()
+                rendered_subject = tpl.get_subject()
+            try:
+                html_body, images = embed_email_images(self.regform, rendered_body)
+                email = make_email(to_list=invitation.email, bcc_list=bcc, sender_address=sender_address,
+                                   subject=rendered_subject, body=html_body, attachments=images, html=True)
+            except ValueError as exc:
+                abort(422, messages=[str(exc)])
             send_email(email, self.event, 'Registration', session.user)
             self.regform.log(
                 EventLogRealm.management, LogKind.other, 'Registration', 'Invitation reminders sent', session.user,
