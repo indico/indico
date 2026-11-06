@@ -6,6 +6,7 @@
 # LICENSE file for more details.
 
 from flask import session
+from webargs.flaskparser import abort
 
 from indico.core import signals
 from indico.core.config import config
@@ -20,6 +21,7 @@ from indico.web.flask.templating import get_template_module
 
 def notify_invitation(invitation, subject, body, sender_address, *, bcc_addresses=None, copy_for_sender=False):
     """Send a notification about a new registration invitation."""
+    from indico.modules.events.registration.util import embed_email_images
     email_body = replace_placeholders('registration-invitation-email', body, invitation=invitation)
     email_subject = replace_placeholders('registration-invitation-email', subject, invitation=invitation)
     template = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
@@ -27,8 +29,12 @@ def notify_invitation(invitation, subject, body, sender_address, *, bcc_addresse
     bcc = set(bcc_addresses or [])
     if copy_for_sender and user:
         bcc.add(user.email)
-    email = make_email(invitation.email, sender_address=sender_address, template=template, html=True,
-                       bcc_list=bcc)
+    try:
+        email_body, images = embed_email_images(invitation.registration_form, template.get_body())
+        email = make_email(invitation.email, sender_address=sender_address, subject=template.get_subject(),
+                           body=email_body, attachments=images, html=True, bcc_list=bcc)
+    except ValueError as exc:
+        abort(422, messages={'body': [str(exc)]})
     send_email(email, invitation.registration_form.event, 'Registration', user)
 
 
