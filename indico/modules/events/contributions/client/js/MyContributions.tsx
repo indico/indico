@@ -11,6 +11,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {Loader, Message} from 'semantic-ui-react';
 
+import {EditContributionButton} from 'indico/modules/events/contributions/ContributionForm';
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {useIndicoAxios} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
 
@@ -31,19 +33,28 @@ const SECTIONS = {
   submitter: Translate.string('Submitter'),
 };
 
-function editContribution(contribution: Contribution) {
+function editContribution(contribution: Contribution, eventId: number) {
   if (contribution.edit_url) {
     return (
-      <a
-        href="#"
-        styleName="edit-button"
-        className="icon-edit js-edit-contribution"
-        title={Translate.string('Edit this contribution')}
-        data-title={`${Translate.string('Edit contribution')} '${contribution.title}'`}
-        data-href={contribution.edit_url}
-        data-ajax-dialog
-        data-reload-after
-      />
+      <span>
+        <a
+          href="#"
+          styleName="edit-button"
+          className="icon-edit js-edit-contribution"
+          title={Translate.string('Edit this contribution')}
+          data-title={`${Translate.string('Edit contribution')} '${contribution.title}'`}
+          data-href={contribution.edit_url}
+          data-ajax-dialog
+          data-reload-after
+        />
+        <UserSearchTokenContext.Provider value={contribution.edit_search_token}>
+          <EditContributionButton
+            eventId={eventId}
+            contribId={contribution.id}
+            className="icon-edit"
+          />
+        </UserSearchTokenContext.Provider>
+      </span>
     );
   }
   return null;
@@ -74,7 +85,7 @@ export function MyContributions({eventId, timezone}: MyContributionsProps) {
           timezone={timezone}
           title={title}
           contributions={myContributions?.[section] ?? null}
-          actionsElement={editContribution}
+          actionsElement={contrib => editContribution(contrib, eventId)}
         />
       ))}
     </>

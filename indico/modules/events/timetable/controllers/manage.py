@@ -277,7 +277,6 @@ class RHTimetableBreak(RHManageEventBase):
 class RHTimetableContributionCreate(RHManageContributionsBase):
     @use_rh_args(ContributionSchema)
     def _process_POST(self, data):
-        # TODO: quick hack to get the person_link data in the right format
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         session_block = SessionBlock.get(data['session_block_id']) if data.get('session_block_id') else None
         data['location_data'] = (
@@ -286,7 +285,13 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
             else data['location_data']
         )
         contrib = create_contribution(self.event, data, data.pop('custom_fields', None), session_block=session_block)
-        return ContributionSchema(context={'event': self.event}).jsonify(contrib)
+        return ContributionSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context}
+        ).jsonify(contrib)
+
+    @property
+    def custom_fields_context(self):
+        return ContributionSchema.get_custom_fields_context(self.event, management=True)
 
     def _get_inherited_location(self, **kwargs):
         location_parent = kwargs.pop('location_parent', None)
@@ -310,14 +315,22 @@ class RHTimetableContribution(RHManageContributionBase):
         with (track_time_changes(), track_location_changes()):
             update_contribution(self.contrib, data, data.pop('custom_fields', None))
 
-        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+        return ContributionSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context}
+        ).jsonify(self.contrib)
 
     def _process_GET(self):
-        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+        return ContributionSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context}
+        ).jsonify(self.contrib)
 
     def _process_DELETE(self):
         delete_contribution(self.contrib)
         return '', 204
+
+    @property
+    def custom_fields_context(self):
+        return ContributionSchema.get_custom_fields_context(self.event, management=True)
 
     def _change_parent(self, session_block_id):
         entry = self.contrib.timetable_entry
@@ -353,7 +366,12 @@ class RHTimetableContribution(RHManageContributionBase):
 class RHTimetableUnscheduleContribution(RHManageContributionBase):
     def _process_POST(self):
         delete_timetable_entry(self.contrib.timetable_entry)
-        return ContributionSchema(context={'event': self.event}).jsonify(self.contrib)
+        return ContributionSchema(
+            context={
+                'event': self.event,
+                'custom_fields_context': ContributionSchema.get_custom_fields_context(self.event, management=True),
+            }
+        ).jsonify(self.contrib)
 
 
 class RHTimetableScheduleContribution(RHManageTimetableBase):
@@ -397,7 +415,13 @@ class RHTimetableScheduleContribution(RHManageTimetableBase):
                 if entry.end_dt.astimezone(entry.event.tzinfo).date() > start_dt.date():
                     raise UserValueError(_("Contribution '{}' could not be scheduled since it doesn't fit on this day.")
                                          .format(contrib.title))
-        return ContributionSchema(many=True, context={'event': self.event}).jsonify(contribs)
+        return ContributionSchema(
+            many=True,
+            context={
+                'event': self.event,
+                'custom_fields_context': ContributionSchema.get_custom_fields_context(self.event, management=True),
+            },
+        ).jsonify(contribs)
 
 
 class RHTimetableSessionBlockCreate(RHManageEventBase):
