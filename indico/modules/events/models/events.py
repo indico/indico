@@ -447,6 +447,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - sessions (Session.event)
     # - settings (EventSetting.event)
     # - settings_principals (EventSettingPrincipal.event)
+    # - speaker_links (EventSpeakerLink.event)
     # - static_list_links (StaticListLink.event)
     # - static_sites (StaticSite.event)
     # - surveys (Survey.event)
