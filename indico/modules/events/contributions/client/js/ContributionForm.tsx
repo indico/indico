@@ -57,6 +57,7 @@ interface ContributionFormProps {
   locationParent?: Record<string, any>;
   limitFields: string[] | null;
   customFields: CustomField[];
+  ignoreRequiredCustomFields: boolean;
   contributionTypes: ContributionType[];
   onSubmit: (formData: any, form?: any) => void;
   initialValues: Record<string, any>;
@@ -73,6 +74,7 @@ interface ContributionFormFieldsProps {
   initialValues: Record<string, any>;
   limitFields: string[] | null;
   customFields?: CustomField[];
+  ignoreRequiredCustomFields: boolean;
   contributionTypes?: ContributionType[];
   extraOptions?: Record<string, any>;
   allowedKeywords: string[];
@@ -86,6 +88,7 @@ export function ContributionFormFields({
   initialValues = {},
   limitFields = null,
   customFields = [],
+  ignoreRequiredCustomFields = true,
   contributionTypes = [],
   extraOptions = {},
   allowedKeywords = [],
@@ -96,7 +99,9 @@ export function ContributionFormFields({
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       // TODO: add client-side validation for max length, choices, etc at some point
-      // TODO: adjust isRequired in management (where all fields are optional)
+      if (ignoreRequiredCustomFields) {
+        isRequired = false;
+      }
       const key = `custom_field_${id}`;
       const name = `custom_fields.custom_${id}`;
       if (fieldType === 'text') {
@@ -305,6 +310,7 @@ function ContributionForm({
   locationParent = {},
   limitFields = null,
   customFields = [],
+  ignoreRequiredCustomFields = false,
   contributionTypes = [],
   onSubmit,
   initialValues = {},
@@ -367,6 +373,7 @@ function ContributionForm({
         sessionBlock={sessionBlock}
         limitFields={limitFields}
         customFields={customFields}
+        ignoreRequiredCustomFields={ignoreRequiredCustomFields}
         contributionTypes={contributionTypes}
         personLinkFieldParams={personLinkFieldParams}
         allowedKeywords={allowedKeywords}
@@ -412,6 +419,7 @@ export function ContributionEditForm({
     allowedKeywords,
     personLinkFieldParams,
     limitFields,
+    ignoreRequiredCustomFields,
     customFields: fields,
     types: contributionTypes,
   } = camelizeKeys(metadata ?? {});
@@ -424,6 +432,7 @@ export function ContributionEditForm({
       locationParent={locationParent}
       limitFields={limitFields}
       customFields={fields}
+      ignoreRequiredCustomFields={ignoreRequiredCustomFields}
       contributionTypes={contributionTypes}
       header={Translate.string("Edit contribution '{title}'", {title: contrib?.title})}
       onSubmit={onSubmit ?? handleSubmit}
@@ -462,6 +471,7 @@ export function ContributionCreateForm({
     allowedKeywords,
     personLinkFieldParams,
     limitFields,
+    ignoreRequiredCustomFields,
     customFields: fields,
     types: contributionTypes,
   } = camelizeKeys(metadata ?? {});
@@ -515,6 +525,7 @@ export function ContributionCreateForm({
       locationParent={locationParent}
       limitFields={limitFields}
       customFields={fields ?? []}
+      ignoreRequiredCustomFields={ignoreRequiredCustomFields}
       contributionTypes={contributionTypes}
       header={Translate.string('Add new contribution')}
       onSubmit={handleSubmit}

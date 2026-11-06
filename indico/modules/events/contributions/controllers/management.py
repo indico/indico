@@ -424,6 +424,7 @@ class ContributionFormMetadataMixin:
                 # a custom field?
                 many=True, only=('id', 'title', 'description', 'is_required', 'field_type', 'field_data')
             ).dump(fields),
+            'ignore_required_custom_fields': management,
         }
 
 
