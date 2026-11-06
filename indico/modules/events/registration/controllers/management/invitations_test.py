@@ -201,6 +201,22 @@ def test_invitation_attaches_repeated_image_once(manager_client, dummy_regform, 
     assert len(_get_images(msg)) == 1
 
 
+@pytest.mark.parametrize(('filename', 'expected'), (
+    ('logo.png', 'logo.png'),
+    ('some/path/logo.png', 'some_path_logo.png'),
+    ('l\N{LATIN SMALL LETTER O WITH ACUTE}go.png', 'l\N{LATIN SMALL LETTER O WITH ACUTE}go.png'),
+))
+def test_invitation_names_embedded_image(manager_client, dummy_event, dummy_regform, png_image, smtp, filename,
+                                         expected):
+    url = _upload_image(manager_client, dummy_regform, png_image, filename).json['url']
+    assert _invite(manager_client, dummy_regform, f'<img src="{url}">').status_code == 200
+    image, = _get_images(extract_emails(smtp, one=True, to='invitee@example.test'))
+    assert image.get_content_disposition() == 'inline'
+    assert image.get_filename() == expected
+    log_entry = dummy_event.log_entries.filter_by(type='email').one()
+    assert log_entry.data['attachments'] == [expected]
+
+
 def test_invitation_keeps_external_images(manager_client, dummy_regform, smtp):
     url = 'https://example.com/logo.png'
     assert _invite(manager_client, dummy_regform, f'<img src="{url}">').status_code == 200
