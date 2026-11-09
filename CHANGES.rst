@@ -21,6 +21,7 @@ Bugfixes
 - Add missing checks for timetable draft mode (:pr:`7821`)
 - Take the user from the API token into account when serializing attachments
   in the timetable export API (:pr:`7822`)
+- Fix cache inconsistencies in Book of Abstracts (:pr:`7870`)
 
 Accessibility
 ^^^^^^^^^^^^^
