@@ -58,6 +58,23 @@ class RHDownloadPaperFile(RHPaperBase):
         RHPaperBase._process_args(self)
         self.file = PaperFile.get_or_404(request.view_args['file_id'])
 
+    def _check_paper_protection(self):
+        if not RHPaperBase._check_paper_protection(self):
+            return False
+        # timeline viewers can download all paper files
+        if self.paper.can_access_timeline(session.user):
+            return True
+        # otherwise reject access if it's not the accepted revision
+        if self.file.paper_revision != self.paper.accepted_revision:
+            return False
+        # also reject access if accepted papers remain hidden
+        if self.event.cfp.hide_accepted:
+            return False
+        # when file types are used, it must be marked as publishable
+        if self.file.file_type and not self.file.file_type.publishable:
+            return False
+        return True
+
     def _process(self):
         return self.file.send()
 
