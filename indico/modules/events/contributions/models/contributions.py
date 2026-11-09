@@ -434,7 +434,7 @@ class Contribution(SearchableTitleMixin, SearchableDescriptionMixin, ProtectionM
             return self.event
 
     @property
-    def protection_parent(self):
+    def protection_parent(self) -> Session | Event:
         return self.session if self.session_id is not None else self.event
 
     @property

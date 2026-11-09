@@ -41,7 +41,9 @@ from indico.legacy.pdfinterface.base import escape
 from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, boa_settings
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.util import sort_contribs
+from indico.modules.events.models.events import Event
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import mdx_latex
 from indico.util.caching import memoize_redis
@@ -590,7 +592,7 @@ class ContributionBook(PDFLaTeXBase):
         super().__init__()
 
         tz = tz or event.timezone
-        contribs = sort_contribs(contribs or event.contributions, sort_by)
+        contribs = sort_contribs(self._filter_contribs(contribs or event.contributions), sort_by)
         affiliation_contribs = {}
         corresp_authors = {}
 
@@ -627,6 +629,9 @@ class ContributionBook(PDFLaTeXBase):
 
         self._args['logo_img'] = create_event_logo_tmp_file(event, self.source_dir) if event.logo else None
 
+    def _filter_contribs(self, contribs: list[Contribution]):
+        return contribs
+
 
 class AbstractBook(ContributionBook):
     LATEX_TEMPLATE = 'book_of_abstracts'
@@ -637,3 +642,20 @@ class AbstractBook(ContributionBook):
         super().__init__(event, None, sort_by=sort_by)
         self._args['show_ids'] = boa_settings.get(event, 'show_abstract_ids')
         self._args['url'] = None
+
+    def _filter_contribs(self, contribs: list[Contribution]):
+        return [
+            contrib
+            for contrib in contribs
+            # skip explicitly protected contributions and
+            if not contrib.is_self_protected
+            # only allow contributions that
+            and (
+                # are public or
+                contrib.is_public
+                # inherit their protection from the event or
+                or isinstance(contrib.protection_parent, Event)
+                # inherit from a public/inheriting session (which in turns inherits from the Event)
+                or not contrib.protection_parent.is_self_protected
+            )
+        ]
