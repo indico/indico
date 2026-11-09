@@ -84,6 +84,7 @@ from xml.etree import ElementTree as etree  # noqa: N813
 import markdown
 import requests
 from lxml.html import html5parser
+from markdown.util import HtmlStash
 from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL
 
@@ -370,6 +371,14 @@ def makeExtension(configs=None):  # noqa: N802
     return LaTeXExtension(configs=configs)
 
 
+class LaTeXHtmlStash(HtmlStash):
+    def store(self, html: str | etree.Element) -> str:
+        if isinstance(html, etree.Element):
+            # not sure if this code is ever reached, but just in case...
+            html = etree.tostring(html, encoding='utf-8', method='html')
+        return super().store(escape_latex_entities(html))
+
+
 class LaTeXExtension(markdown.Extension):
     def __init__(self, configs=None):
         self.configs = configs
@@ -377,6 +386,7 @@ class LaTeXExtension(markdown.Extension):
 
     def extendMarkdown(self, md, md_globals):  # noqa: N802
         self.md = md
+        self.md.htmlStash = LaTeXHtmlStash()
 
         # remove escape pattern -- \\(.*) -- as this messes up any embedded
         # math and we don't need to escape stuff any more for html

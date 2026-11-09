@@ -85,9 +85,10 @@ def test_resolve_carets(input, expected):
     ('\tCode sample with reserved chars &{}', '\\begin{verbatim}\nCode sample with reserved chars \\&\\{\\}\n\\end{verbatim}'),
     ('## Plain Heading ##', r'\subsection{Plain Heading}'),
     ('## Heading with reserved chars &{} ##', r'\subsection{Heading with reserved chars \&\{\}}'),
+    (r'<div>\naughty</div>', r'<div>\textbackslash{}naughty</div>'),
 ))
 def test_convert_markdown_to_latex(input, expected):
-    md = Markdown(safe_mode='remove')
+    md = Markdown()
     _latex_md = LaTeXExtension(configs={'apply_br': True})
     _latex_md.extendMarkdown(md, md.__dict__)
     assert md.convert(input) == expected
