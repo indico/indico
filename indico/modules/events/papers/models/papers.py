@@ -96,6 +96,15 @@ class Paper(ProposalMixin):
             return True
         return self.contribution.is_paper_reviewer(user)
 
+    def can_access_timeline(self, user):
+        return (
+            self.contribution.is_user_associated(user, check_abstract=True)
+            or self.contribution.can_submit_proceedings(user)
+            or self.event.cfp.is_manager(user)
+            or self.can_review(user)
+            or self.can_judge(user)
+        )
+
     def get_revisions(self):
         return self.revisions
 

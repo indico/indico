@@ -9,7 +9,7 @@ from flask import request, session
 from webargs import fields, validate
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.papers.controllers.base import RHPaperBase
+from indico.modules.events.papers.controllers.base import RHPaperBase, RHPaperTimelineBase
 from indico.modules.events.papers.controllers.display import RHSubmitPaperBase
 from indico.modules.events.papers.fields import PaperActionField, PaperFilesField
 from indico.modules.events.papers.file_types import PaperFileType
@@ -28,7 +28,7 @@ from indico.web.args import parser, use_kwargs, use_rh_kwargs
 from indico.web.util import jsonify_data
 
 
-class RHPaperDetails(RHPaperBase):
+class RHPaperDetails(RHPaperTimelineBase):
     def _process(self):
         return PaperSchema(context={'user': session.user}).jsonify(self.paper)
 

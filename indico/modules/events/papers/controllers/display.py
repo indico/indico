@@ -9,7 +9,7 @@ from flask import request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import NoReportError
-from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
+from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase, RHPaperTimelineBase
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.util import (get_contributions_with_paper_submitted_by_user,
                                                get_user_contributions_to_review, get_user_reviewed_contributions,
@@ -40,14 +40,7 @@ class RHSubmitPaperBase(RHPaperBase):
                                                      'Please contact the event organizer for further assistance.')))
 
 
-class RHPaperTimeline(RHPaperBase):
-    def _check_paper_protection(self):
-        return (self.contribution.is_user_associated(session.user, check_abstract=True) or
-                self.contribution.can_submit_proceedings(session.user) or
-                self.event.cfp.is_manager(session.user) or
-                self.paper.can_review(session.user) or
-                self.paper.can_judge(session.user))
-
+class RHPaperTimeline(RHPaperTimelineBase):
     def _process(self):
         return WPDisplayCallForPapersReact.render_template('paper.html', self.paper.event, paper=self.paper)
 
