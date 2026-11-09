@@ -6,6 +6,358 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'design_system/visibility';
+@use '../NativeModal.module' as *;
+
+$narrow-search-width: 600px;
+$tablet-search-width: 991px;
+$short-search-height: 600px;
+
+.native-hidden {
+  @extend %visually-hidden;
+}
+
+.native-result {
+  position: relative;
+}
+
+.native-results-list:global(.ui.list) {
+  margin-left: 0;
+  padding: 0;
+  list-style: none;
+
+  > li::before {
+    content: none;
+  }
+}
+
+.native-result-select {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  > span {
+    min-width: 0;
+  }
+}
+
+.result-detail {
+  display: block;
+}
+
+.native-selection-action {
+  flex: none;
+  padding-left: 2.01785714rem;
+  color: #767676;
+}
+
+.native-selected-state:global(.icon) {
+  color: #137d2e;
+}
+
+.native-favorite-target {
+  position: absolute;
+  top: calc(50% - 0.75rem);
+  right: 2.01785714rem;
+
+  &:not([shown]) [data-tip-content] {
+    @extend %visually-hidden;
+    border: 0;
+    padding: 0;
+  }
+}
+
+.native-favorite,
+.native-remove-staged {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: #767676;
+  font: inherit;
+  cursor: pointer;
+}
+
+.native-is-favorite {
+  color: #8a6d00;
+}
+
+.native-favorite {
+  display: flex;
+}
+
+.native-remove-staged {
+  margin-left: 0.5em;
+  color: #555;
+  line-height: 1;
+
+  > :global(.icon) {
+    width: auto;
+    margin: 0;
+  }
+}
+
+.native-favorites {
+  display: inline-block;
+  margin-left: 1em;
+
+  > button {
+    border: 0;
+    padding: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+
+    &::after {
+      display: none;
+    }
+
+    &:disabled {
+      opacity: 0.45;
+    }
+
+    > :global(.dropdown.icon) {
+      width: auto;
+      height: 1em;
+      margin: 0 0 0 1em;
+      font-family: 'Dropdown', sans-serif;
+      font-size: 0.85714286em;
+      line-height: 1;
+    }
+  }
+
+  > menu {
+    will-change: transform, opacity;
+    z-index: 2;
+    max-width: calc(100vw - 2rem);
+    max-height: calc((100dvh - var(--anchor-height, 0px)) / 2 - 0.5rem);
+    margin: 0.5em 0 0;
+    padding: 0;
+    overflow: auto;
+    list-style: none;
+    border: 1px solid rgba(34, 36, 38, 0.15);
+    border-radius: 0.28571429rem;
+    background: white;
+    box-shadow:
+      0 2px 4px 0 rgba(34, 36, 38, 0.12),
+      0 2px 10px 0 rgba(34, 36, 38, 0.15);
+
+    button {
+      width: 100%;
+      border: 0;
+      padding: 0.78571429rem 1.14285714rem;
+      background: none;
+      color: inherit;
+      font: inherit;
+      line-height: 1;
+      text-align: left;
+      cursor: pointer;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.05);
+      }
+    }
+  }
+}
+
+.native-search-status {
+  display: block;
+  margin: 1em 0;
+  overflow-wrap: anywhere;
+
+  &:empty {
+    margin: 0;
+  }
+}
+
+.native-empty-results {
+  flex: 0 0 0 !important;
+}
+
+.native-search-status.native-search-error {
+  display: flow-root;
+  margin: 1.5em 0;
+
+  > :global(.ui.message) {
+    margin-bottom: 1em;
+  }
+}
+
+.native-error:global(.ui.icon.message) {
+  flex-wrap: wrap;
+  gap: 0.75em;
+
+  > :global(.icon) {
+    margin: 0;
+  }
+
+  > :global(.content) {
+    flex-basis: 10em;
+    min-width: 0;
+  }
+}
+
+:global(dialog.ui.modal.account-impersonation) {
+  display: none;
+  will-change: auto;
+  inset: calc(5vh + 1rem) 0 auto;
+  max-width: 95%;
+  max-height: calc(95dvh - 2rem);
+  height: fit-content;
+  margin: 0 auto !important;
+  border: 0;
+  padding: 0;
+  overflow: visible;
+  color: rgba(0, 0, 0, 0.87);
+  line-height: 1;
+  box-shadow: 1px 3px 10px 2px rgba(0, 0, 0, 0.2);
+
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &::backdrop {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(0.5rem);
+  }
+
+  > :global(.native-modal-close) {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    top: max(-2.5rem, calc(-5vh - 0.5rem));
+    right: -2.5rem;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0.625rem 0 0;
+    margin: 0 0.25rem 0 0;
+    color: #333;
+    font-size: 1.25em;
+    line-height: 1;
+
+    > :global(.icon) {
+      width: 1em;
+      height: 1em;
+      margin: 0;
+      line-height: 1;
+      vertical-align: top;
+    }
+  }
+
+  > :global(.header) {
+    flex: none;
+    border-top-left-radius: inherit;
+    border-top-right-radius: inherit;
+    padding: 1.25rem 1.5rem;
+
+    h2 {
+      display: inline;
+    }
+  }
+
+  > :global(.content) {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+  }
+
+  > :global(.actions) {
+    flex: none;
+  }
+
+  :global(.ui.primary.button:not(:disabled)) {
+    background: #0076a8;
+    color: white;
+  }
+
+  :global(.ui.primary.button:not(:disabled)):hover,
+  :global(.ui.primary.button:not(:disabled)):focus {
+    background: #005272;
+  }
+
+  button:not(:global(.ui)):focus-visible,
+  h2:focus {
+    outline: 2px solid #005272;
+    outline-offset: 2px;
+  }
+
+  @media (max-width: $tablet-search-width) {
+    > :global(.native-modal-close) {
+      top: 1rem;
+      right: 1rem;
+    }
+
+    > :global(.header) {
+      padding-right: 4rem;
+    }
+  }
+
+  @media (max-height: $short-search-height) {
+    top: 2rem;
+    max-height: calc(100dvh - 4rem);
+  }
+
+  @media (max-width: $narrow-search-width) {
+    overflow: auto;
+
+    > :global(.actions) {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 0.75em;
+      padding-bottom: 1rem !important;
+
+      > :global(.button) {
+        min-width: 0;
+        max-width: 100%;
+        margin: 0;
+        overflow-wrap: anywhere;
+      }
+    }
+
+    .form {
+      flex-basis: 100%;
+      min-width: 0;
+      margin-right: clamp(0px, calc(100% - 16em), 2em);
+    }
+
+    .results:not(.native-empty-results) {
+      flex-basis: 100%;
+      min-width: 0;
+    }
+
+    .native-result-select {
+      flex-direction: column;
+      align-items: flex-start;
+      overflow-wrap: anywhere;
+
+      > span {
+        max-width: 100%;
+      }
+    }
+
+    .native-selection-action {
+      position: absolute;
+      top: 0.6em;
+      right: 0;
+      padding-left: 0;
+    }
+
+    .native-favorite-target {
+      top: 0.6em;
+    }
+  }
+}
 
 .header {
   min-height: 4.55rem;
