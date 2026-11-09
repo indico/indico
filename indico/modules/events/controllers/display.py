@@ -185,8 +185,11 @@ class RHQRCodeImage(QRCodeMixin, RH):
         'box_size': fields.Int(load_default=10, validate=validate.Range(min=1, max=100)),
     }, location='query')
     def _process(self, url, box_size):
+        box_size = min(
+            box_size,
+            max(x['box_size'] for x in self._calculate_possible_sizes(self._build_qr(url, box_size=10)).values()),
+        )
         qr = self._build_qr(url, box_size)
-
         qr_img = qr.make_image(
             image_factory=StyledPilImage,
             module_drawer=SquareModuleDrawer(),
