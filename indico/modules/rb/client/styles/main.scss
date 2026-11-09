@@ -45,7 +45,16 @@ a {
 
   .indico-top-bar-logo {
     display: flex;
+    flex: none;
     align-items: center;
+    min-height: 3.5em;
+    margin-left: -0.75em;
+    padding: 0 0.75em;
+
+    &:focus-visible {
+      outline: 2px solid white;
+      outline-offset: -2px;
+    }
 
     img {
       height: 30px;

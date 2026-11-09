@@ -25,11 +25,12 @@ import {
   Label,
   List,
   Message,
-  Modal,
+  Modal as SemanticModal,
   Popup,
   Image,
 } from 'semantic-ui-react';
 
+import NativeModal from 'indico/react/components/NativeModal';
 import {FinalCheckbox, FinalInput, handleSubmitError} from 'indico/react/forms';
 import {useFavoriteUsers, useIndicoAxios} from 'indico/react/hooks';
 import {Translate, PluralTranslate, Singular, Plural, Param} from 'indico/react/i18n';
@@ -39,9 +40,10 @@ import {camelizeKeys} from 'indico/utils/case';
 import {PrincipalType} from './util';
 
 import './items.module.scss';
-import './Search.module.scss';
+import styles from './Search.module.scss';
 
 const InitialFormValuesContext = React.createContext({});
+const NativeSearchContext = React.createContext(false);
 export const UserSearchTokenContext = (window._UserSearchTokenContext =
   window._UserSearchTokenContext || React.createContext(null));
 
@@ -131,6 +133,7 @@ const searchFactory = config => {
   };
 
   const SearchForm = ({onSearch, favoritesController, isAdded, onAdd, onRemove, single}) => {
+    const native = useContext(NativeSearchContext);
     const initialFormValues = useContext(InitialFormValuesContext);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const favorites = favoritesController?.[0] ?? [];
@@ -155,7 +158,74 @@ const searchFactory = config => {
                 primary
                 content={Translate.string('Search')}
               />
-              {!_.isEmpty(favorites) && (
+              {native && !_.isEmpty(favorites) && (
+                <ind-menu
+                  class={styles['native-favorites']}
+                  onKeyDownCapture={event => {
+                    if (event.key === 'Escape' && event.currentTarget.hasAttribute('open')) {
+                      event.preventDefault();
+                    }
+                  }}
+                >
+                  <button type="button" disabled={fprops.submitting}>
+                    <Translate>Select favorite</Translate>
+                    <Icon name="dropdown" />
+                  </button>
+                  <menu hidden>
+                    {_.sortBy(Object.values(favorites), 'name').map(user => (
+                      <li key={user.identifier}>
+                        <button
+                          type="button"
+                          disabled={fprops.submitting}
+                          onClick={event => {
+                            if (isAdded(user)) {
+                              onRemove(user);
+                            } else {
+                              onAdd(user);
+                              if (single) {
+                                const trigger = event.currentTarget
+                                  .closest('ind-menu')
+                                  .querySelector(':scope > button');
+                                trigger.click();
+                                trigger.focus();
+                              }
+                            }
+                          }}
+                        >
+                          <span styleName="item">
+                            <span styleName="icon">
+                              <Icon.Group size="large">
+                                {user.avatarURL ? (
+                                  <Image src={user.avatarURL} size="mini" avatar alt="" />
+                                ) : (
+                                  <Icon name={resultIcon} />
+                                )}
+                                {isAdded(user) && <Icon name="check" color="green" corner />}
+                              </Icon.Group>
+                            </span>
+                            <span styleName={`content ${user.avatarURL ? 'has-avatar' : ''}`}>
+                              <span styleName="result-detail">{user.name}</span>
+                              {user.detail && (
+                                <span className="description" styleName="result-detail">
+                                  <small>{user.detail}</small>
+                                </span>
+                              )}
+                            </span>
+                          </span>
+                          <span styleName="native-hidden">
+                            {isAdded(user) ? (
+                              <Translate>Remove selection</Translate>
+                            ) : (
+                              <Translate>Add selection</Translate>
+                            )}
+                          </span>
+                        </button>
+                      </li>
+                    ))}
+                  </menu>
+                </ind-menu>
+              )}
+              {!native && !_.isEmpty(favorites) && (
                 <Dropdown
                   floating
                   labeled
@@ -195,8 +265,38 @@ const searchFactory = config => {
     );
   };
 
-  const FavoriteControls = ({favorite, onAddFavorite, onDelFavorite}) =>
-    favorite ? (
+  const FavoriteControls = ({favorite, onAddFavorite, onDelFavorite, disabled}) => {
+    const native = useContext(NativeSearchContext);
+    if (native) {
+      return (
+        <ind-with-tooltip
+          class={styles['native-favorite-target']}
+          onKeyDownCapture={event => {
+            if (event.key === 'Escape' && event.currentTarget.hasAttribute('shown')) {
+              event.preventDefault();
+              event.currentTarget.hide();
+            }
+          }}
+        >
+          <button
+            type="button"
+            styleName={`native-favorite ${favorite ? 'native-is-favorite' : ''}`}
+            disabled={disabled}
+            onClick={favorite ? onDelFavorite : onAddFavorite}
+          >
+            <Icon name={favorite ? 'star' : 'star outline'} size="large" />
+            <span data-tip-content>
+              {favorite ? (
+                <Translate>Remove from favorites</Translate>
+              ) : (
+                <Translate>Add to favorites</Translate>
+              )}
+            </span>
+          </button>
+        </ind-with-tooltip>
+      );
+    }
+    return favorite ? (
       <Icon
         styleName="button favorite active"
         name="star"
@@ -219,6 +319,7 @@ const searchFactory = config => {
         }}
       />
     );
+  };
 
   const ResultItem = ({
     name,
@@ -232,7 +333,9 @@ const searchFactory = config => {
     existsInEvent,
     external,
     avatarURL,
+    disabled,
   }) => {
+    const native = useContext(NativeSearchContext);
     const avatar = avatarURL ? (
       <Image src={avatarURL} size="mini" avatar />
     ) : (
@@ -241,6 +344,64 @@ const searchFactory = config => {
 
     const hasAvatarClass = avatarURL ? 'has-avatar' : '';
 
+    if (native) {
+      return (
+        <li className="item" styleName="result-item native-result">
+          <button
+            type="button"
+            styleName="native-result-select"
+            disabled={disabled}
+            onClick={added ? onRemove : onAdd}
+          >
+            <span styleName="icon">
+              <Icon.Group size="large">
+                {avatarURL ? (
+                  <Image avatar src={avatarURL} size="mini" alt="" />
+                ) : (
+                  <Icon name={resultIcon} />
+                )}
+                {favorite && <Icon name="star" color="yellow" corner="bottom right" />}
+              </Icon.Group>
+            </span>
+            <span styleName={`content ${hasAvatarClass}`}>
+              <span styleName="result-detail">{name}</span>
+              {detail && (
+                <span className="description" styleName="result-detail">
+                  <small>{detail}</small>
+                </span>
+              )}
+              <span styleName="native-hidden">
+                {added ? (
+                  <Translate>Remove selection</Translate>
+                ) : (
+                  <Translate>Add selection</Translate>
+                )}
+              </span>
+              {added && (
+                <strong styleName="native-hidden">
+                  <Translate>Selected</Translate>
+                </strong>
+              )}
+            </span>
+            <span styleName="native-selection-action">
+              <Icon
+                name={added ? 'checkmark' : 'add'}
+                size="large"
+                styleName={added ? 'native-selected-state' : undefined}
+              />
+            </span>
+          </button>
+          {onAddFavorite && onDelFavorite && (
+            <FavoriteControls
+              favorite={favorite}
+              onAddFavorite={onAddFavorite}
+              onDelFavorite={onDelFavorite}
+              disabled={disabled}
+            />
+          )}
+        </li>
+      );
+    }
     return (
       <List.Item styleName="result-item" onClick={added ? onRemove : onAdd}>
         <div styleName="item">
@@ -305,61 +466,81 @@ const searchFactory = config => {
     favoritesController,
     // eslint-disable-next-line no-shadow
     getResultsText,
+    status,
+    statusError,
     ...rest
-  }) => (
-    <div styleName={`search-results ${loading ? 'disabled' : ''}`} {...rest}>
-      {total !== 0 ? (
-        <>
-          <Divider horizontal>{getResultsText(total)}</Divider>
-          <List styleName="list" divided relaxed>
-            {results.map(r => (
-              <ResultItem
-                key={r.identifier}
-                name={r.name}
-                detail={r.detail}
-                added={isAdded(r)}
-                favorite={
-                  favoritesController && favoriteKey
-                    ? r[favoriteKey] in favoritesController[0]
-                    : false
-                }
-                onAddFavorite={
-                  favoritesController && r.type === 'user' && r.userId !== null
-                    ? () => favoritesController[1][0](r.identifier)
-                    : null
-                }
-                onDelFavorite={
-                  favoritesController && r.type === 'user' && r.userId !== null
-                    ? () => favoritesController[1][1](r.identifier)
-                    : null
-                }
-                onAdd={() => onAdd(r)}
-                onRemove={() => onRemove(r)}
-                existsInEvent={r.existsInEvent}
-                external={r.type === 'user' && r.userId === null}
-                avatarURL={r.avatarURL}
-              />
-            ))}
-          </List>
-          {total > results.length && <Message info>{tooManyText}</Message>}
-        </>
-      ) : (
-        <Divider horizontal>{noResultsText}</Divider>
-      )}
-      {onEnterManually && !pristine && (
-        <Message>
-          <Translate as={Message.Header}>I could not find the right person</Translate>
-          <Translate as={Message.Content}>
-            If nobody on the search results corresponds to the person you were looking for, you can{' '}
-            <Param name="enterManuallyLink" wrapper={<a onClick={onEnterManually} />}>
-              add them manually
-            </Param>
-            .
-          </Translate>
-        </Message>
-      )}
-    </div>
-  );
+  }) => {
+    const native = useContext(NativeSearchContext);
+    const ResultList = native ? 'ul' : List;
+    return (
+      <div styleName={`search-results ${loading ? 'disabled' : ''}`} {...rest}>
+        {native && (
+          <output
+            className={statusError ? undefined : 'ui horizontal divider'}
+            styleName={`native-search-status ${statusError ? 'native-search-error' : ''}`}
+          >
+            {status}
+          </output>
+        )}
+        {total !== 0 ? (
+          <>
+            {!native && <Divider horizontal>{getResultsText(total)}</Divider>}
+            <ResultList
+              className={native ? 'ui divided relaxed list' : undefined}
+              styleName={native ? 'native-results-list list' : 'list'}
+              {...(!native && {divided: true, relaxed: true})}
+            >
+              {results.map(r => (
+                <ResultItem
+                  key={r.identifier}
+                  name={r.name}
+                  detail={r.detail}
+                  added={isAdded(r)}
+                  favorite={
+                    favoritesController && favoriteKey
+                      ? r[favoriteKey] in favoritesController[0]
+                      : false
+                  }
+                  onAddFavorite={
+                    favoritesController && r.type === 'user' && r.userId !== null
+                      ? () => favoritesController[1][0](r.identifier)
+                      : null
+                  }
+                  onDelFavorite={
+                    favoritesController && r.type === 'user' && r.userId !== null
+                      ? () => favoritesController[1][1](r.identifier)
+                      : null
+                  }
+                  onAdd={() => onAdd(r)}
+                  onRemove={() => onRemove(r)}
+                  existsInEvent={r.existsInEvent}
+                  external={r.type === 'user' && r.userId === null}
+                  avatarURL={r.avatarURL}
+                  disabled={loading}
+                />
+              ))}
+            </ResultList>
+            {total > results.length && <Message info>{tooManyText}</Message>}
+          </>
+        ) : (
+          !native && <Divider horizontal>{noResultsText}</Divider>
+        )}
+        {onEnterManually && !pristine && (
+          <Message>
+            <Translate as={Message.Header}>I could not find the right person</Translate>
+            <Translate as={Message.Content}>
+              If nobody on the search results corresponds to the person you were looking for, you
+              can{' '}
+              <Param name="enterManuallyLink" wrapper={<a onClick={onEnterManually} />}>
+                add them manually
+              </Param>
+              .
+            </Translate>
+          </Message>
+        )}
+      </div>
+    );
+  };
 
   const SearchContent = ({
     onAdd,
@@ -371,8 +552,11 @@ const searchFactory = config => {
     withEventPersons,
     eventId,
     searchToken,
+    errorMessage,
   }) => {
+    const native = useContext(NativeSearchContext);
     const [loading, setLoading] = useState(false);
+    const [searchError, setSearchError] = useState(false);
     const [result, _setResult] = useState(null);
     const [initialFavoritesResults, setInitialFavoritesResults] = useState([]);
     const lastResult = useRef(null);
@@ -385,8 +569,24 @@ const searchFactory = config => {
     };
     const handleSearch = async data => {
       setLoading(true);
+      setSearchError(false);
       try {
-        await runSearch(data, setResult, withEventPersons, eventId, searchToken);
+        const errors = await runSearch(
+          data,
+          setResult,
+          withEventPersons,
+          eventId,
+          searchToken,
+          native ? () => ({[FORM_ERROR]: true}) : undefined
+        );
+        if (native && errors) {
+          setSearchError(true);
+        }
+      } catch (error) {
+        if (!native) {
+          throw error;
+        }
+        setSearchError(true);
       } finally {
         setLoading(false);
       }
@@ -410,6 +610,43 @@ const searchFactory = config => {
         results: initialFavoritesResults,
         total: initialFavoritesResults.length,
       };
+    const showFavoriteCount = native
+      ? pristine.current &&
+        favoriteKey &&
+        favoritesController &&
+        resultDisplay.results.every(r => r[favoriteKey] in favoritesController[0])
+      : resultDisplay.results === favoriteResults;
+    const getResultSummary = total =>
+      showFavoriteCount
+        ? PluralTranslate.string('{total} favorite', '{total} favorites', total, {total})
+        : getResultsText(total);
+    const hasStatusError = !!errorMessage || searchError;
+    const emptyNativeResults =
+      native && pristine.current && !resultDisplay.total && !hasStatusError;
+
+    const status = native && (
+      <>
+        {loading && <Translate>Searching…</Translate>}
+        {!loading && errorMessage && (
+          <Message as="span" error icon styleName="native-error">
+            <Icon name="warning sign" />
+            <Message.Content as="span">{errorMessage}</Message.Content>
+          </Message>
+        )}
+        {searchError && (
+          <Message as="span" error icon styleName="native-error">
+            <Icon name="warning sign" />
+            <Message.Content as="span">
+              <Translate>The search could not be completed. Please try again.</Translate>
+            </Message.Content>
+          </Message>
+        )}
+        {!loading &&
+          !searchError &&
+          (!pristine.current || resultDisplay.total > 0) &&
+          (resultDisplay.total === 0 ? noResultsText : getResultSummary(resultDisplay.total))}
+      </>
+    );
 
     return (
       <div styleName="search-content">
@@ -423,9 +660,11 @@ const searchFactory = config => {
             single={single}
           />
         </div>
-        {(!pristine.current || resultDisplay.total > 0) && (
+        {(native || !pristine.current || resultDisplay.total > 0) && (
           <SearchResults
-            styleName="results"
+            styleName={`results ${emptyNativeResults ? 'native-empty-results' : ''}`}
+            status={status}
+            statusError={hasStatusError}
             loading={loading}
             pristine={pristine.current}
             results={resultDisplay.results}
@@ -435,13 +674,7 @@ const searchFactory = config => {
             onRemove={onRemove}
             onEnterManually={onEnterManually}
             isAdded={isAdded}
-            getResultsText={total =>
-              resultDisplay.results === favoriteResults
-                ? PluralTranslate.string('{total} favorite', '{total} favorites', total, {
-                    total,
-                  })
-                : getResultsText(total)
-            }
+            getResultsText={getResultSummary}
           />
         )}
       </div>
@@ -449,6 +682,7 @@ const searchFactory = config => {
   };
 
   const SearchStaged = ({single, staged, onRemove}) => {
+    const native = useContext(NativeSearchContext);
     if (!staged || !staged.length) {
       return null;
     }
@@ -457,7 +691,28 @@ const searchFactory = config => {
       return (
         <Label circular styleName="staged-label">
           {staged[0].name}
-          <Icon name="delete" onClick={() => onRemove(staged[0])} />
+          {native ? (
+            <button
+              type="button"
+              styleName="native-remove-staged"
+              onClick={event => {
+                const dialog = event.currentTarget.closest('dialog');
+                onRemove(staged[0]);
+                requestAnimationFrame(() => {
+                  if (!dialog?.contains(document.activeElement)) {
+                    dialog?.querySelector('h2')?.focus();
+                  }
+                });
+              }}
+            >
+              <Icon name="delete" />
+              <span styleName="native-hidden">
+                {Translate.string('Remove {name}', {name: staged[0].name})}
+              </span>
+            </button>
+          ) : (
+            <Icon name="delete" onClick={() => onRemove(staged[0])} />
+          )}
         </Label>
       );
     }
@@ -502,7 +757,10 @@ const searchFactory = config => {
     withEventPersons,
     eventId,
     searchToken,
+    nativeModal,
+    errorMessage,
   }) => {
+    const Modal = nativeModal ? NativeModal : SemanticModal;
     const searchTokenFromContext = useContext(UserSearchTokenContext);
     const [open, setOpen] = useState(defaultOpen);
     const [staged, setStaged] = useState([]);
@@ -546,7 +804,9 @@ const searchFactory = config => {
     const handleClose = () => {
       setStaged([]);
       setOpen(false);
-      onClose();
+      if (!nativeModal) {
+        onClose();
+      }
     };
 
     let trigger = null;
@@ -570,51 +830,63 @@ const searchFactory = config => {
     };
 
     return (
-      <Modal
-        trigger={trigger}
-        dimmer="inverted"
-        centered={false}
-        open={open}
-        onClose={handleClose}
-        onClick={stopPropagation}
-        onFocus={stopPropagation}
-        closeIcon
-      >
-        <Modal.Header styleName="header">
-          {modalTitle(single)}{' '}
-          {(!single || alwaysConfirm) && (
-            <SearchStaged
-              single={single}
-              alwaysConfirm={alwaysConfirm}
-              staged={staged}
-              onRemove={handleRemove}
-            />
-          )}
-        </Modal.Header>
-        <Modal.Content>
-          <SearchContent
-            favoritesController={favoritesController}
-            onAdd={handleAdd}
-            onRemove={handleRemove}
-            onEnterManually={onEnterManually ? handleEnterManually : null}
-            isAdded={isAdded}
-            single={single}
-            withEventPersons={withEventPersons}
-            eventId={eventId}
-            searchToken={searchToken ?? searchTokenFromContext}
-          />
-        </Modal.Content>
-        <Modal.Actions>
-          {(!single || alwaysConfirm) && (
-            <Button onClick={handleAddButtonClick} disabled={!staged.length} primary>
-              <Translate>Confirm</Translate>
+      <NativeSearchContext.Provider value={nativeModal}>
+        {nativeModal && trigger}
+        <Modal
+          {...(nativeModal
+            ? {
+                title: modalTitle(single),
+                size: '',
+                portal: true,
+                className: 'account-impersonation',
+                onAfterClose: onClose,
+              }
+            : {trigger, dimmer: 'inverted', centered: false})}
+          open={open}
+          onClose={handleClose}
+          onClick={stopPropagation}
+          onFocus={stopPropagation}
+          closeIcon
+        >
+          <Modal.Header styleName="header">
+            {nativeModal ? <h2 tabIndex={-1}>{modalTitle(single)}</h2> : modalTitle(single)}{' '}
+            {(!single || alwaysConfirm) && (
+              <SearchStaged
+                single={single}
+                alwaysConfirm={alwaysConfirm}
+                staged={staged}
+                onRemove={handleRemove}
+              />
+            )}
+          </Modal.Header>
+          <Modal.Content>
+            {(!nativeModal || open) && (
+              <SearchContent
+                favoritesController={favoritesController}
+                onAdd={handleAdd}
+                onRemove={handleRemove}
+                onEnterManually={onEnterManually ? handleEnterManually : null}
+                isAdded={isAdded}
+                single={single}
+                withEventPersons={withEventPersons}
+                eventId={eventId}
+                searchToken={searchToken ?? searchTokenFromContext}
+                errorMessage={errorMessage}
+              />
+            )}
+          </Modal.Content>
+          <Modal.Actions>
+            {(!single || alwaysConfirm) && (
+              <Button onClick={handleAddButtonClick} disabled={!staged.length} primary>
+                <Translate>Confirm</Translate>
+              </Button>
+            )}
+            <Button onClick={handleClose}>
+              <Translate>Cancel</Translate>
             </Button>
-          )}
-          <Button onClick={handleClose}>
-            <Translate>Cancel</Translate>
-          </Button>
-        </Modal.Actions>
-      </Modal>
+          </Modal.Actions>
+        </Modal>
+      </NativeSearchContext.Provider>
     );
   };
 
@@ -624,6 +896,8 @@ const searchFactory = config => {
     disabled: PropTypes.bool,
     favoritesController: PropTypes.array,
     triggerFactory: PropTypes.func,
+    nativeModal: PropTypes.bool,
+    errorMessage: PropTypes.string,
     defaultOpen: PropTypes.bool,
     single: PropTypes.bool,
     alwaysConfirm: PropTypes.bool,
@@ -639,6 +913,8 @@ const searchFactory = config => {
     favoritesController: null,
     disabled: false,
     triggerFactory: null,
+    nativeModal: false,
+    errorMessage: null,
     defaultOpen: false,
     single: false,
     alwaysConfirm: false,
@@ -658,6 +934,7 @@ const searchFactory = config => {
 const WithExternalsContext = React.createContext(false);
 
 const UserSearchFields = () => {
+  const native = useContext(NativeSearchContext);
   const withExternals = useContext(WithExternalsContext);
 
   const {data} = useIndicoAxios(userSearchInfoURL(), {
@@ -670,12 +947,22 @@ const UserSearchFields = () => {
     <>
       <FinalInput
         name="last_name"
-        autoFocus
+        autoFocus={!native}
         noAutoComplete
         label={Translate.string('Family name')}
       />
       <FinalInput name="first_name" noAutoComplete label={Translate.string('Given name')} />
-      <FinalInput name="email" noAutoComplete label={Translate.string('Email address')} />
+      <FinalInput
+        name="email"
+        noAutoComplete
+        label={Translate.string('Email address')}
+        minLength={native ? 4 : undefined}
+      />
+      {native && (
+        <span styleName="native-hidden">
+          <Translate>Enter at least four characters when searching by email.</Translate>
+        </span>
+      )}
       <FinalInput name="affiliation" noAutoComplete label={Translate.string('Affiliation')} />
       {hasExternals && (
         <FinalCheckbox
@@ -719,7 +1006,14 @@ const InnerUserSearch = searchFactory({
       return {[FORM_ERROR]: 'No criteria specified'};
     }
   },
-  runSearch: async (data, setResult, withEventPersons, eventId, searchToken) => {
+  runSearch: async (
+    data,
+    setResult,
+    withEventPersons,
+    eventId,
+    searchToken,
+    onError = handleSubmitError
+  ) => {
     setResult(null);
     const values = _.fromPairs(Object.entries(data).filter(([, val]) => !!val));
     values.favorites_first = true;
@@ -733,7 +1027,7 @@ const InnerUserSearch = searchFactory({
     try {
       response = await indicoAxios.get(userSearchURL(values));
     } catch (error) {
-      return handleSubmitError(error);
+      return onError(error);
     }
     const resultData = camelizeKeys(response.data);
     resultData.results = resultData.users.map(
@@ -773,7 +1067,7 @@ const InnerUserSearch = searchFactory({
       try {
         epResponse = await indicoAxios.get(eventPersonSearchURL({...values, event_id: eventId}));
       } catch (error) {
-        return handleSubmitError(error);
+        return onError(error);
       }
       const epResultData = camelizeKeys(epResponse.data);
       epResultData.results = epResultData.users.map(
