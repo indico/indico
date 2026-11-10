@@ -97,9 +97,7 @@ class PDFLaTeXBase:
     LATEX_TEMPLATE = None
 
     def __init__(self):
-        # Markdown -> LaTeX renderer
-        # safe_mode - strip out all HTML
-        md = markdown.Markdown(safe_mode='remove')
+        md = markdown.Markdown()
         self.source_dir = tempfile.mkdtemp(prefix='indico-texgen-', dir=config.TEMP_DIR)
         latex_mdx = mdx_latex.LaTeXExtension(configs={'apply_br': True, 'tmpdir': self.source_dir})
         latex_mdx.extendMarkdown(md, markdown.__dict__)
