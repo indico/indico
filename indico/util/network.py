@@ -16,7 +16,14 @@ from requests.exceptions import RequestException
 
 def _is_private_ip(ip):
     ip_data = ipaddress.ip_address(ip)
-    return ip_data.is_private or ip_data.is_loopback or ip_data.is_reserved or ip_data.is_link_local
+    return (
+        not ip_data.is_global
+        # anything below should already be covered by not being a global IP, but keeping it just in case
+        or ip_data.is_private
+        or ip_data.is_loopback
+        or ip_data.is_reserved
+        or ip_data.is_link_local
+    )
 
 
 def is_private_url(url):

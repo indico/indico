@@ -31,7 +31,8 @@ Accessibility
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Nothing so far
+- Require all IPs used in outgoing connections to be public IPs (ie disallow RFC 6598 IPs
+  in addition to private ranges, loopback, etc.) (:pr:`7877`)
 
 
 Version 3.3.14
