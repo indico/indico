@@ -37,7 +37,6 @@ interface DnDState {
   transformSinceMouseMove: Transform;
   initialScrollPosition: MousePosition;
   initialOffset: MousePosition;
-  yAdjustment: number;
   activeDraggable: string | null;
 }
 
@@ -51,12 +50,7 @@ interface DnDContextType {
   unregisterDroppable: (id: string) => void;
   registerDraggable: (id: string, fixed: boolean, node: HTMLRef) => void;
   unregisterDraggable: (id: string) => void;
-  onMouseDown: (
-    id: string,
-    draggable: Draggable,
-    position: CoordsWithOffset,
-    yAdjustment?: number
-  ) => void;
+  onMouseDown: (id: string, draggable: Draggable, position: CoordsWithOffset) => void;
 }
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const DnDContext = createContext<DnDContextType>(null!);
@@ -140,7 +134,6 @@ function setTransform(
   initialMousePosition: MousePosition,
   currentMousePosition: MousePosition,
   currentScrollPosition: Transform,
-  yAdjustment: number,
   modifier: Modifier
 ) {
   const draggable = draggableData[id];
@@ -153,7 +146,7 @@ function setTransform(
     id,
   });
   transform.x -= currentScrollPosition.x;
-  transform.y -= currentScrollPosition.y - yAdjustment;
+  transform.y -= currentScrollPosition.y;
   return {
     ...draggableData,
     [id]: {
@@ -283,7 +276,6 @@ export function DnDProvider({
     initialScrollPosition: {x: 0, y: 0},
     initialOffset: {x: 0, y: 0},
     activeDraggable: null,
-    yAdjustment: 0,
   });
 
   useScrollIntent({
@@ -317,7 +309,6 @@ export function DnDProvider({
         transformSinceMouseMove: {x: 0, y: 0},
         initialOffset: {x: 0, y: 0},
         activeDraggable: null,
-        yAdjustment: 0,
       };
       setDragged(null);
     }
@@ -326,7 +317,7 @@ export function DnDProvider({
   }, []);
 
   const onMouseDown = useCallback(
-    (id: string, draggable: Draggable, where: CoordsWithOffset, yAdjustment?: number) => {
+    (id: string, draggable: Draggable, where: CoordsWithOffset) => {
       if (state.current.state === 'idle') {
         if (!draggable) {
           return;
@@ -342,9 +333,8 @@ export function DnDProvider({
             x: computedScrollParent.scrollLeft,
             y: computedScrollParent.scrollTop,
           },
-          initialOffset: {x: offsetX, y: offsetY - (yAdjustment ?? 0)},
+          initialOffset: {x: offsetX, y: offsetY},
           activeDraggable: id,
-          yAdjustment: yAdjustment ?? 0,
         };
         setDraggableData(d =>
           setInitialOffset(setBoundingRectAndScroll(d, draggable.node, id), id, {
@@ -372,7 +362,6 @@ export function DnDProvider({
             state.current.initialMousePosition,
             mousePosition,
             state.current.scrollPosition,
-            state.current.yAdjustment,
             modifier
           );
           state.current.transformSinceMouseMove =
@@ -563,7 +552,7 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
   }, []);
 
   const onMouseDown = useCallback(
-    (e: React.MouseEvent<HTMLElement>, yAdjustment?: number) => {
+    (e: React.MouseEvent<HTMLElement>) => {
       e.stopPropagation();
       if (e.target instanceof Node && !ref.current.contains(e.target)) {
         return;
@@ -571,7 +560,7 @@ export function useDraggable({id, fixed = false}: {id: string; fixed?: boolean})
       const rect = e.currentTarget.getBoundingClientRect();
       const offsetX = e.clientX - rect.left;
       const offsetY = e.clientY - rect.top;
-      _onMouseDown(id, draggable, {x: e.pageX, y: e.pageY, offsetX, offsetY}, yAdjustment);
+      _onMouseDown(id, draggable, {x: e.pageX, y: e.pageY, offsetX, offsetY});
     },
     [_onMouseDown, id, draggable]
   );

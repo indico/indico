@@ -7,7 +7,8 @@
 
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {flushSync} from 'react-dom';
 import {useSelector} from 'react-redux';
 import {Button} from 'semantic-ui-react';
 
@@ -58,6 +59,7 @@ export function DraggableUnscheduledContributionEntry({
   });
   const dt = useSelector(selectors.getCurrentDate);
   const dispatch = useTimetableDispatch();
+  const [transform, setTransform] = useState<string>();
 
   const listeners = {
     ..._listeners,
@@ -66,6 +68,8 @@ export function DraggableUnscheduledContributionEntry({
         return;
       }
 
+      // Since the unscheduled entry is not necessarily aligned with the calendar grid,
+      // we temporarily move it when dragging to ensure that alignement.
       const calendar = document.getElementById('timetable-calendar');
       const calendarTop = calendar?.getBoundingClientRect?.()?.top ?? 0;
       const entryTop = ref.current.getBoundingClientRect().top;
@@ -76,12 +80,25 @@ export function DraggableUnscheduledContributionEntry({
         .startOf('day')
         .add(pixelsToMinutes(yAdjustment - pixelDiff), 'minutes');
       dispatch(actions.updateUnscheduledEntry(EntryType.Contribution, id, {startDt}));
-      _listeners.onMouseDown(event, yAdjustment);
+
+      // When _listeners.onMouseDown is ran, the transform property must already be set.
+      flushSync(() => setTransform(`translateY(${yAdjustment}px)`));
+      _listeners.onMouseDown(event);
     },
   };
 
+  useEffect(() => {
+    if (isDragging) {
+      // Reset the entry to its normal alignement
+      return () => {
+        dispatch(actions.updateUnscheduledEntry(EntryType.Contribution, id, {startDt: undefined}));
+        setTransform(undefined);
+      };
+    }
+  }, [isDragging, id, dispatch]);
+
   return (
-    <div ref={setNodeRef} {...listeners} style={{opacity: isDragging ? 0 : 1}}>
+    <div ref={setNodeRef} {...listeners} style={{opacity: isDragging ? 0 : 1, transform}}>
       <UnscheduledContributionEntry
         title={title}
         timeRange={`${duration} minutes`}
