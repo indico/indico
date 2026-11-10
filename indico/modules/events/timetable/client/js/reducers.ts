@@ -197,14 +197,13 @@ export default {
       }
       case actions.SCHEDULE_ENTRY: {
         const {id, startDt, sessionId, sessionBlockId, layoutOverrides} = action;
+        const unscheduledEntry = state.unscheduled.find(u => u.id === id);
         const newEntry = {
-          ...state.unscheduled.find(u => u.id === id),
+          ...unscheduledEntry,
           startDt,
           sessionId,
+          ...(sessionBlockId !== null ? {sessionBlockId} : undefined),
         };
-        if (sessionBlockId !== null) {
-          newEntry.sessionBlockId = sessionBlockId;
-        }
         return {
           ...state,
           entries: {...state.entries, [id]: newEntry},

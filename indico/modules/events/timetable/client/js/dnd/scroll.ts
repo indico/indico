@@ -29,11 +29,13 @@ export function useScrollIntent({
   draggables,
   enabled,
   bounds,
+  scrollParent,
 }: {
   state: MutableRefObject<ScrollState>;
   draggables: Record<string, Draggable>;
   enabled: boolean;
   bounds?: ScrollBounds;
+  scrollParent?: HTMLElement;
 }) {
   const scrollSpeed = useRef<{x: number; y: number}>({x: 0, y: 0});
   const intervalRef = useRef<Timeout | null>(null);
@@ -58,21 +60,25 @@ export function useScrollIntent({
         return;
       }
       const draggable = draggables[state.current.activeDraggable];
-      const scrollParent = getScrollParent(draggable.node.current);
+      const computedScrollParent = scrollParent ?? getScrollParent(draggable.node.current);
 
       scrollSpeed.current = getScrollSpeed(
         {x: event.clientX, y: event.clientY},
-        scrollParent,
+        computedScrollParent,
         bounds
       );
 
       if (scrollSpeed.current.x !== 0 || scrollSpeed.current.y !== 0) {
         if (intervalRef.current === null) {
           intervalRef.current = setInterval(() => {
-            const boundedSpeed = applyScrollBounds(scrollSpeed.current, scrollParent, bounds);
+            const boundedSpeed = applyScrollBounds(
+              scrollSpeed.current,
+              computedScrollParent,
+              bounds
+            );
             scrollSpeed.current = boundedSpeed;
             if (boundedSpeed.x !== 0 || boundedSpeed.y !== 0) {
-              scrollParent.scrollBy(boundedSpeed.x, boundedSpeed.y);
+              computedScrollParent.scrollBy(boundedSpeed.x, boundedSpeed.y);
             } else {
               cleanUp();
             }
@@ -88,7 +94,7 @@ export function useScrollIntent({
       window.removeEventListener('mousemove', handleMouseMove);
       clearInterval(id);
     };
-  }, [state, draggables, enabled, bounds]);
+  }, [state, draggables, enabled, bounds, scrollParent]);
 }
 
 function getScrollSpeed(mouse: MousePosition, scrollParent: HTMLElement, bounds?: ScrollBounds) {

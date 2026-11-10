@@ -71,18 +71,18 @@ export const createRestrictToElement =
     return restrictToBoundingRect(transform, draggingNodeRect, rect);
   };
 
-export function getScrollParent(element: HTMLElement): HTMLElement {
+export function getScrollParent(element: Element | HTMLElement | null): HTMLElement {
   const overflowRegex = /(auto|scroll)/;
-  let parent: HTMLElement | undefined = element;
+  let parent = element?.parentElement ?? null;
   do {
-    if (!parent.parentElement) {
+    if (parent === null) {
       return document.body;
     }
-    parent = parent.parentElement;
     const style = getComputedStyle(parent);
     if (overflowRegex.test(style.overflow + style.overflowY + style.overflowX)) {
       return parent;
     }
+    parent = parent.parentElement;
   } while (parent);
   return document.body;
 }
