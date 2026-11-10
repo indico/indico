@@ -382,6 +382,15 @@ def test_markdown_linker(input, output):
 
 
 @pytest.mark.parametrize(('input', 'output'), (
+    ('![x](x/$"$)', '<p><img alt="x" src="x/$&quot;$"></p>'),
+    ('![$"$](x)', '<p><img alt="$&quot;$" src="x"></p>'),
+    ("![x](x/$'$)", '<p><img alt="x" src="x/$&#39;$"></p>'),
+))
+def test_markdown_math_escape(input, output):
+    assert render_markdown(input, escape_latex_math=True) == output
+
+
+@pytest.mark.parametrize(('input', 'output'), (
     ('hello world', 'hello world'),
     ('hello\nworld', 'hello\nworld'),
     ('hello\r\nworld', 'hello\nworld'),
