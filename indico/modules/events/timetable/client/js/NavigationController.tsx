@@ -36,9 +36,9 @@ export function NavigationController() {
 
       if (newExpandedSessionBlockId !== undefined) {
         if (
-          entries.entries[newExpandedSessionBlockId] === undefined ||
-          entries.entries[newExpandedSessionBlockId].type !== EntryType.SessionBlock ||
-          !entries.entries[newExpandedSessionBlockId].startDt.isSame(newDate, 'day')
+          entries[newExpandedSessionBlockId] === undefined ||
+          entries[newExpandedSessionBlockId].type !== EntryType.SessionBlock ||
+          !entries[newExpandedSessionBlockId].startDt.isSame(newDate, 'day')
         ) {
           newExpandedSessionBlockId = undefined;
         }
@@ -50,7 +50,7 @@ export function NavigationController() {
         expandedSessionBlockId: newExpandedSessionBlockId ?? null,
       };
     },
-    [currentDate, eventStartDt, eventEndDt, entries.entries]
+    [currentDate, eventStartDt, eventEndDt, entries]
   );
 
   useEffect(() => {
