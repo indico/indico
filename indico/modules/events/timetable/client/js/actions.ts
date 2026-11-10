@@ -485,7 +485,7 @@ export function deleteScheduledContrib(id: number) {
   };
 }
 
-export function addUnscheduledContrib(entry: UnscheduledContribEntry) {
+export function addUnscheduledContrib(entry: UnscheduledContribEntry): AddUnscheduledContribAction {
   return {
     type: ADD_UNSCHEDULED_CONTRIB,
     entry,

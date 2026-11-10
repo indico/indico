@@ -203,7 +203,7 @@ export interface Entries {
   draftEntry: any | null;
   entries: Record<string, Entry>;
   layoutOverrides: LayoutOverrides;
-  unscheduled: any[];
+  unscheduled: UnscheduledContribEntry[];
   selectedId: string | null;
   draggedIds: Set<number>;
 }
