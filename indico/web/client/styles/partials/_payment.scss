@@ -13,10 +13,18 @@
 
   &.i-payment-enabled {
     @include badges.i-badge-color($green, $light-green, $dark-green, true);
+
+    .i-payment-status-disabled {
+      display: none;
+    }
   }
 
   &.i-payment-disabled {
     @include badges.i-badge-color($black, $light-gray, $dark-gray, true);
+
+    .i-payment-status-enabled {
+      display: none;
+    }
   }
 }
 
