@@ -6,18 +6,16 @@
 // LICENSE file for more details.
 
 import {partition} from 'lodash';
-import {Moment} from 'moment';
 import React, {useEffect, useRef, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 import {Button, Input, Dropdown, Icon, Popup} from 'semantic-ui-react';
 
-import {useDroppable} from 'indico/modules/events/timetable/dnd';
-import {SessionIcon} from 'indico/modules/events/timetable/SessionIcon';
 import PopoverDropdownMenu from 'indico/react/components/PopoverDropdownMenu';
 import {Translate} from 'indico/react/i18n';
 
 import * as actions from './actions';
 import TimetableConfirmDialog from './ConfirmDialog';
+import {useDroppable} from './dnd';
 import {mapDataToEntry} from './mapperUtils';
 import {
   SESSION_CREATE_MODAL,
@@ -26,8 +24,10 @@ import {
   useModal,
 } from './ModalContext';
 import * as selectors from './selectors';
+import {SessionIcon} from './SessionIcon';
 import {EntryType, SidePanelView, UnscheduledContribEntry} from './types';
 import {DraggableUnscheduledContributionEntry} from './UnscheduledContributionEntry';
+import {useTimetableDispatch} from './utils';
 
 import './TimetableSidePanel.module.scss';
 
@@ -37,13 +37,7 @@ enum GenericFilterType {
 
 type FilterType = GenericFilterType | number;
 
-function UnscheduledContributionList({
-  dt,
-  contribs,
-}: {
-  dt: Moment;
-  contribs: UnscheduledContribEntry[];
-}) {
+function UnscheduledContributionList({contribs}: {contribs: UnscheduledContribEntry[]}) {
   const uniqueContribs = [...new Map(contribs.map(contrib => [contrib.id, contrib])).values()];
   const {setNodeRef} = useDroppable({id: 'sidepanel'});
 
@@ -60,7 +54,6 @@ function UnscheduledContributionList({
         uniqueContribs.map(contrib => (
           <DraggableUnscheduledContributionEntry
             key={contrib.id}
-            dt={dt}
             id={contrib.id}
             objId={contrib.objId}
             title={contrib.title}
@@ -73,8 +66,8 @@ function UnscheduledContributionList({
   );
 }
 
-function TimetableSidePanel({dt}: {dt: Moment}) {
-  const dispatch = useDispatch<any>();
+function TimetableSidePanel() {
+  const dispatch = useTimetableDispatch();
   const {openModal} = useModal();
   const minSidebarWidthPx = 200;
   const maxSidebarWidthPx = 700;
@@ -355,7 +348,7 @@ function TimetableSidePanel({dt}: {dt: Moment}) {
                   })
                 }
               />
-              <UnscheduledContributionList dt={dt} contribs={filteredContribs} />
+              <UnscheduledContributionList contribs={filteredContribs} />
               <div styleName="gradient" />
             </div>
           </>

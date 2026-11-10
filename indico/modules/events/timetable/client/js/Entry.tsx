@@ -382,7 +382,7 @@ export default function Entry({
         type === EntryType.SessionBlock &&
         !isPosterBlock &&
         droppableArea === 'full' && <DroppableArea id={id} horizontalPadding="15px" />}
-      {!draftEntry && (
+      {!draftEntry && !isDragging && (
         <EntryMoveButtons
           id={id}
           sessionBlockId={sessionBlockId}
