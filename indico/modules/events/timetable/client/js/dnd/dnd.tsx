@@ -331,9 +331,8 @@ export function DnDProvider({
         if (!draggable) {
           return;
         }
-
         const {x, y, offsetX, offsetY} = where;
-        const computedScrollParent = getScrollParent(draggable.node.current); // TODO: this should be getTotalScroll()
+        const computedScrollParent = scrollParent ?? getScrollParent(draggable.node.current); // TODO: this should be getTotalScroll()
         state.current = {
           state: 'mousedown',
           initialMousePosition: {x, y},
@@ -355,7 +354,7 @@ export function DnDProvider({
         );
       }
     },
-    []
+    [scrollParent]
   );
 
   const onMouseMove = useCallback(

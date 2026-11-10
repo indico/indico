@@ -29,6 +29,7 @@ import {
   V_SPACE_BETWEEN_ENTRIES_PX,
   useTimetableDispatch,
   GRID_SIZE,
+  pixelsToMinutes,
 } from './utils';
 import './Entry.module.scss';
 
@@ -55,11 +56,13 @@ export function DraggableUnscheduledContributionEntry({
     id: draggableId,
     fixed: true,
   });
+  const dt = useSelector(selectors.getCurrentDate);
+  const dispatch = useTimetableDispatch();
 
   const listeners = {
     ..._listeners,
     onMouseDown: (event: React.MouseEvent<HTMLElement>) => {
-      if (event.button !== 0) {
+      if (event.button !== 0 || ref.current === null) {
         return;
       }
 
@@ -68,6 +71,11 @@ export function DraggableUnscheduledContributionEntry({
       const entryTop = ref.current.getBoundingClientRect().top;
       const pixelDiff = calendarTop - entryTop;
       const yAdjustment = pixelDiff % GRID_SIZE;
+      const startDt = dt
+        .clone()
+        .startOf('day')
+        .add(pixelsToMinutes(yAdjustment - pixelDiff), 'minutes');
+      dispatch(actions.updateUnscheduledEntry(EntryType.Contribution, id, {startDt}));
       _listeners.onMouseDown(event, yAdjustment);
     },
   };

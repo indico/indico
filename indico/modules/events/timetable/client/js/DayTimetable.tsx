@@ -791,7 +791,7 @@ export function DayTimetable({
       onDrop={handleDragEnd}
       modifier={restrictToCalendar}
       scrollBounds={scrollBounds}
-      scrollParent={wrapperRef.current}
+      scrollParent={wrapperRef.current ?? undefined}
     >
       <div styleName="side-panel-container">
         <TimetableTabRail />
