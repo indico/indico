@@ -23,7 +23,6 @@ import {
   DayEntries,
   Entry,
   isChildEntry,
-  Entries,
   isBlockEntry,
 } from './types';
 import {
@@ -37,33 +36,31 @@ import {
 } from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
-const _getEntries = (state: ReduxState) => state.entries;
+export const getDraftEntry = (state: ReduxState) => state.entries.draftEntry;
+const _getScheduledEntries = (state: ReduxState) => state.entries.entries;
+const _getUnscheduledEntries = (state: ReduxState) => state.entries.unscheduled;
 const getLayoutOverrides = (state: ReduxState) => state.entries.layoutOverrides;
 export const getSessions = (state: ReduxState) => state.sessions;
 export const getNavigation = (state: ReduxState) => state.navigation;
 
 export const getEntries = createSelector(
-  _getEntries,
+  _getScheduledEntries,
   getSessions,
-  (entries, sessions): Entries => {
-    return {
-      ...entries,
-      entries: Object.fromEntries(
-        Object.entries(entries.entries).map(([id, entry]) => {
-          if (entry.type !== EntryType.SessionBlock) {
-            return [id, entry];
-          }
-          return [id, {...entry, attachments: sessions[entry.sessionId].attachments}];
-        })
-      ),
-    };
-  }
+  (entries, sessions): Record<string, Entry> =>
+    Object.fromEntries(
+      Object.entries(entries).map(([id, entry]) => {
+        if (entry.type !== EntryType.SessionBlock) {
+          return [id, entry];
+        }
+        return [id, {...entry, attachments: sessions[entry.sessionId].attachments}];
+      })
+    )
 );
 
 const getNestedEntries = createSelector(
   getEntries,
   getLayoutOverrides,
-  ({entries}, layoutOverrides) => {
+  (entries, layoutOverrides) => {
     const topLevelEntries: Entry[] = [];
     const entriesById = new Map();
     const childEntries: ChildEntry[] = [];
@@ -111,7 +108,7 @@ export const getSelectedId = (state: ReduxState) => state.entries.selectedId;
 
 export const getSelectedEntry = createSelector(
   [getEntries, getSelectedId],
-  ({entries}, selectedId) => (selectedId === null ? null : entries[selectedId])
+  (entries, selectedId) => (selectedId === null ? null : entries[selectedId])
 );
 
 export const getCurrentDate = (state: ReduxState) => state.navigation.currentDate;
@@ -257,14 +254,9 @@ export const getCurrentDayEntriesWithoutOverlap = createSelector(
 );
 
 export const getUnscheduled = createSelector(
-  getEntries,
+  _getUnscheduledEntries,
   getSessions,
-  ({unscheduled}, sessions) => appendSessionAttributes(unscheduled, sessions)
-);
-
-export const getDraftEntry = createSelector(
-  getEntries,
-  entries => entries.draftEntry
+  (unscheduled, sessions) => appendSessionAttributes(unscheduled, sessions)
 );
 
 export const getActivePanel = (state: ReduxState) => state.display.activePanel;
