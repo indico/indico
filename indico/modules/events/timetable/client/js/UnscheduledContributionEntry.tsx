@@ -69,11 +69,14 @@ export function DraggableUnscheduledContributionEntry({
       }
 
       // Since the unscheduled entry is not necessarily aligned with the calendar grid,
-      // we temporarily move it when dragging to ensure that alignement.
+      // we temporarily move it when dragging to ensure that alignment
       const calendar = document.getElementById('timetable-calendar');
       const calendarTop = calendar?.getBoundingClientRect?.()?.top ?? 0;
       const entryTop = ref.current.getBoundingClientRect().top;
+
+      // Calculate the entry's offset from the start of the calendar
       const pixelDiff = calendarTop - entryTop;
+      // Calculate the previous grid position (at each GRID_SIZE pixels)
       const yAdjustment = pixelDiff % GRID_SIZE;
       const startDt = dt
         .clone()
@@ -81,7 +84,8 @@ export function DraggableUnscheduledContributionEntry({
         .add(pixelsToMinutes(yAdjustment - pixelDiff), 'minutes');
       dispatch(actions.updateUnscheduledEntry(EntryType.Contribution, id, {startDt}));
 
-      // When _listeners.onMouseDown is ran, the transform property must already be set.
+      // Adjust the entry's position to be at a grid position
+      // When _listeners.onMouseDown is ran, the transform property must already be set
       flushSync(() => setTransform(`translateY(${yAdjustment}px)`));
       _listeners.onMouseDown(event);
     },
