@@ -68,11 +68,8 @@
                     </span>
                 </div>
                 <div class="i-badge-legend">
-                    {% if payment_enabled %}
-                        <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
-                    {% else %}
-                        <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
-                    {% endif %}
+                    <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
+                    <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
                 </div>
             </a>
         {%- endfor %}
