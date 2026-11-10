@@ -246,7 +246,14 @@ def strip_tags(text):
 
 
 def _escape_for_mathjax(text):
-    return text.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+    return (
+        text
+        .replace('&', '&amp;')
+        .replace('<', '&lt;')
+        .replace('>', '&gt;')
+        .replace('"', '&quot;')
+        .replace("'", '&#39;')
+    )
 
 
 def render_markdown(text, *, escape_latex_math=True, md=None, extra_html=False, **kwargs):
