@@ -5,16 +5,10 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import contribAllowedKeywordsURL from 'indico-url:contributions.api_contrib_allowed_keywords';
-import contribFieldsURL from 'indico-url:contributions.api_contrib_fields';
-import locationParentContribURL from 'indico-url:contributions.api_contrib_location_parent';
-import contribPersonLinkFieldParamsURL from 'indico-url:contributions.api_contrib_person_link_params';
-import contribTypesURL from 'indico-url:contributions.api_contrib_types';
-import defaultDurationURL from 'indico-url:contributions.api_contribs_duration';
-import locationParentURL from 'indico-url:contributions.api_contribs_location_parent';
+import createContribFormMetadataURL from 'indico-url:contributions.api_contrib_create_form_metadata';
+import editContribFormMetadataURL from 'indico-url:contributions.api_contrib_edit_form_metadata';
 import contributionCreateURL from 'indico-url:contributions.api_create_contrib';
 import contributionURL from 'indico-url:contributions.api_manage_contrib';
-import personLinkFieldParamsURL from 'indico-url:events.api_person_link_params';
 
 import {FormApi} from 'final-form';
 import _ from 'lodash';
@@ -61,7 +55,9 @@ interface ContributionFormProps {
   personLinkFieldParams?: Record<string, any>;
   allowedKeywords: string[];
   locationParent?: Record<string, any>;
+  limitFields: string[] | null;
   customFields: CustomField[];
+  ignoreRequiredCustomFields: boolean;
   contributionTypes: ContributionType[];
   onSubmit: (formData: any, form?: any) => void;
   initialValues: Record<string, any>;
@@ -76,7 +72,9 @@ interface ContributionFormFieldsProps {
   locationParent?: Record<string, any>;
   personLinkFieldParams?: Record<string, any>;
   initialValues: Record<string, any>;
+  limitFields?: string[] | null;
   customFields?: CustomField[];
+  ignoreRequiredCustomFields?: boolean;
   contributionTypes?: ContributionType[];
   extraOptions?: Record<string, any>;
   allowedKeywords: string[];
@@ -88,16 +86,21 @@ export function ContributionFormFields({
   locationParent = {inheriting: false},
   personLinkFieldParams = {},
   initialValues = {},
+  limitFields = null,
   customFields = [],
+  ignoreRequiredCustomFields = true,
   contributionTypes = [],
   extraOptions = {},
   allowedKeywords = [],
 }: ContributionFormFieldsProps) {
+  const showField = (name: string) => limitFields === null || limitFields.includes(name);
   const customFieldNames = customFields.map(f => `custom_fields.custom_${f.id}`);
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
       // TODO: add client-side validation for max length, choices, etc at some point
-      // TODO: adjust isRequired in management (where all fields are optional)
+      if (ignoreRequiredCustomFields) {
+        isRequired = false;
+      }
       const key = `custom_field_${id}`;
       const name = `custom_fields.custom_${id}`;
       if (fieldType === 'text') {
@@ -173,9 +176,13 @@ export function ContributionFormFields({
 
   return (
     <>
-      <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
-      <FinalTextArea name="description" label={Translate.string('Description')} />
-      {contributionTypes.length > 0 && (
+      {showField('title') && (
+        <FinalInput name="title" label={Translate.string('Title')} autoFocus required />
+      )}
+      {showField('description') && (
+        <FinalTextArea name="description" label={Translate.string('Description')} />
+      )}
+      {showField('type_id') && contributionTypes.length > 0 && (
         <FinalDropdown
           name="type_id"
           placeholder={Translate.string('No type selected')}
@@ -190,88 +197,108 @@ export function ContributionFormFields({
           nullIfEmpty
         />
       )}
-      {initialValues.start_dt ? (
-        <>
-          <Field name="duration" subscription={{value: true}}>
-            {({input: {value: duration}}) => (
-              <FinalDateTimePicker
-                name="start_dt"
-                label={Translate.string('Start date')}
-                minStartDt={minStartDt}
-                maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
-                required
-              />
-            )}
-          </Field>
-          <Field name="start_dt" subscription={{value: true}}>
-            {({input: {value: startDt}}) => (
-              <FinalDuration
-                name="duration"
-                label={Translate.string('Duration')}
-                max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
-              />
-            )}
-          </Field>
-        </>
-      ) : (
-        <FinalDuration name="duration" label={Translate.string('Duration')} />
-      )}
-      <FinalContributionPersonLinkField
-        name="person_links"
-        label={Translate.string('People')}
-        eventId={eventId}
-        sessionUser={{...Indico.User, userId: Indico.User.id}}
-        {...personLinkFieldParams}
-      />
-      <FinalLocationField
-        name="location_data"
-        label={Translate.string('Location')}
-        locationParent={locationParent}
-      />
-      {allowedKeywords.length ? (
-        <FinalDropdown
-          name="keywords"
-          label={Translate.string('Keywords')}
-          multiple
-          selection
-          options={[...new Set([...allowedKeywords, ...initialValues.keywords])].map(keyword => ({
-            value: keyword,
-            text: keyword,
-            key: keyword,
-          }))}
-          placeholder={Translate.string('Please choose a keyword')}
-        />
-      ) : (
-        <FinalTagList
-          name="keywords"
-          label={Translate.string('Keywords')}
-          placeholder={Translate.string('Please enter a keyword')}
+      {showField('start_dt') &&
+        showField('duration') &&
+        (initialValues.start_dt ? (
+          <>
+            <Field name="duration" subscription={{value: true}}>
+              {({input: {value: duration}}) => (
+                <FinalDateTimePicker
+                  name="start_dt"
+                  label={Translate.string('Start date')}
+                  minStartDt={minStartDt}
+                  maxEndDt={maxEndDt ? maxEndDt.clone().subtract(duration, 'seconds') : null}
+                  required
+                />
+              )}
+            </Field>
+            <Field name="start_dt" subscription={{value: true}}>
+              {({input: {value: startDt}}) => (
+                <FinalDuration
+                  name="duration"
+                  label={Translate.string('Duration')}
+                  max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
+                />
+              )}
+            </Field>
+          </>
+        ) : (
+          <FinalDuration name="duration" label={Translate.string('Duration')} />
+        ))}
+      {showField('person_links') && (
+        <FinalContributionPersonLinkField
+          name="person_links"
+          label={Translate.string('People')}
+          eventId={eventId}
+          sessionUser={{...Indico.User, userId: Indico.User.id}}
+          {...personLinkFieldParams}
         />
       )}
-      <CollapsibleContainer
-        title={
-          <span style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}>
-            <Translate>Advanced</Translate>
-            <Popup
-              trigger={<ErrorMarker fields={[...customFieldNames, 'references']} size="tiny" />}
-            >
-              <Translate>Please expand this section and correct the invalid fields.</Translate>
-            </Popup>
-          </span>
-        }
-        dividing
-      >
-        {customFieldsSection}
-        <FinalReferences
-          name="references"
-          label={Translate.string('External IDs')}
-          description={Translate.string('Manage external resources for this contribution')}
+      {showField('location_data') && (
+        <FinalLocationField
+          name="location_data"
+          label={Translate.string('Location')}
+          locationParent={locationParent}
         />
-        <Form.Group widths="equal">
-          <FinalInput name="board_number" label={Translate.string('Board number')} />
-          <FinalInput name="code" label={Translate.string('Program code')} />
-        </Form.Group>
-      </CollapsibleContainer>
+      )}
+      {showField('keywords') &&
+        (allowedKeywords.length ? (
+          <FinalDropdown
+            name="keywords"
+            label={Translate.string('Keywords')}
+            multiple
+            selection
+            options={[...new Set([...allowedKeywords, ...initialValues.keywords])].map(keyword => ({
+              value: keyword,
+              text: keyword,
+              key: keyword,
+            }))}
+            placeholder={Translate.string('Please choose a keyword')}
+          />
+        ) : (
+          <FinalTagList
+            name="keywords"
+            label={Translate.string('Keywords')}
+            placeholder={Translate.string('Please enter a keyword')}
+          />
+        ))}
+      {(showField('custom_fields') ||
+        showField('references') ||
+        showField('board_number') ||
+        showField('code')) && (
+        <CollapsibleContainer
+          title={
+            <span style={{display: 'inline-flex', alignItems: 'center', gap: '0.5rem'}}>
+              <Translate>Advanced</Translate>
+              <Popup
+                trigger={<ErrorMarker fields={[...customFieldNames, 'references']} size="tiny" />}
+              >
+                <Translate>Please expand this section and correct the invalid fields.</Translate>
+              </Popup>
+            </span>
+          }
+          dividing
+        >
+          {showField('custom_fields') && customFieldsSection}
+          {showField('references') && (
+            <FinalReferences
+              name="references"
+              label={Translate.string('External IDs')}
+              description={Translate.string('Manage external resources for this contribution')}
+            />
+          )}
+          {(showField('board_number') || showField('code')) && (
+            <Form.Group widths="equal">
+              {showField('board_number') && (
+                <FinalInput name="board_number" label={Translate.string('Board number')} />
+              )}
+              {showField('code') && (
+                <FinalInput name="code" label={Translate.string('Program code')} />
+              )}
+            </Form.Group>
+          )}
+        </CollapsibleContainer>
+      )}
     </>
   );
 }
@@ -280,7 +307,9 @@ function ContributionForm({
   eventId,
   personLinkFieldParams = {},
   locationParent = {},
+  limitFields = null,
   customFields = [],
+  ignoreRequiredCustomFields = false,
   contributionTypes = [],
   onSubmit,
   initialValues = {},
@@ -341,7 +370,9 @@ function ContributionForm({
         locationParent={locationParent}
         initialValues={initialValues}
         sessionBlock={sessionBlock}
+        limitFields={limitFields}
         customFields={customFields}
+        ignoreRequiredCustomFields={ignoreRequiredCustomFields}
         contributionTypes={contributionTypes}
         personLinkFieldParams={personLinkFieldParams}
         allowedKeywords={allowedKeywords}
@@ -361,24 +392,8 @@ export function ContributionEditForm({
   onSubmit?: (formData: any, form: any) => void;
   onClose: () => void;
 }) {
-  const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
-    contribPersonLinkFieldParamsURL({event_id: eventId, contrib_id: contribId}),
-    {camelize: true}
-  );
-  const {data: allowedKeywords, loading: allowedKeywordsLoading} = useIndicoAxios(
-    contribAllowedKeywordsURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: fields, loading: fieldsLoading} = useIndicoAxios(
-    contribFieldsURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: contributionTypes, loading: contributionTypesLoading} = useIndicoAxios(
-    contribTypesURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
-    locationParentContribURL({event_id: eventId, contrib_id: contribId})
+  const {data: metadata, loading: metadataLoading} = useIndicoAxios(
+    editContribFormMetadataURL({event_id: eventId, contrib_id: contribId})
   );
   const contribURL = contributionURL(snakifyKeys({eventId, contribId}));
   const {data: contrib, loading: contribLoading} = useIndicoAxios(contribURL);
@@ -396,13 +411,17 @@ export function ContributionEditForm({
     await new Promise(() => {});
   };
 
-  const loading =
-    contribLoading ||
-    locationParentLoading ||
-    fieldsLoading ||
-    personLinkFieldParamsLoading ||
-    allowedKeywordsLoading ||
-    contributionTypesLoading;
+  const loading = contribLoading || metadataLoading;
+
+  const {
+    locationParent,
+    allowedKeywords,
+    personLinkFieldParams,
+    limitFields,
+    ignoreRequiredCustomFields,
+    customFields: fields,
+    types: contributionTypes,
+  } = camelizeKeys(metadata ?? {});
 
   return (
     <ContributionForm
@@ -410,7 +429,9 @@ export function ContributionEditForm({
       personLinkFieldParams={personLinkFieldParams}
       allowedKeywords={allowedKeywords}
       locationParent={locationParent}
+      limitFields={limitFields}
       customFields={fields}
+      ignoreRequiredCustomFields={ignoreRequiredCustomFields}
       contributionTypes={contributionTypes}
       header={Translate.string("Edit contribution '{title}'", {title: contrib?.title})}
       onSubmit={onSubmit ?? handleSubmit}
@@ -439,28 +460,20 @@ export function ContributionCreateForm({
   onClose: () => void;
   onCreate?: (contrib: any) => void;
 }) {
-  const {data: personLinkFieldParams, loading: personLinkFieldParamsLoading} = useIndicoAxios(
-    personLinkFieldParamsURL({event_id: eventId}),
-    {camelize: true}
+  const {data: metadata, loading} = useIndicoAxios(
+    createContribFormMetadataURL({event_id: eventId})
   );
-  const {data: allowedKeywords, loading: allowedKeywordsLoading} = useIndicoAxios(
-    contribAllowedKeywordsURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: fields, loading: fieldsLoading} = useIndicoAxios(
-    contribFieldsURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: contributionTypes, loading: contributionTypesLoading} = useIndicoAxios(
-    contribTypesURL({event_id: eventId}),
-    {camelize: true}
-  );
-  const {data: defaultDuration, loading: defaultDurationLoading} = useIndicoAxios(
-    defaultDurationURL({event_id: eventId})
-  );
-  const {data: locationParent, loading: locationParentLoading} = useIndicoAxios(
-    locationParentURL({event_id: eventId})
-  );
+
+  const {
+    locationParent,
+    defaultDuration,
+    allowedKeywords,
+    personLinkFieldParams,
+    limitFields,
+    ignoreRequiredCustomFields,
+    customFields: fields,
+    types: contributionTypes,
+  } = camelizeKeys(metadata ?? {});
 
   const handleSubmit = async (formData: any) => {
     try {
@@ -483,13 +496,6 @@ export function ContributionCreateForm({
   const locationData = locationParent
     ? {...locationParent.location_data, inheriting: true}
     : {inheriting: false};
-  const loading =
-    locationParentLoading ||
-    defaultDurationLoading ||
-    fieldsLoading ||
-    personLinkFieldParamsLoading ||
-    allowedKeywordsLoading ||
-    contributionTypesLoading;
 
   const defaultValuesByType = {
     text: '',
@@ -516,7 +522,9 @@ export function ContributionCreateForm({
       personLinkFieldParams={personLinkFieldParams}
       allowedKeywords={allowedKeywords}
       locationParent={locationParent}
+      limitFields={limitFields}
       customFields={fields ?? []}
+      ignoreRequiredCustomFields={ignoreRequiredCustomFields}
       contributionTypes={contributionTypes}
       header={Translate.string('Add new contribution')}
       onSubmit={handleSubmit}
@@ -527,13 +535,21 @@ export function ContributionCreateForm({
   );
 }
 
-export function EditContributionButton({eventId, contribId}: {eventId: number; contribId: number}) {
+export function EditContributionButton({
+  eventId,
+  contribId,
+  className,
+}: {
+  eventId: number;
+  contribId: number;
+  className?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
       <a
-        className="icon-edit i-link highlight"
+        className={className}
         title={Translate.string('Edit contribution (new React-based dialog)')}
         onClick={evt => {
           evt.preventDefault();
