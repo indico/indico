@@ -203,7 +203,7 @@ export default function Entry({
   const [droppableArea, setDroppableArea] = useState<'full' | 'partial'>('full');
   const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
-  const draftEntry = useSelector(selectors.getDraftEntry);
+  const draftEntry = useSelector((state: ReduxState) => selectors.getDraftEntry(state) !== null);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const maxDuration = useMemo(() => {
     if (parentEndDt) {
