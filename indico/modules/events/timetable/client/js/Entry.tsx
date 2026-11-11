@@ -203,7 +203,7 @@ export default function Entry({
   const [droppableArea, setDroppableArea] = useState<'full' | 'partial'>('full');
   const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
-  const draftEntry = useSelector(selectors.getDraftEntry);
+  const hasDraftEntry = useSelector(selectors.hasDraftEntry);
   const eventEndDt = useSelector(selectors.getEventEndDt);
   const maxDuration = useMemo(() => {
     if (parentEndDt) {
@@ -382,7 +382,7 @@ export default function Entry({
         type === EntryType.SessionBlock &&
         !isPosterBlock &&
         droppableArea === 'full' && <DroppableArea id={id} horizontalPadding="15px" />}
-      {!draftEntry && !isDragging && (
+      {!hasDraftEntry && !isDragging && (
         <EntryMoveButtons
           id={id}
           sessionBlockId={sessionBlockId}
