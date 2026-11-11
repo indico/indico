@@ -5,8 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import moment from 'moment';
-import React, {useEffect, useRef, useState, useMemo} from 'react';
+import moment, {Moment} from 'moment';
+import React, {useEffect, useRef, useState, useMemo, useCallback} from 'react';
 import {useSelector} from 'react-redux';
 import {Icon, SemanticICONS} from 'semantic-ui-react';
 
@@ -31,6 +31,7 @@ import {
   MIN_DURATION,
   V_SPACE_BETWEEN_ENTRIES_PX,
   useTimetableDispatch,
+  getDateKey,
 } from './utils';
 
 import './DayTimetable.module.scss';
@@ -38,13 +39,12 @@ import './Entry.module.scss';
 
 interface DraggableEntryProps extends BaseEntry, ScheduledMixin {
   id: EntryUniqueID;
+  dt: Moment;
   blockRef?: React.RefObject<HTMLDivElement>;
   parentEndDt?: string;
-  setDuration: (duration: number) => void;
-  setChildDuration?: (id: string) => (duration: number) => void;
 }
 
-export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) {
+export function DraggableEntry({id, dt, ...rest}: DraggableEntryProps) {
   const dispatch = useTimetableDispatch();
   const {listeners: _listeners, setNodeRef, isDragging, ref} = useDraggable({id});
   const isSelected = useSelector((state: ReduxState) =>
@@ -108,12 +108,12 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
   const entry = (
     <Entry
       id={id}
+      dt={dt}
       {...rest}
       listeners={listeners}
       setNodeRef={setNodeRef}
       isDragging={isDragging}
       selected={isSelected}
-      setDuration={setDuration}
     />
   );
 
@@ -132,6 +132,7 @@ export function DraggableEntry({id, setDuration, ...rest}: DraggableEntryProps) 
 
 interface _EntryProps {
   id: EntryUniqueID;
+  dt: Moment;
   transform?: {x: number; y: number};
   isDragging?: boolean;
   isPlaceholder?: boolean;
@@ -139,9 +140,7 @@ interface _EntryProps {
   setNodeRef: (element: HTMLElement | null) => void;
   blockRef?: React.RefObject<HTMLDivElement>;
   selected: boolean;
-  setDuration: (duration: number) => void;
   onMouseUp?: () => void;
-  setChildDuration?: (id: string) => (duration: number) => void;
   children?: ChildEntry[];
   parentEndDt?: string;
   sessionId?: number;
@@ -167,6 +166,7 @@ export default function Entry({
   type,
   id,
   startDt,
+  dt,
   duration: _duration,
   title,
   blockRef,
@@ -179,7 +179,6 @@ export default function Entry({
   isPlaceholder = false,
   column,
   maxColumn,
-  setDuration: _setDuration,
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   onMouseUp: _onMouseUp = () => {},
   // TODO: (Ajob) Check if we can get rid of parentEndDt now that we pass the parent already
@@ -188,9 +187,8 @@ export default function Entry({
   sessionBlockId,
   colors: customColors,
   children: _children = [],
-  // eslint-disable-next-line @typescript-eslint/no-shadow, @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function
-  setChildDuration = (_: string) => (_: number) => {},
 }: EntryProps) {
+  const dispatch = useTimetableDispatch();
   const isPosterBlock = useSelector((state: ReduxState) =>
     selectors.isPosterSessionBlock(state, id)
   );
@@ -199,7 +197,7 @@ export default function Entry({
   const entryRef = useRef<HTMLDivElement>(null);
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
-  const [duration, setDuration] = useState(_duration);
+  const [duration, setTempDuration] = useState(_duration);
   const [droppableArea, setDroppableArea] = useState<'full' | 'partial'>('full');
   const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
@@ -247,7 +245,7 @@ export default function Entry({
   }, moment(startDt));
 
   useEffect(() => {
-    setDuration(_duration);
+    setTempDuration(_duration);
   }, [_duration]);
 
   // TODO: (Ajob) Check if this code is necessary
@@ -293,13 +291,12 @@ export default function Entry({
     return () => observer.disconnect();
   }, [id, type]);
 
-  const setChildDurations = useMemo(() => {
-    const obj = {};
-    for (const e of _children) {
-      obj[e.id] = setChildDuration(e.id);
-    }
-    return obj;
-  }, [_children, setChildDuration]);
+  const commitDuration = useCallback(
+    (newDuration: number) => {
+      dispatch(actions.resizeEntry(id, newDuration, getDateKey(dt)));
+    },
+    [id, dt, dispatch]
+  );
 
   return (
     <div
@@ -347,10 +344,10 @@ export default function Entry({
               isPlaceholder ? (
                 <Entry
                   key={child.id}
+                  dt={dt}
                   listeners={{}}
                   isPlaceholder
                   selected={false}
-                  setDuration={() => null}
                   setNodeRef={() => null}
                   {...child}
                   blockRef={blockRef}
@@ -362,7 +359,7 @@ export default function Entry({
               ) : (
                 <DraggableEntry
                   key={child.id}
-                  setDuration={_children ? setChildDurations[child.id] : null}
+                  dt={dt}
                   blockRef={blockRef}
                   parentEndDt={moment(startDt)
                     .add(deltaMinutes + duration, 'minutes')
@@ -396,8 +393,8 @@ export default function Entry({
         minDuration={Math.max(MIN_DURATION, latestChildEndDt.diff(startDt, 'minutes'))}
         maxDuration={maxDuration}
         resizeStartRef={resizeStartRef}
-        setLocalDuration={setDuration}
-        setGlobalDuration={_setDuration}
+        setTempDuration={setTempDuration}
+        commitDuration={commitDuration}
         setIsResizing={setIsResizing}
       />
     </div>

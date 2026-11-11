@@ -87,55 +87,27 @@ const TopLevelEntries = React.memo(function TopLevelEntries({
   dt: Moment;
   entries: TopLevelEntry[];
 }) {
-  const dispatch = useTimetableDispatch();
   // (Ajob) In session block view, children become top-level entries
-
   const parent = useSelector(selectors.getExpandedSessionBlock);
   const parentEndDt = parent
     ? moment(parent.startDt).add(parent.duration, 'minutes').format()
-    : null;
-
-  const setDurations = useMemo(() => {
-    const obj = {};
-    for (const e of entries) {
-      obj[e.id] = (duration: number) => dispatch(actions.resizeEntry(e, duration, getDateKey(dt)));
-    }
-    return obj;
-  }, [entries, dispatch, dt]);
-
-  const setChildDurations = useMemo(() => {
-    const obj = {};
-
-    for (const e of entries) {
-      obj[e.id] = (id: Entry) => (duration: number) => {
-        // TODO
-        // @ts-expect-error the children attribute is not in the type (yet)
-        const child = e.children.find(c => c.id === id);
-        dispatch(actions.resizeEntry(child, duration, getDateKey(dt)));
-      };
-    }
-    return obj;
-  }, [entries, dispatch, dt]);
+    : undefined;
 
   return (
     <>
       {entries.map(entry => (
-        <DraggableEntry
-          key={entry.id}
-          setDuration={setDurations[entry.id]}
-          setChildDuration={setChildDurations[entry.id]}
-          parentEndDt={parentEndDt}
-          {...entry}
-        />
+        <DraggableEntry key={entry.id} dt={dt} parentEndDt={parentEndDt} {...entry} />
       ))}
     </>
   );
 });
 
 function DragPlaceholderContainer({
+  dt,
   entries,
   unscheduledEntries,
 }: {
+  dt: Moment;
   entries: TopLevelEntry[];
   unscheduledEntries: UnscheduledContribEntry[];
 }) {
@@ -178,11 +150,11 @@ function DragPlaceholderContainer({
     <DragPlaceholder width={width}>
       {draggedEntry ? (
         <EntryComponent
+          dt={dt}
           listeners={{}}
           isDragging
           isPlaceholder
           selected={false}
-          setDuration={() => null}
           setNodeRef={() => null}
           transform={transform}
           startDt={moment()}
@@ -849,7 +821,7 @@ export function DayTimetable({
           </div>
         </div>
       </div>
-      <DragPlaceholderContainer entries={entries} unscheduledEntries={unscheduled} />
+      <DragPlaceholderContainer dt={dt} entries={entries} unscheduledEntries={unscheduled} />
     </DnDProvider>
   );
 }
