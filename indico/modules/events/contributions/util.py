@@ -411,7 +411,7 @@ def get_contribution_person_link_field_params(event: Event, contrib: Contributio
         name_format = session.user.settings.get('name_format')
     extra_params = values_from_signal(signals.event.person_link_field_extra_params.send(), as_list=True)
     # XXX this is an awful hack to not break this signal for now; when removing the ContributionForm, plugins
-    # making use of it (ie the JAcoW plugin need to be updated to take e.g. a string or enum indicating
+    # making use of it (ie the JAcoW plugin) need to be updated to take e.g. a string or enum indicating
     # for what kind of person link (contribution/abstract/...) the required fields are retrieved.
     from indico.modules.events.contributions.forms import ContributionForm
     required_person_fields = values_from_signal(
