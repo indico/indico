@@ -122,9 +122,14 @@ def generate_event_component(
     """Generate an event icalendar component from an Indico event."""
     uid = event.ical_uid
     component = generate_basic_component(event, uid, organizer=organizer)
+
     category = event.category
     if category is not None and not category.is_root and category.can_access(user):
-        component.add('categories', [category.title])
+        titles = [parent.title for parent in category.parent_chain_query
+                  if not parent.is_root and parent.can_access(user)]
+        titles.append(category.title)
+        component.add('categories', [' / '.join(titles)])
+
     # add contact information
     contact_info = event.contact_emails + event.contact_phones
     if contact_info:
