@@ -38,6 +38,7 @@ import {
 
 export const getStaticData = (state: ReduxState) => state.staticData;
 export const getDraftEntry = (state: ReduxState) => state.entries.draftEntry;
+export const hasDraftEntry = (state: ReduxState) => state.entries.draftEntry !== null;
 const _getScheduledEntries = (state: ReduxState) => state.entries.entries;
 const _getUnscheduledEntries = (state: ReduxState) => state.entries.unscheduled;
 const getLayoutOverrides = (state: ReduxState) => state.entries.layoutOverrides;
