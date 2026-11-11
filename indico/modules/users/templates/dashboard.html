@@ -28,7 +28,9 @@
 {%- endblock %}
 
 {% block banner_actions -%}
-    <div id="dashboard-calendar-link"></div>
+    {% if user == session.user %}
+        <ind-dashboard-calendar-link></ind-dashboard-calendar-link>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
