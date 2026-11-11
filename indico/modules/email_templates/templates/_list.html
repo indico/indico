@@ -1,0 +1,114 @@
+{% macro _render_template(tpl, target, inherited=false, event=none) -%}
+    <tr>
+        <td class="i-table id-column">
+            <i class="designer-template-type-icon icon-mail" title="{{ tpl.type }}"></i>
+        </td>
+        <td>
+            <strong>{{ tpl.title }}</strong>
+            <div>
+                {{ tpl.type.title }}{% if tpl.notification_type %} · {{ tpl.notification_type.title }} {% if tpl.notification_type.name == 'registration_state_update' %} · {{ tpl.rules['status'].title() }}{%
+                endif %}{% endif %}
+            </div>
+        </td>
+
+        <td class="text-superfluous">
+            {% if inherited %}
+                {% if not tpl.category.is_root %}
+                    {% trans title=tpl.category.title -%} from category "{{ title }}" {% endtrans %}
+                {% endif %}
+            {% endif %}
+        </td>
+        <td>
+            <div class="thin toolbar right">
+                <div class="group">
+                    {% if tpl.is_default(target) %}
+                        <span class="i-button icon icon-circle-small borderless accept" title="{% trans %}Active{% endtrans %}"></span>
+                    {% else %}
+                        <span class="i-button icon icon-circle-small borderless disabled" title="{% trans %}Inactive{% endtrans %}"></span>
+                    {% endif %}
+                    <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
+                        data-href="{{ url_for('email_templates.clone_email_template', tpl, target) }}"
+                        title="{% trans %}Clone this template{% endtrans %}"
+                        data-update="#template-list"
+                        {% if event %}
+                            data-method="POST"
+                            data-confirm="{% trans title=tpl.title -%}Are you sure you want to clone template '{{ title }}'? {%- endtrans %}">
+                        {% else %}
+                            data-title="{% trans title=tpl.title %}Clone '{{ title }}' template into a category{% endtrans %}"
+                            data-ajax-dialog>
+                        {% endif %}
+                    </button>
+                    {% if not inherited %}
+                        <a class="i-button icon-edit icon-only text-color borderless"
+                           data-href="{{ url_for('email_templates.edit_email_template', tpl) }}"
+                           data-title="{% trans %}Edit template{% endtrans %}"
+                           data-update="#template-list"
+                           data-ajax-dialog
+                           title="{% trans %}Edit template{% endtrans %}">
+                        </a>
+                    {% endif %}
+                    {% if not inherited %}
+                        <button class="i-button icon-remove icon-only text-color borderless danger"
+                                title="{% trans %}Delete template{% endtrans %}"
+                                data-href="{{ url_for('email_templates.delete_email_template', tpl) }}"
+                                data-method="DELETE"
+                                data-update="#template-list"
+                                data-confirm="{% trans title=tpl.title -%}
+                                                Are you sure you want to delete the template '{{ title }}'?
+                                              {%- endtrans %}">
+                        </button>
+                    {%- endif %}
+                </div>
+            </div>
+        </td>
+    </tr>
+{% endmacro -%}
+
+{% macro render_email_template_list(email_templates, target, inherited_templates=[], event=none) -%}
+    {% if inherited_templates %}
+        <section>
+            <h3>{% trans %}Inherited templates{% endtrans %}</h3>
+            <table class="i-table-widget">
+                <tbody>
+                {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
+                    {{ _render_template(tpl, target, inherited=true, event=event) }}
+                {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
+
+    <section class="custom-template-list">
+        <div class="flexrow f-a-center f-j-space-between">
+            <h3>{% trans %}Custom templates{% endtrans %}</h3>
+            <ind-menu class="create-event-button">
+                <button class="i-button highlight icon-plus dropdown">{% trans 'Custom template' %}Add new{% endtrans %}</button>
+                <menu>
+                    <li><a href
+                           data-href="{{ url_for('email_templates.add_email_template', target, email_template_type='registration') }}"
+                           data-title="{% trans %}Add a new registration email template{% endtrans %}"
+                           data-update="#template-list" data-ignore-href
+                           data-ajax-dialog>{% trans %}Registration{% endtrans %}</a></li>
+                    <li><a href
+                        data-href="{{ url_for('email_templates.add_email_template', target, email_template_type='invitation') }}"
+                        data-title="{% trans %}Add a new invitation email template{% endtrans %}"
+                        data-update="#template-list" data-ignore-href
+                        data-ajax-dialog>{% trans %}Invitation{% endtrans %}</a></li>
+                </menu>
+            </ind-menu>
+        </div>
+        {% if email_templates %}
+            <table class="i-table-widget">
+                <tbody>
+                {% for tpl in email_templates | sort(attribute='title') | sort(attribute='type') %}
+                    {{ _render_template(tpl, target, event=event) }}
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="italic text-not-important">
+                {% trans %}No templates{% endtrans %}
+            </div>
+        {% endif %}
+    </section>
+{% endmacro -%}
