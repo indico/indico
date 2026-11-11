@@ -20,16 +20,16 @@ export default function ResizeHandle({
   minDuration = MIN_DURATION,
   maxDuration,
   resizeStartRef,
-  setLocalDuration,
-  setGlobalDuration,
+  setTempDuration,
+  commitDuration,
   setIsResizing,
 }: {
   duration: number;
   minDuration?: number;
   maxDuration?: number;
   resizeStartRef: React.MutableRefObject<number | null>;
-  setLocalDuration: (d: number) => void;
-  setGlobalDuration: (d: number) => void;
+  setTempDuration: (d: number) => void;
+  commitDuration: (d: number) => void;
   setIsResizing: (b: boolean) => void;
 }) {
   function resizeHandler(e: SyntheticMouseEvent<HTMLDivElement>) {
@@ -99,7 +99,7 @@ export default function ResizeHandle({
         return;
       }
 
-      setLocalDuration(Math.max(newDuration, minDuration));
+      setTempDuration(Math.max(newDuration, minDuration));
     }
 
     function mouseMoveHandler(moveEvent: MouseEvent) {
@@ -127,7 +127,7 @@ export default function ResizeHandle({
       if (maxDuration !== undefined) {
         newDuration = Math.min(newDuration, maxDuration);
       }
-      setGlobalDuration(newDuration);
+      commitDuration(newDuration);
       setIsResizing(false);
     };
 
@@ -142,7 +142,7 @@ export default function ResizeHandle({
         return;
       }
       setIsResizing(false);
-      setLocalDuration(duration);
+      setTempDuration(duration);
     };
 
     addEventListener('mousemove', mouseMoveHandler);

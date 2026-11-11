@@ -197,7 +197,7 @@ export default function Entry({
   const entryRef = useRef<HTMLDivElement>(null);
   const resizeStartRef = useRef<number | null>(null);
   const [isResizing, setIsResizing] = useState(false);
-  const [duration, setDuration] = useState(_duration);
+  const [duration, setTempDuration] = useState(_duration);
   const [droppableArea, setDroppableArea] = useState<'full' | 'partial'>('full');
   const colors = getEntryColors({type, sessionBlockId, colors: customColors}, session);
   const btnColors = {backgroundColor: colors.color, color: colors.backgroundColor};
@@ -245,7 +245,7 @@ export default function Entry({
   }, moment(startDt));
 
   useEffect(() => {
-    setDuration(_duration);
+    setTempDuration(_duration);
   }, [_duration]);
 
   // TODO: (Ajob) Check if this code is necessary
@@ -291,7 +291,7 @@ export default function Entry({
     return () => observer.disconnect();
   }, [id, type]);
 
-  const setGlobalDuration = useCallback(
+  const commitDuration = useCallback(
     (newDuration: number) => {
       dispatch(actions.resizeEntry(id, newDuration, getDateKey(dt)));
     },
@@ -393,8 +393,8 @@ export default function Entry({
         minDuration={Math.max(MIN_DURATION, latestChildEndDt.diff(startDt, 'minutes'))}
         maxDuration={maxDuration}
         resizeStartRef={resizeStartRef}
-        setLocalDuration={setDuration}
-        setGlobalDuration={setGlobalDuration}
+        setTempDuration={setTempDuration}
+        commitDuration={commitDuration}
         setIsResizing={setIsResizing}
       />
     </div>

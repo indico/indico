@@ -424,7 +424,7 @@ export function setExpandedSessionBlock(
   return {type: SET_EXPANDED_SESSION_BLOCK_ID, sessionBlockId, pushState, eventId};
 }
 
-export function resizeEntry(id: string, duration: number, date: string) {
+export function resizeEntry(id: EntryUniqueID, duration: number, date: string) {
   return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
     const {staticData, entries} = getState();
     const entry = entries.entries[id];
