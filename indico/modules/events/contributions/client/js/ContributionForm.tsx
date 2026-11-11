@@ -93,8 +93,7 @@ export function ContributionFormFields({
   extraOptions = {},
   allowedKeywords = [],
 }: ContributionFormFieldsProps) {
-  const showField = (name: string) =>
-    limitFields === null || limitFields.includes(name) ? true : null;
+  const showField = (name: string) => limitFields === null || limitFields.includes(name);
   const customFieldNames = customFields.map(f => `custom_fields.custom_${f.id}`);
   const customFieldsSection = customFields.map(
     ({id, fieldType, title, description, isRequired, fieldData}) => {
