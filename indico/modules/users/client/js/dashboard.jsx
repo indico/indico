@@ -10,21 +10,33 @@ import ReactDOM from 'react-dom';
 
 import {ICSCalendarLink} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
+import {domReady} from 'indico/utils/domstate';
 
-document.addEventListener('DOMContentLoaded', () => {
-  ReactDOM.render(
-    <ICSCalendarLink
-      endpoint="users.export_dashboard_ics"
-      options={[
-        {key: 'events', text: Translate.string('Events at hand'), extraParams: {include: 'linked'}},
-        {
-          key: 'categories',
-          text: Translate.string('Categories'),
-          extraParams: {include: 'categories'},
-        },
-        {key: 'everything', text: Translate.string('Everything'), extraParams: {}},
-      ]}
-    />,
-    document.querySelector('#dashboard-calendar-link')
+domReady.then(() => {
+  customElements.define(
+    'ind-dashboard-calendar-link',
+    class extends HTMLElement {
+      connectedCallback() {
+        ReactDOM.render(
+          <ICSCalendarLink
+            endpoint="users.export_dashboard_ics"
+            options={[
+              {
+                key: 'events',
+                text: Translate.string('Events at hand'),
+                extraParams: {include: 'linked'},
+              },
+              {
+                key: 'categories',
+                text: Translate.string('Categories'),
+                extraParams: {include: 'categories'},
+              },
+              {key: 'everything', text: Translate.string('Everything'), extraParams: {}},
+            ]}
+          />,
+          this
+        );
+      }
+    }
   );
 });
