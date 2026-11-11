@@ -171,7 +171,7 @@ export const isPosterSessionBlock = createSelector(
   getSessions,
   getCurrentDayEntries,
   (_state: ReduxState, id: EntryUniqueID) => id,
-  (sessions, dayEntries, id) => {
+  (sessions, dayEntries, id): boolean => {
     const entry = dayEntries.find(e => e.id === id);
     const session = sessions[entry?.sessionId];
 

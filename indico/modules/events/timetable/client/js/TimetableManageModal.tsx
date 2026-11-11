@@ -83,6 +83,7 @@ interface TimetableManageModalProps {
   eventId: number;
   // TODO: (Ajob) Replace with proper passed entry, probably define it higher in hierarchy
   entry: any;
+  isChildOfPoster?: boolean;
   onClose?: () => void;
   onSubmit?: () => void;
 }
@@ -90,6 +91,7 @@ interface TimetableManageModalProps {
 const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
   eventId,
   entry,
+  isChildOfPoster = false,
   onClose = () => null,
   onSubmit = () => null,
 }) => {
@@ -209,15 +211,19 @@ const TimetableManageModal: React.FC<TimetableManageModalProps> = ({
           ),
         }
       : null),
-    [EntryType.Break]: (
-      <BreakFormFields
-        eventId={eventId}
-        locationParent={snakifyKeys(entry.locationParent)}
-        initialValues={initialValues}
-        extraOptions={extraOptions}
-        hasParent={isCreatingChild}
-      />
-    ),
+    ...(!isChildOfPoster
+      ? {
+          [EntryType.Break]: (
+            <BreakFormFields
+              eventId={eventId}
+              locationParent={snakifyKeys(entry.locationParent)}
+              initialValues={initialValues}
+              extraOptions={extraOptions}
+              hasParent={isCreatingChild}
+            />
+          ),
+        }
+      : null),
   };
 
   const [activeType, setActiveType] = useState<EntryType>(
