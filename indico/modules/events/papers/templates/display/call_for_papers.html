@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 {{ render_cfp_infoline(event, cfp, contributions) }}
-                {{ render_contribution_list(contributions, enable_actions=False) }}
+                {{ render_contribution_list(contributions) }}
             </section>
         {% endif %}
         {% if event.paper_templates %}
