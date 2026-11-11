@@ -197,6 +197,10 @@ const PictureManager = ({
       );
       if (data) {
         dispatch({type: 'UPLOAD_FINISHED', picture: data});
+        // Allow the server to provide a preview of the processed (stored) picture
+        if (data.preview_url) {
+          setPicturePreview(data.preview_url);
+        }
         onChange(data.uuid);
       } else {
         dispatch({type: 'FAILED', errors});
