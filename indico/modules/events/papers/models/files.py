@@ -54,7 +54,7 @@ class PaperFile(StoredFileMixin, db.Model):
             lazy=True
         )
     )
-    file_type = db.relationship(
+    file_type: PaperFileType = db.relationship(
         lambda: PaperFileType,
         lazy=False,
         backref=db.backref(

@@ -85,3 +85,10 @@ class RHPaperBase(RHPapersBase):
         privileges than the generic "can access".
         """
         return self.contribution.can_access(session.user)
+
+
+class RHPaperTimelineBase(RHPaperBase):
+    """Base class for RHs that need paper timeline access."""
+
+    def _check_paper_protection(self):
+        return self.paper.can_access_timeline(session.user)
