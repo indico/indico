@@ -88,6 +88,8 @@ def checkAK(apiKey, signature, timestamp, path, query):
         raise HTTPAPIError('Invalid API key', 403)
     if ak.is_blocked:
         raise HTTPAPIError('API key is blocked', 403)
+    if ak.user.is_blocked:
+        raise HTTPAPIError('API key user is blocked', 403)
     # Signature validation
     onlyPublic = False
     if signature:
