@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import _ from 'lodash';
 import moment, {Moment} from 'moment';
 import {createSelector} from 'reselect';
 
@@ -34,6 +33,7 @@ import {
   sortEntriesByStartDt,
   computeOverlappingEntryIds,
   flattenEntries,
+  freezeEntry,
 } from './utils';
 
 export const getStaticData = (state: ReduxState) => state.staticData;
@@ -66,26 +66,25 @@ const getNestedEntries = createSelector(
     const entriesById = new Map();
     const childEntries: ChildEntry[] = [];
 
-    Object.entries(entries)
-      .map(rec => _.cloneDeep(rec))
-      .forEach(([key, entry]) => {
-        entry = {...entry, ...(layoutOverrides[entry.id] || {})};
-        if (entry.type === EntryType.SessionBlock) {
-          entry.children = [];
-        }
-        entriesById.set(key, entry);
-        if (!isChildEntry(entry)) {
-          topLevelEntries.push(entry);
-        } else {
-          childEntries.push(entry);
-        }
-      });
+    Object.entries(entries).forEach(([key, entry]) => {
+      entry = {...entry, ...(layoutOverrides[entry.id] || {})};
+      if (entry.type === EntryType.SessionBlock) {
+        entry.children = [];
+      }
+      entriesById.set(key, entry);
+      if (!isChildEntry(entry)) {
+        topLevelEntries.push(entry);
+      } else {
+        childEntries.push(entry);
+      }
+    });
 
     childEntries.forEach(entry => {
       const parent = entriesById.get(entry.sessionBlockId);
       parent.children.push(entry);
     });
-
+    topLevelEntries.forEach(x => freezeEntry(x));
+    childEntries.forEach(x => freezeEntry(x));
     return topLevelEntries;
   }
 );

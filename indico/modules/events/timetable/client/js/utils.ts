@@ -280,3 +280,16 @@ export function createTimetableURL(
   };
   return timetableURL(params);
 }
+
+export function freezeEntry(object: Entry) {
+  const propNames = Object.getOwnPropertyNames(object) as unknown as keyof Entry;
+  for (const name of propNames) {
+    const value = object[name as keyof Entry];
+
+    if (value && typeof value === 'object') {
+      Object.freeze(value);
+    }
+  }
+
+  Object.freeze(object);
+}
