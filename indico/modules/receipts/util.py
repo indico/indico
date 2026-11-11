@@ -11,7 +11,7 @@ from datetime import datetime
 from io import BytesIO
 from operator import attrgetter
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 
 import yaml
 from flask import current_app, g
@@ -45,6 +45,7 @@ from indico.modules.receipts.settings import receipts_settings
 from indico.util.date_time import format_currency, format_date, format_datetime, format_interval, format_time, now_utc
 from indico.util.i18n import _
 from indico.util.iterables import materialize_iterable
+from indico.util.network import validate_request_url
 
 
 logger = Logger.get('receipts')
@@ -230,9 +231,10 @@ class IndicoURLFetcher(URLFetcher):
                 logger.warning('Attempted to use local file URL %s in a document template', url)
             raise ValueError('Invalid URL scheme')
 
-        if not self.allow_external_urls and not url.startswith(config.BASE_URL):
+        if not self.allow_external_urls and urlsplit(config.BASE_URL).netloc != urlsplit(url).netloc:
             raise ValueError('External URLs not allowed')
 
+        validate_request_url(url)
         return super().fetch(url, headers)
 
 
