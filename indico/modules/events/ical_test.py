@@ -12,9 +12,7 @@ def test_export_includes_event_category_path(create_event, create_category):
     physics = create_category(title='Physics')
     category = create_category(title='Seminars', parent=physics)
     event = create_event(category=category)
-
     exported = generate_event_component(event).to_ical()
-
     assert b'CATEGORIES:Physics / Seminars' in exported.splitlines()
 
 
