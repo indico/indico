@@ -35,7 +35,12 @@ import {
   SessionBlockId,
   AttachmentUpdatedEventDetail,
 } from './types';
-import {getIconByEntryType, getEntryColors, useTimetableDispatch} from './utils';
+import {
+  getIconByEntryType,
+  getEntryColors,
+  useTimetableDispatch,
+  useDeleteOrUnscheduleEntryAfterConfirmation,
+} from './utils';
 
 import './EntryPopup.module.scss';
 import './Entry.module.scss';
@@ -75,6 +80,7 @@ function EntryPopupContent({
   const endTime = moment(startDt).add(duration, 'minutes');
   const colors = getEntryColors(entry, session);
   const {openModal} = useModal();
+  const deleteEntry = useDeleteOrUnscheduleEntryAfterConfirmation();
 
   const entryLocatorKey = entry.type === EntryType.SessionBlock ? 'session_id' : 'contrib_id';
   const entryLocatorValue = entry.type === EntryType.SessionBlock ? sessionId : objId;
@@ -169,22 +175,7 @@ function EntryPopupContent({
   const onDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
     onClose();
-
-    switch (entry.type) {
-      case EntryType.Break:
-        dispatch(actions.deleteBreak(entry, eventId));
-        break;
-      case EntryType.SessionBlock:
-        dispatch(actions.deleteBlock(entry, eventId));
-        break;
-      case EntryType.Contribution:
-        if (eventType === 'meeting') {
-          dispatch(actions.deleteScheduledContrib(entry.objId));
-        } else {
-          dispatch(actions.unscheduleEntry(entry, eventId));
-        }
-        break;
-    }
+    deleteEntry(entry);
   };
 
   const onShowPosterContributions = (e: React.MouseEvent) => {

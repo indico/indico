@@ -14,8 +14,11 @@ import {DayTimetable} from './DayTimetable';
 import {NavigationController} from './NavigationController';
 import * as selectors from './selectors';
 import Toolbar from './Toolbar';
-import {EntryType} from './types';
-import {minutesToPixels, useTimetableDispatch} from './utils';
+import {
+  minutesToPixels,
+  useDeleteOrUnscheduleEntryAfterConfirmation,
+  useTimetableDispatch,
+} from './utils';
 
 import './timetable.scss';
 import './Timetable.module.scss';
@@ -86,6 +89,7 @@ function GlobalEvents() {
   const dispatch = useTimetableDispatch();
   const eventId = useSelector(selectors.getEventId);
   const selectedEntry = useSelector(selectors.getSelectedEntry);
+  const deleteEntry = useDeleteOrUnscheduleEntryAfterConfirmation();
 
   useEffect(() => {
     function onKeydown(e: KeyboardEvent) {
@@ -96,20 +100,8 @@ function GlobalEvents() {
         }
       } else if (e.key === 'Delete' || e.key === 'Backspace') {
         if (selectedEntry) {
-          switch (selectedEntry.type) {
-            case EntryType.Break: {
-              dispatch(actions.deleteBreak(selectedEntry, eventId));
-              break;
-            }
-            case EntryType.SessionBlock: {
-              dispatch(actions.deleteBlock(selectedEntry, eventId));
-              break;
-            }
-            case EntryType.Contribution: {
-              dispatch(actions.unscheduleEntry(selectedEntry, eventId));
-              break;
-            }
-          }
+          dispatch(actions.deselectEntry());
+          deleteEntry(selectedEntry);
         }
       }
     }
@@ -127,7 +119,7 @@ function GlobalEvents() {
       document.removeEventListener('keydown', onKeydown);
       document.removeEventListener('scroll', onScroll, true);
     };
-  }, [dispatch, eventId, selectedEntry]);
+  }, [dispatch, eventId, selectedEntry, deleteEntry]);
 
   return null;
 }

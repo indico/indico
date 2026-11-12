@@ -11,11 +11,16 @@ import contributionURL from 'indico-url:timetable.tt_contrib_rest';
 import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
 
 import moment, {Moment} from 'moment';
-import {useEffect, useRef} from 'react';
-import {useDispatch} from 'react-redux';
+import {useCallback, useEffect, useRef} from 'react';
+import {useDispatch, useSelector} from 'react-redux';
 import {SemanticICONS} from 'semantic-ui-react';
 
+import {Translate} from 'indico/react/i18n';
+
+import * as actions from './actions';
 import {DEFAULT_BREAK_COLORS, DEFAULT_CONTRIB_COLORS, ENTRY_COLORS_BY_BACKGROUND} from './colors';
+import {CONFIRMATION_MODAL, useModal} from './ModalContext';
+import * as selectors from './selectors';
 import {
   BlockEntry,
   Colors,
@@ -292,4 +297,59 @@ export function freezeEntry(object: Entry) {
   }
 
   Object.freeze(object);
+}
+
+export function useDeleteOrUnscheduleEntryAfterConfirmation() {
+  const dispatch = useTimetableDispatch();
+  const {openModal} = useModal();
+  const eventId = useSelector(selectors.getEventId);
+  const eventType = useSelector(selectors.getEventType);
+
+  return useCallback(
+    (entry: Entry) => {
+      switch (entry.type) {
+        case EntryType.Break:
+          openModal(CONFIRMATION_MODAL, {
+            header: Translate.string('Delete break?'),
+            description: Translate.string('Are you sure you want to delete this break?'),
+            confirmText: Translate.string('Delete'),
+            onConfirm: () => dispatch(actions.deleteBreak(entry, eventId)),
+          });
+          break;
+        case EntryType.SessionBlock:
+          openModal(CONFIRMATION_MODAL, {
+            header: Translate.string('Delete session block?'),
+            description: Translate.string(
+              'Are you sure you want to delete this session block? This will unschedule all contributions within it.'
+            ),
+            confirmText: Translate.string('Delete'),
+            onConfirm: () => dispatch(actions.deleteBlock(entry, eventId)),
+          });
+          break;
+        case EntryType.Contribution: {
+          const payload =
+            eventType === 'meeting'
+              ? {
+                  header: Translate.string('Delete contribution?'),
+                  description: Translate.string(
+                    'Are you sure you want to delete this contribution?'
+                  ),
+                  confirmText: Translate.string('Delete'),
+                  onConfirm: () => dispatch(actions.deleteScheduledContrib(entry.objId)),
+                }
+              : {
+                  header: Translate.string('Unschedule contribution?'),
+                  description: Translate.string(
+                    'Are you sure you want to unschedule this contribution?'
+                  ),
+                  confirmText: Translate.string('Unschedule'),
+                  onConfirm: () => dispatch(actions.unscheduleEntry(entry, eventId)),
+                };
+          openModal(CONFIRMATION_MODAL, payload);
+          break;
+        }
+      }
+    },
+    [dispatch, eventId, eventType, openModal]
+  );
 }
