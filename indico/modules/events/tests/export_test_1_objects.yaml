@@ -13,6 +13,7 @@
     - userref
     - 00000000-0000-4000-8000-000000000001
     custom_boa_id: null
+    default_check_type_id: Check type
     default_page_id: null
     description: ''
     end_dt: !!python/tuple
