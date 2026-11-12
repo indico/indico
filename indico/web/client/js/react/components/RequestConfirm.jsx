@@ -52,6 +52,7 @@ export default function RequestConfirm({
       <Modal.Content>{children}</Modal.Content>
       <Modal.Actions>
         <Button
+          autoFocus
           onClick={handleConfirmClick}
           disabled={requestInProgress}
           loading={requestInProgress}
