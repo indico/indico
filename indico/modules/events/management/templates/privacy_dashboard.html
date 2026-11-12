@@ -1,21 +1,18 @@
 {% extends 'events/management/base.html' %}
-{% from 'forms/_form.html' import form_header, form_footer, form_row, form_rows, form_fieldset, form_row_static %}
+{% from 'forms/_form.html' import form_header, form_footer, form_fieldset %}
 {% from 'events/management/_registrations_visibility_list.html' import render_registrations_visibility_list %}
+{% from '_privacy_dashboard.html' import privacy_inheritance_message, privacy_settings_fieldsets,
+                                         privacy_save_button %}
 
 {% block title %}{% trans %}Privacy dashboard{% endtrans %}{% endblock %}
 
 {% block content %}
+    {{ privacy_inheritance_message(inherited_from, locked, is_event=true) }}
     {{ form_header(form, id='privacy-dashboard-form') }}
-    {% call form_fieldset(_('Data controller')) %}
-        {{ form_rows(form, fields=form._data_controller_fields) }}
-    {% endcall %}
-    {% call form_fieldset(_('Privacy notice')) %}
-        {{ form_rows(form, fields=form._privacy_policy_fields) }}
-    {% endcall %}
-    {% call form_row_static() %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}"
-               data-disabled-until-change data-save-reminder>
-    {% endcall %}
+    {{ privacy_settings_fieldsets(form, locked) }}
+    {% if not locked %}
+        {{ privacy_save_button() }}
+    {% endif %}
     {% if regforms %}
         {% call form_fieldset(_('Registration forms')) %}
             {{ render_registrations_visibility_list(regforms) }}

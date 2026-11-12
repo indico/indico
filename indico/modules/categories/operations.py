@@ -12,6 +12,7 @@ from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.event_move_request import MoveRequestState
+from indico.modules.categories.settings import category_privacy_settings
 from indico.modules.categories.util import format_visibility
 from indico.modules.logs.models.entries import CategoryLogRealm, EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
@@ -166,3 +167,47 @@ def update_event_move_request(request, accept, reason=''):
                      data={'Event ID': event.id, 'Event title': event.title, 'Reason': reason}, meta=log_meta)
 
     db.session.flush()
+
+
+def update_category_privacy(category, data):
+    log_fields = {
+        'data_controller_name': {'title': 'Data controller name', 'type': 'string'},
+        'data_controller_email': {'title': 'Data controller e-mail', 'type': 'string'},
+        'privacy_policy_urls': {
+            'title': 'Privacy policy URLs',
+            'type': 'struct_list',
+            'convert': lambda changes: [[dict(sorted(rec.items())) for rec in chg] for chg in changes]
+        },
+        'privacy_policy': {'title': 'Privacy policy', 'type': 'text'},
+        'lock_privacy_data': {'title': 'Lock privacy data', 'type': 'bool'},
+    }
+    assert set(data.keys()) <= log_fields.keys()
+    changes = {}
+    for key, value in data.items():
+        old_value = category_privacy_settings.get(category, key)
+        if old_value != value:
+            changes[key] = (old_value, value)
+    if not any(data.values()):
+        category_privacy_settings.delete_all(category)
+    else:
+        category_privacy_settings.set_multi(category, data)
+    logger.info('Privacy settings of category %r updated with %r by %r', category, data, session.user)
+    if changes:
+        category.log(CategoryLogRealm.category, LogKind.change, 'Category', 'Privacy settings updated', session.user,
+                     data={'Changes': make_diff_log(changes, log_fields)})
+
+
+def get_category_privacy(category):
+    """Get the privacy settings applying to a category.
+
+    :param category: the category to get the privacy settings for
+    :return: `(privacy settings, inherited from category)` where the inherited from category is
+             the one holding the settings, or `None` if no category in the chain
+             has any privacy settings
+    """
+    chain = category.chain_query.all()[::-1]
+    stored = category_privacy_settings.get_all_multi(chain, no_defaults=True)
+    for cat in chain:
+        if settings := stored[cat.id]:
+            return dict(category_privacy_settings.defaults) | settings, cat
+    return dict(category_privacy_settings.defaults), None

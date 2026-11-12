@@ -245,7 +245,8 @@ class EventPrivacyForm(IndicoForm):
     data_controller_email = EmailField(_('Contact email'), [Optional(), Email()])
     privacy_policy_urls = IndicoLinkListField(_('External page'),
                                               description=_('List of URLs to external pages containing privacy '
-                                                            'notices.'))
+                                                            'notices.'),
+                                              empty_if_null=True)
     privacy_policy = TextAreaField(_('Text'), widget=TinyMCEWidget(),
                                    description=_('Only used if no URL is provided'))
 
