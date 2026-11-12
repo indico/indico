@@ -45,8 +45,8 @@ REGEX_SERVER_DEFAULT = re.compile(r'server_default\s*=')
 
 
 @click.command()
-@click.option('-n', '--nb-scripts', 'nb_scripts', default=0, type=int, show_default=True,
-              help='Number of scripts to check from the most recent (0 checks all)')
+@click.option('-n', '--nb-scripts', 'nb_scripts', type=int,
+              help='Number of scripts to check from the most recent (default: all, 0 skips the migration check)')
 @click.option('-v', '--verbose', 'verbose', is_flag=True, default=False, show_default=True,
               help='Print debug information.')
 @click.option('-p', '--plugin-dir', 'plugin_dir', help='Path to an indico plugin directory', required=False,
@@ -88,10 +88,11 @@ def _validate_plugin_dir(ctx, param, plugin_dir: Path):
 
 # -- Top-level checks --------------------------------------------------------------------------------------------------
 
-def _check(nb_scripts=0, plugin_dir=None, verbose=False):
+def _check(nb_scripts=None, plugin_dir=None, verbose=False):
     _check_history(plugin_dir, verbose)
     _check_contents(plugin_dir, verbose)
-    _check_migrations(nb_scripts, plugin_dir, verbose)
+    if nb_scripts != 0:
+        _check_migrations(nb_scripts, plugin_dir, verbose)
 
 
 def _check_history(plugin_dir=None, verbose=False):
@@ -121,7 +122,7 @@ def _check_contents(plugin_dir=None, verbose=False):
     click.secho(_indent('No server defaults missing'), fg='green')
 
 
-def _check_migrations(nb_scripts=0, plugin_dir=None, verbose=False):
+def _check_migrations(nb_scripts=None, plugin_dir=None, verbose=False):
     """Check that the revision scripts upgrade and downgrade cleanly.
 
     The DB state is only ever changed by alembic, starting from a DB created
@@ -143,7 +144,7 @@ def _check_migrations(nb_scripts=0, plugin_dir=None, verbose=False):
     config = _get_alembic_config(plugin_dir)
     script_dir = ScriptDirectory.from_config(config)
     revisions = list(script_dir.walk_revisions())
-    revisions = revisions[:nb_scripts] if nb_scripts else revisions
+    revisions = revisions[:nb_scripts] if nb_scripts is not None else revisions
     for revision in revisions:
         if isinstance(revision.down_revision, tuple):
             raise ClickException(f'Revision {revision.revision} is a merge revision, which is not supported')
