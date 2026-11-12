@@ -188,6 +188,7 @@ def events_to_ical(
     scope: str | None = None,
     *,
     skip_access_check: bool = False,
+    calendar_name: str | None = None,
     method: str | None = None,
     organizer: tuple[str, str] | None = None
 ):
@@ -197,6 +198,7 @@ def events_to_ical(
     :param user: The user who needs to be able to access the events
     :param scope: If specified, use a more detailed timetable using the given scope
     :param skip_access_check: Do not perform access checks. Defaults to False.
+    :param calendar_name: Display name for the calendar subscription
     :param method: METHOD field of the iCalendar object
     :param organizer: ORGANIZER field of the iCalendar object
     """
@@ -206,6 +208,10 @@ def events_to_ical(
     calendar = icalendar.Calendar()
     calendar.add('version', '2.0')
     calendar.add('prodid', '-//CERN//INDICO//EN')
+
+    if calendar_name:
+        calendar.add('name', calendar_name)
+        calendar.add('x-wr-calname', calendar_name)
 
     if method:
         calendar.add('method', method)
