@@ -79,11 +79,6 @@ export function DeleteDialog({
         </div>
       </Modal.Content>
       <Modal.Actions>
-        <Button
-          onClick={onClose}
-          disabled={isDeleting}
-          content={cancelText || Translate.string('Cancel')}
-        />
         {isButtonDisabled ? (
           <Button color="red" disabled>
             {confirmText || Translate.string('Delete')} (
@@ -94,6 +89,11 @@ export function DeleteDialog({
             {confirmText || Translate.string('Delete')}
           </Button>
         )}
+        <Button
+          onClick={onClose}
+          disabled={isDeleting}
+          content={cancelText || Translate.string('Cancel')}
+        />
       </Modal.Actions>
     </Modal>
   );
