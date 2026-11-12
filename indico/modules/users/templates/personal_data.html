@@ -25,6 +25,7 @@
                             <ind-delete-button
                                 dialog-title="{% trans name=user.full_name %}Delete {{ name }}{% endtrans %}"
                                 button-label="{% trans %}Delete User{% endtrans %}"
+                                button-class="small"
                                 is-disabled="{{ (disabled_message is not none) | tojson }}"
                                 disabled-message="{{ disabled_message }}"
                                 message="{% trans %}Deleted user accounts cannot be restored.{% endtrans %}"
