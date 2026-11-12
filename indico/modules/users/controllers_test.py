@@ -72,7 +72,7 @@ def test_user_search_results_filtered_by_all_handlers(app_context, create_user, 
 def test_dashboard_calendar_name(app_context, mocker, query, label):
     from indico.modules.users.controllers import RHExportDashboardICS
     rh = RHExportDashboardICS()
-    mocker.patch.object(rh, '_get_user', return_value=mocker.Mock(full_name='Jane Doe'))
+    mocker.patch.object(rh, '_get_user')
     mocker.patch('indico.modules.users.controllers.get_linked_events', return_value=[])
     mocker.patch('indico.modules.users.controllers.get_related_categories', return_value={})
 
@@ -80,4 +80,5 @@ def test_dashboard_calendar_name(app_context, mocker, query, label):
         response = rh._process()
         calendar = icalendar.Calendar.from_ical(b''.join(response.response))
 
-    assert calendar['NAME'] == calendar['X-WR-CALNAME'] == f'{label} for Jane Doe'
+    assert calendar['NAME'] == f'Indico: {label}'
+    assert calendar['X-WR-CALNAME'] == f'Indico: {label}'

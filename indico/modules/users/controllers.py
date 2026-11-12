@@ -216,14 +216,14 @@ class RHExportDashboardICS(RHProtected):
         response = {'results': [serialize_event_for_ical(event) for event in all_events]}
         sources = {'linked', 'categories'}.intersection(include)
         if sources == {'linked'}:
-            name = _('Events at hand for {user}')
+            name = _('Events at hand')
         elif sources == {'categories'}:
-            name = _('Categories for {user}')
+            name = _('Categories')
         elif sources:
-            name = _('Everything for {user}')
+            name = _('Everything')
         else:
-            name = _('Dashboard for {user}')
-        serializer = Serializer.create('ics', calendar_name=name.format(user=user.full_name))
+            name = _('Dashboard')
+        serializer = Serializer.create('ics', calendar_name=f'Indico: {name}')
         return send_file('event.ics', BytesIO(serializer(response)), 'text/calendar')
 
 

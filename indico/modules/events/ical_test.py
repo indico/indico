@@ -27,7 +27,8 @@ def test_export_skips_category_for_unlisted_event(dummy_event):
 def test_calendar_subscription_name():
     title = 'Physics, Seminars'
     calendar = icalendar.Calendar.from_ical(events_to_ical([], calendar_name=title))
-    assert calendar['NAME'] == calendar['X-WR-CALNAME'] == title
+    assert calendar['NAME'] == title
+    assert calendar['X-WR-CALNAME'] == title
 
     unnamed = icalendar.Calendar.from_ical(events_to_ical([]))
     assert 'NAME' not in unnamed

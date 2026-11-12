@@ -22,7 +22,6 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                               *, calendar_name=None):
     """Export the events in a category to iCal.
 
-    :param calendar_name: Display name for the calendar subscription
     :param category_ids: Category IDs to export
     :param user: The user who needs to be able to access the events
     :param event_filter: A SQLalchemy criterion to restrict which
@@ -31,6 +30,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
     :param event_filter_fn: A callable that determines which events to include (after querying)
     :param update_query: A callable that can update the query used to retrieve the events.
                          Must return the updated query object.
+    :param calendar_name: Display name for the calendar subscription
     """
     own_room_strategy = joinedload('own_room')
     own_room_strategy.load_only('location_id', 'site', 'building', 'floor', 'number', 'verbose_name')
