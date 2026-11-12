@@ -216,10 +216,13 @@ jobs:
           PGPORT: ${{ job.services.postgres.ports[5432] }}
 
       - name: Run DB script tests
+        if: github.event_name == 'pull_request'
         run: |
           export PGHOST=localhost
           export PGUSER=postgres
-          bin/utils/db_test.py --nb-scripts 10
+          git fetch --no-tags --depth=1 origin "$GITHUB_BASE_REF"
+          nb_scripts=$(git diff --name-only --diff-filter=A FETCH_HEAD HEAD -- indico/migrations/versions | wc -l)
+          bin/utils/db_test.py --nb-scripts "$(( nb_scripts > 0 ? nb_scripts : 1 ))"
         env:
           PGPORT: ${{ job.services.postgres.ports[5432] }}
 
