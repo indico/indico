@@ -268,8 +268,12 @@ def _downgrade(db_eng, config, revision, *, progress):
 
 @contextmanager
 def _get_db_context(verbose=False):
+    created_user = False
     try:
         click.secho(_indent('Setting up test DBs...'), fg='cyan')
+        if 'PGUSER' not in os.environ:
+            _run(['createuser', PG_USER])
+            created_user = True
         _prepare_clean_db(verbose)
         # Postgres can't copy or drop a DB that has open connections so none are pooled
         yield tuple(create_engine(_build_db_uri(name), poolclass=NullPool)
@@ -280,7 +284,7 @@ def _get_db_context(verbose=False):
         raise ClickException(click.style(str(e), fg='red')) from e
     finally:
         click.secho(_indent('Tearing down test DBs...'), fg='cyan')
-        _destroy_dbs()
+        _destroy_dbs(created_user)
 
 
 def _build_db_uri(dbname):
@@ -292,8 +296,6 @@ def _build_db_uri(dbname):
 
 def _prepare_clean_db(verbose=False):
     try:
-        if 'PGUSER' not in os.environ:
-            _run(['createuser', PG_USER])
         _run(['createdb', '-O', PG_USER, DBCLEAN_NAME])
         _run(['psql', DBCLEAN_NAME, '-c', 'CREATE EXTENSION unaccent;'])
         _run(['psql', DBCLEAN_NAME, '-c', 'CREATE EXTENSION pg_trgm;'])
@@ -304,12 +306,15 @@ def _prepare_clean_db(verbose=False):
         raise RuntimeError('Clean test DB could not be initialized') from e
 
 
-def _destroy_dbs():
-    _drop_db(DB_NAME)
-    _drop_db(DBDIFF_NAME)
-    _drop_db(DBCLEAN_NAME)
-    if 'PGUSER' not in os.environ:
-        _drop_db_user(PG_USER)
+def _destroy_dbs(drop_user):
+    drops = [(_drop_db, name) for name in (DB_NAME, DBDIFF_NAME, DBCLEAN_NAME)]
+    if drop_user:
+        drops.append((_drop_db_user, PG_USER))
+    for drop, name in drops:
+        try:
+            drop(name)
+        except ClickException as e:
+            click.secho(_indent(f'Could not drop {name}: {e.message}'), fg='red')
 
 
 def _drop_db(db_name):
