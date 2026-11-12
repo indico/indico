@@ -222,7 +222,7 @@ jobs:
           export PGUSER=postgres
           git fetch --no-tags --depth=1 origin "$GITHUB_BASE_REF"
           nb_scripts=$(git diff --name-only --diff-filter=A FETCH_HEAD HEAD -- indico/migrations/versions | wc -l)
-          bin/utils/db_test.py --nb-scripts "$(( nb_scripts > 0 ? nb_scripts : 1 ))"
+          bin/utils/db_test.py --nb-scripts "$nb_scripts"
         env:
           PGPORT: ${{ job.services.postgres.ports[5432] }}
 
