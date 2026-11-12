@@ -197,15 +197,14 @@ class RHTimetableBreakCreate(RHManageEventBase):
         session_block_id = data.pop('session_block', {}).pop('id', None)
         session_block = SessionBlock.get(session_block_id) if session_block_id else None
         data['location_data'] = (
-            self._get_inherited_location(location_parent=session_block)
+            self._get_inherited_location(session_block)
             if data['location_data'].get('inheriting')
             else data['location_data']
         )
         break_entry = create_break_entry(self.event, data, extend_parent=False, session_block=session_block)
         return BreakSchema(context={'event': self.event}).jsonify(break_entry.break_)
 
-    def _get_inherited_location(self, **kwargs):
-        location_parent = kwargs.pop('location_parent', None)
+    def _get_inherited_location(self, location_parent):
         inherited_location = location_parent.location_data if location_parent else self.event.location_data
         inherited_location['inheriting'] = True
         return inherited_location
@@ -280,7 +279,7 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
         data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
         session_block = SessionBlock.get(data['session_block_id']) if data.get('session_block_id') else None
         data['location_data'] = (
-            self._get_inherited_location(location_parent=session_block)
+            self._get_inherited_location(session_block)
             if data['location_data'].get('inheriting')
             else data['location_data']
         )
@@ -293,8 +292,7 @@ class RHTimetableContributionCreate(RHManageContributionsBase):
     def custom_fields_context(self):
         return ContributionSchema.get_custom_fields_context(self.event, management=True)
 
-    def _get_inherited_location(self, **kwargs):
-        location_parent = kwargs.pop('location_parent', None)
+    def _get_inherited_location(self, location_parent):
         inherited_location = location_parent.location_data if location_parent else self.event.location_data
         inherited_location['inheriting'] = True
         return inherited_location
