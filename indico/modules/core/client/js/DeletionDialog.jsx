@@ -265,4 +265,3 @@ DeleteDialog.defaultProps = {
 };
 
 export {DeleteDialog, GenericDeleteButton};
-export default GenericDeleteButton;
