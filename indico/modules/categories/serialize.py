@@ -9,7 +9,7 @@ from io import BytesIO
 
 from feedgen.feed import FeedGenerator
 from flask import session
-from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
+from sqlalchemy.orm import joinedload, load_only, selectinload, subqueryload, undefer
 
 from indico.modules.categories import Category
 from indico.modules.events import Event
@@ -33,7 +33,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
     own_room_strategy = joinedload('own_room')
     own_room_strategy.load_only('location_id', 'site', 'building', 'floor', 'number', 'verbose_name')
     own_room_strategy.lazyload('owner')
-    own_venue_strategy = joinedload('own_venue').load_only('name')
+    own_venue_strategy = joinedload('own_venue').load_only('name', 'room_name_format')
     query = (Event.query
              .filter(Event.category_chain_overlaps(category_ids),
                      ~Event.is_deleted,
@@ -44,6 +44,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                       subqueryload('acl_entries'),
                       subqueryload('vc_room_associations'),
                       joinedload('person_links'),
+                      selectinload('category').load_only('id', 'chain_titles'),
                       own_room_strategy,
                       own_venue_strategy)
              .order_by(Event.start_dt))

@@ -123,6 +123,10 @@ def generate_event_component(
     uid = event.ical_uid
     component = generate_basic_component(event, uid, organizer=organizer)
 
+    if event.category and not event.category.is_root:
+        separator = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
+        component.add('categories', [separator.join(event.category.chain_titles[1:])])
+
     # add contact information
     contact_info = event.contact_emails + event.contact_phones
     if contact_info:
