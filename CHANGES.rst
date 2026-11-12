@@ -41,6 +41,8 @@ Internal Changes
   (:pr:`7499`, thanks :user:`moliholy, unconventionaldotdev`)
 - Add new signals to allow restricting which registrations someone can manage
   (:pr:`7611`, thanks :user:`moliholy, unconventionaldotdev`)
+- Add a script to check the alembic revision history and that all revisions can be
+  upgraded and downgraded cleanly (:pr:`7234`, thanks :user:`omegak, SegiNyn`)
 
 
 Version 3.3.13
