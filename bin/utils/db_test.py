@@ -15,20 +15,15 @@ from contextlib import contextmanager
 from pathlib import Path
 from subprocess import PIPE
 
-import alembic
+import alembic.command
 import alembic.config
 import click
 from alembic.script import ScriptDirectory
-from click import ClickException
-from click import BadParameter
+from click import BadParameter, ClickException
 from flask.helpers import get_root_path
 from results.dbdiff import Migration
-from sqlalchemy import create_engine, text
-from sqlalchemy.sql.ddl import CreateSchema
-
-from indico.core.db.sqlalchemy.custom.array_utils import (create_array_append_function, create_array_is_unique_function,
-                                                          create_array_to_string_function)
-from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
+from sqlalchemy import create_engine
+from sqlalchemy.pool import NullPool
 
 
 INDICO_DIR = Path(get_root_path('indico')).parent
@@ -37,6 +32,7 @@ ALEMBIC_INI_FILE = ALEMBIC_TESTENV_DIR / 'test_alembic.ini'
 
 DB_NAME = os.environ.get('DB_NAME') or 'indico_dbtest'
 DBDIFF_NAME = os.environ.get('DBDIFF_NAME') or 'indico_dbtest_diff'
+DBCLEAN_NAME = os.environ.get('DBCLEAN_NAME') or 'indico_dbtest_clean'
 PG_USER = os.environ.get('PGUSER') or 'indicotest'
 
 REGEX_REV_FILENAME = re.compile(r'\d{8}_\d{4}_(\S{12})_.*\.py$')
@@ -57,9 +53,10 @@ REGEX_SERVER_DEFAULT = re.compile(r'server_default\s*=')
               callback=lambda ctx, param, value: _validate_plugin_dir(ctx, param, value))
 def main(nb_scripts, verbose, plugin_dir):
     """Check sanity of Alembic revision history and migration scripts.
-    By default, two test databases named 'indico_dbtest' and
-    'indico_dbtest_diff' will be created and dropped. The database names will be
-    overridden by the DB_NAME and DBDIFF_NAME environment variables.
+    By default, three test databases named 'indico_dbtest',
+    'indico_dbtest_diff' and 'indico_dbtest_clean' will be created and dropped.
+    The database names will be overridden by the DB_NAME, DBDIFF_NAME and
+    DBCLEAN_NAME environment variables.
 
     Since this script uses the command-line PostgreSQL tools any other
     configuration should be done using the various environment variables like
@@ -93,7 +90,7 @@ def _validate_plugin_dir(ctx, param, plugin_dir: Path):
 def _check(nb_scripts=0, plugin_dir=None, verbose=False):
     _check_history(plugin_dir, verbose)
     _check_contents(plugin_dir, verbose)
-    _check_scripts(nb_scripts, plugin_dir, verbose)
+    _check_migrations(nb_scripts, plugin_dir, verbose)
 
 
 def _check_history(plugin_dir=None, verbose=False):
@@ -123,18 +120,57 @@ def _check_contents(plugin_dir=None, verbose=False):
     click.secho(_indent('No server defaults missing'), fg='green')
 
 
-def _check_scripts(nb_scripts=0, plugin_dir=None, verbose=False):
-    """Check that revisions are idempotent.
+def _check_migrations(nb_scripts=0, plugin_dir=None, verbose=False):
+    """Check that the revision scripts upgrade and downgrade cleanly.
+
+    The DB state is only ever changed by alembic, starting from a DB created
+    with `indico db prepare`. The diffs from `results` are only checked for
+    emptiness and never executed, since it can order drops wrongly (e.g.
+    functions before the indexes that use them):
+
+    1. Copy it to DB1, downgrade DB1 to the revision before the oldest one
+       checked and copy DB1 to DB2, so both start out identical.
+    2. For each revision, oldest first, upgrade DB2, downgrade it again and diff
+       it against DB1: an empty diff proves the downgrade reverts the upgrade.
+    3. Upgrade both DBs to that revision before checking the next one.
+    4. Diff DB1 against the freshly prepared DB: an empty diff proves the
+       upgrades lead to the same schema as `indico db prepare`.
 
     :param nb_scripts: Number of revision scripts to check.
     """
-    click.secho('Checking Alembic revision scripts (newer to older):')
-    with _get_db_context(verbose) as (db_conn, dbdiff_conn):
-        config = _get_alembic_config(db_conn, plugin_dir=plugin_dir)
-        revisions_dir = _get_alembic_revisions_dir(plugin_dir)
-        scripts = ScriptDirectory(ALEMBIC_INI_FILE, version_locations=[revisions_dir]).walk_revisions()
-        scripts = list(scripts)[:nb_scripts] if nb_scripts else list(scripts)
-        _check_script_idempotence(scripts, db_conn, dbdiff_conn, config)
+    click.secho('Checking Alembic revision scripts (older to newer):')
+    config = _get_alembic_config(plugin_dir)
+    script_dir = ScriptDirectory.from_config(config)
+    revisions = list(script_dir.walk_revisions())
+    revisions = revisions[:nb_scripts] if nb_scripts else revisions
+    for revision in revisions:
+        if isinstance(revision.down_revision, tuple):
+            raise ClickException(f'Revision {revision.revision} is a merge revision, which is not supported')
+    total_revisions = len(revisions)
+    with _get_db_context(verbose) as (db_eng, dbdiff_eng, dbclean_eng):
+        _copy_db(DBCLEAN_NAME, DB_NAME)
+        click.secho(_indent(f'Downgrading test DB by {total_revisions} revisions...'), fg='cyan')
+        for idx, revision in enumerate(revisions):
+            _downgrade(db_eng, config, revision, progress=f'[{total_revisions - idx}/{total_revisions}]')
+        _copy_db(DB_NAME, DBDIFF_NAME)
+        for idx, revision in enumerate(reversed(revisions)):
+            progress = f'[{idx + 1}/{total_revisions}]'
+            _upgrade(dbdiff_eng, config, revision, progress=progress)
+            _downgrade(dbdiff_eng, config, revision, progress=progress)
+            if diff := _get_db_diff(db_eng, dbdiff_eng):
+                click.secho(
+                    _indent(f'{progress} Revision {revision.revision} is not reverted by its downgrade'), fg='red'
+                )
+                raise ClickException(
+                    f'Upgrading and downgrading revision {revision.revision} leaves these changes:\n\n{diff}'
+                )
+            _upgrade(db_eng, config, revision, progress=progress)
+            _upgrade(dbdiff_eng, config, revision, progress=progress)
+            click.secho(_indent(f'{progress} Revision {revision.revision} is correct'), fg='green')
+        if diff := _get_db_diff(db_eng, dbclean_eng):
+            click.secho(_indent('Upgraded DB differs from a freshly prepared one'), fg='red')
+            raise ClickException(f'The upgraded DB needs these changes to match `indico db prepare`:\n\n{diff}')
+        click.secho(_indent('All revisions are correct'), fg='green')
 
 
 # -- Check history operations ------------------------------------------------------------------------------------------
@@ -204,54 +240,40 @@ def _check_server_default_in_non_nullable_column(content, file_path):
 
 # -- Check script operations -------------------------------------------------------------------------------------------
 
-def _check_script_idempotence(scripts, db_conn, dbdiff_conn, config):
-    """Check that revisions are idempotent.
+@contextmanager
+def _alembic_connection(db_eng, config, failure_msg):
+    try:
+        with db_eng.begin() as conn:
+            config.attributes['connection'] = conn
+            yield
+    except Exception:
+        click.secho(_indent(failure_msg), fg='red')
+        raise
 
-    Starting from newest to oldest, applies downgrade+upgrade scripts to
-    verify that they leave the database in the same state as it was before.
-    """
-    total_scripts = len(scripts)
-    for idx, script in enumerate(scripts):
-        rev = script.revision
-        _sync_dbs(dbdiff_conn, db_conn)
-        progress = f'[{idx + 1}/{total_scripts}]'
-        try:
-            alembic.command.downgrade(config, '-1')
-        except Exception:
-            click.secho(_indent(f'{progress} Revision {rev} cannot be applied (downgrade)'), fg='red')
-            raise
-        try:
-            alembic.command.upgrade(config, '+1')
-        except Exception:
-            click.secho(_indent(f'{progress} Revision {rev} cannot be applied (upgrade)'), fg='red')
-            raise
-        if diff := _get_db_diff(dbdiff_conn, db_conn):
-            click.secho(_indent(f'{progress} Revision {rev} is not idempotent'), fg='red')
-            raise ClickException(f'Upgrade script in revision {rev} should be applying:\n\n{diff}')
-        alembic.command.downgrade(config, '-1')
-        click.secho(_indent(f'{progress} Revision {rev} is correct'), fg='green')
-    click.secho(_indent('All revisions are correct'), fg='green')
+
+def _upgrade(db_eng, config, revision, *, progress):
+    """Upgrade a DB to the given revision."""
+    with _alembic_connection(db_eng, config, f'{progress} Revision {revision.revision} cannot be applied (upgrade)'):
+        alembic.command.upgrade(config, revision.revision)
+
+
+def _downgrade(db_eng, config, revision, *, progress):
+    """Downgrade a DB to the revision before the given one."""
+    with _alembic_connection(db_eng, config, f'{progress} Revision {revision.revision} cannot be applied (downgrade)'):
+        # The first revision has no parent so downgrading it goes to alembic's 'base'
+        alembic.command.downgrade(config, revision.down_revision or 'base')
 
 
 # -- DB context functions ----------------------------------------------------------------------------------------------
 
 @contextmanager
 def _get_db_context(verbose=False):
-    # XXX: This is necessary because results dbdiff fails to properly sort functions when producing SQL diffs.
-    #      Remove once this is fixed: https://github.com/djrobstep/results/issues/11.
-    def prepare_diff_db(dbdiff_conn):
-        CreateSchema('indico').execute(dbdiff_conn)
-        create_unaccent_function(dbdiff_conn)
-        create_array_append_function(dbdiff_conn)
-        create_array_is_unique_function(dbdiff_conn)
-        create_array_to_string_function(dbdiff_conn)
-
     try:
         click.secho(_indent('Setting up test DBs...'), fg='cyan')
-        _prepare_dbs(verbose)
-        with _connect_dbs() as (db_conn, dbdiff_conn):
-            prepare_diff_db(dbdiff_conn)
-            yield (db_conn, dbdiff_conn)
+        _prepare_clean_db(verbose)
+        # Postgres can't copy or drop a DB that has open connections so none are pooled
+        yield tuple(create_engine(_build_db_uri(name), poolclass=NullPool)
+                    for name in (DB_NAME, DBDIFF_NAME, DBCLEAN_NAME))
     except Exception as e:
         if verbose:
             click.secho(traceback.format_exc().rstrip(), fg='red')
@@ -261,56 +283,31 @@ def _get_db_context(verbose=False):
         _destroy_dbs()
 
 
-@contextmanager
-def _connect_dbs():
-    db_eng = create_engine(_build_db_uri(DB_NAME))
-    dbdiff_eng = create_engine(_build_db_uri(DBDIFF_NAME))
-    db_conn = db_eng.connect()
-    dbdiff_conn = dbdiff_eng.connect()
-    try:
-        yield (db_conn, dbdiff_conn)
-    finally:
-        db_conn.close()
-        db_eng.dispose()
-        dbdiff_conn.close()
-        dbdiff_eng.dispose()
-
-
 def _build_db_uri(dbname):
-    pghost = os.environ.get('PGHOST')
-    pgport = os.environ.get('PGPORT')
-    parts = ['postgresql://']
-    parts += [PG_USER, ':@']
-    if pghost:
-        parts += [pghost]
-        if pgport:
-            parts += [':', pgport]
-    parts += ['/', dbname]
-    return ''.join(parts)
+    # Host and port come from libpq's PGHOST and PGPORT
+    return f'postgresql://{PG_USER}@/{dbname}'
 
 
 # -- DB helper functions -----------------------------------------------------------------------------------------------
 
-def _prepare_dbs(verbose=False):
+def _prepare_clean_db(verbose=False):
     try:
         if 'PGUSER' not in os.environ:
             _run(['createuser', PG_USER])
-        _run(['createdb', '-O', PG_USER, DB_NAME])
-        _run(['createdb', '-O', PG_USER, DBDIFF_NAME])
-        _run(['psql', DB_NAME, '-c', 'CREATE EXTENSION unaccent;'])
-        _run(['psql', DB_NAME, '-c', 'CREATE EXTENSION pg_trgm;'])
-        _run(['psql', DBDIFF_NAME, '-c', 'CREATE EXTENSION unaccent;'])
-        _run(['psql', DBDIFF_NAME, '-c', 'CREATE EXTENSION pg_trgm;'])
+        _run(['createdb', '-O', PG_USER, DBCLEAN_NAME])
+        _run(['psql', DBCLEAN_NAME, '-c', 'CREATE EXTENSION unaccent;'])
+        _run(['psql', DBCLEAN_NAME, '-c', 'CREATE EXTENSION pg_trgm;'])
         _run(['indico', 'db', 'prepare'])
     except Exception as e:
         if verbose:
-            click.secho(_indent(f'Failed to set up test DBs due to: {e}'), fg='red')
-        raise RuntimeError('Test DBs could not be initialized') from e
+            click.secho(_indent(f'Failed to set up the clean test DB due to: {e}'), fg='red')
+        raise RuntimeError('Clean test DB could not be initialized') from e
 
 
 def _destroy_dbs():
     _drop_db(DB_NAME)
     _drop_db(DBDIFF_NAME)
+    _drop_db(DBCLEAN_NAME)
     if 'PGUSER' not in os.environ:
         _drop_db_user(PG_USER)
 
@@ -321,33 +318,29 @@ def _drop_db(db_name):
         _run(['dropdb', db_name])
 
 
+def _copy_db(source_db, target_db):
+    _run(['createdb', '-O', PG_USER, '-T', source_db, target_db])
+
+
 def _drop_db_user(db_user):
     # Check if user exists. Source: https://stackoverflow.com/a/8546783/1901977
     if _run(['psql', 'postgres', '-XtAc', f"SELECT 1 FROM pg_roles WHERE rolname='{db_user}'"]) == '1':  # noqa: S608
         _run(['dropuser', db_user])
 
 
-def _get_db_diff(base_db_conn, target_db_conn):
-    migration = Migration(base_db_conn, target_db_conn)
-    migration.set_safety(False)
-    migration.add_all_changes()
-    return migration.sql
-
-
-def _sync_dbs(base_db_conn, target_db_conn):
-    """Synchronize a base DB to a target DB and return the diff."""
-    diff = _get_db_diff(base_db_conn, target_db_conn)
-    if not diff:
-        return
-    with base_db_conn.begin():
-        base_db_conn.execute(text(diff))
+def _get_db_diff(base_eng, target_eng):
+    with base_eng.connect() as base_conn, target_eng.connect() as target_conn:
+        migration = Migration(base_conn, target_conn)
+        migration.set_safety(False)
+        migration.add_all_changes()
+        return migration.sql
 
 
 # -- Alembic helper functions ------------------------------------------------------------------------------------------
 
-def _get_alembic_config(db_conn, stdout=sys.stdout, plugin_dir=None):
+def _get_alembic_config(plugin_dir=None, stdout=sys.stdout):
     """Configure alembic for running against revisions."""
-    config = alembic.config.Config(ALEMBIC_INI_FILE, attributes={'connection': db_conn}, stdout=stdout)
+    config = alembic.config.Config(ALEMBIC_INI_FILE, stdout=stdout)
     config.set_main_option('script_location', str(ALEMBIC_TESTENV_DIR))
     config.set_main_option('version_locations', str(_get_alembic_revisions_dir(plugin_dir)))
     return config
@@ -377,7 +370,7 @@ def _set_test_environment(plugin_name=None, verbose=False):
         'REDIS_CACHE_URL': 'redis://127.0.0.1:6379/1',
         'DEBUG': True,
         'PLUGINS': [plugin_name] if plugin_name else [],
-        'SQLALCHEMY_DATABASE_URI': _build_db_uri(DB_NAME)
+        'SQLALCHEMY_DATABASE_URI': _build_db_uri(DBCLEAN_NAME)
     }
     os.environ['INDICO_CONFIG'] = '/dev/null'
     os.environ['INDICO_CONF_OVERRIDE'] = repr(indico_conf)
