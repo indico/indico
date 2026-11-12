@@ -11,12 +11,14 @@ import {
   ContributionCreateForm,
   ContributionEditForm,
 } from 'indico/modules/events/contributions/ContributionForm';
+import {RequestConfirmDelete} from 'indico/react/components';
 
 import TimetableManageModal from './TimetableManageModal';
 import {TimetablePosterBlockModal} from './TimetablePosterBlockModal';
 import {TimetableSessionCreateModal, TimetableSessionEditModal} from './TimetableSessionModal';
 import {SessionBlockId} from './types';
 
+export const CONFIRMATION_MODAL = 'Confirm';
 export const DRAFT_ENTRY_MODAL = 'Create/Edit draft entry';
 export const POSTER_BLOCK_CONTRIBUTIONS_MODAL = 'Show poster block contributions';
 export const SESSION_CREATE_MODAL = 'Create session';
@@ -25,6 +27,15 @@ export const UNSCHEDULED_CONTRIB_CREATE_MODAL = 'Create unscheduled contribution
 export const UNSCHEDULED_CONTRIB_EDIT_MODAL = 'Edit unscheduled contribution';
 
 type ModalState =
+  | {
+      type: typeof CONFIRMATION_MODAL;
+      payload: {
+        header?: string;
+        description?: string;
+        confirmText?: string;
+        onConfirm?: () => void;
+      };
+    }
   | {
       type: typeof DRAFT_ENTRY_MODAL;
       payload: {eventId: number; entry; onClose?; isChildOfPoster?: boolean};
@@ -66,6 +77,21 @@ const ModalContext = createContext<ModalRootInterface & {openModal: ModalFunctio
 function ModalRoot({modal, closeModal}: ModalRootInterface) {
   const {type, payload} = modal ?? {};
   switch (type) {
+    case CONFIRMATION_MODAL:
+      return (
+        <RequestConfirmDelete
+          open
+          header={payload?.header}
+          confirmText={payload?.confirmText}
+          requestFunc={() => {
+            payload?.onConfirm?.();
+            return false;
+          }}
+          onClose={closeModal}
+        >
+          {payload?.description}
+        </RequestConfirmDelete>
+      );
     case POSTER_BLOCK_CONTRIBUTIONS_MODAL:
       return <TimetablePosterBlockModal id={payload.id} onClose={closeModal} />;
     case DRAFT_ENTRY_MODAL:
