@@ -18,9 +18,11 @@ from indico.modules.events.settings import event_contact_settings
 from indico.util.string import sanitize_html
 
 
-def serialize_categories_ical(category_ids, user, event_filter=True, event_filter_fn=None, update_query=None):
+def serialize_categories_ical(category_ids, user, event_filter=True, event_filter_fn=None, update_query=None,
+                              *, calendar_name=None):
     """Export the events in a category to iCal.
 
+    :param calendar_name: Display name for the calendar subscription
     :param category_ids: Category IDs to export
     :param user: The user who needs to be able to access the events
     :param event_filter: A SQLalchemy criterion to restrict which
@@ -63,7 +65,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                                joinedload('acl_entries'))
                       .all())
 
-    return BytesIO(events_to_ical(events, user))
+    return BytesIO(events_to_ical(events, user, calendar_name=calendar_name))
 
 
 def serialize_category_atom(category, url, user, event_filter):
