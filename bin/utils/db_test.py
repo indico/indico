@@ -10,6 +10,7 @@ import os
 import re
 import subprocess
 import sys
+import tomllib
 import traceback
 from contextlib import contextmanager
 from pathlib import Path
@@ -77,10 +78,10 @@ def _validate_plugin_dir(ctx, param, plugin_dir: Path):
     if plugin_dir == INDICO_DIR:
         raise BadParameter(click.style(f'\nIndico core found in {plugin_dir}', fg='red'))
     try:
-        plugin_name = _get_plugin_name(plugin_dir)
+        _get_plugin_name(plugin_dir)
     except ClickException as e:
         raise BadParameter(click.style(f'\n{e!s}', fg='red'))
-    if not (plugin_dir / plugin_name / 'migrations').is_dir():
+    if not _get_alembic_revisions_dir(plugin_dir).is_dir():
         raise BadParameter(click.style(f'\nNo migrations/ folder found in "{plugin_dir}"', fg='red'))
     return plugin_dir
 
@@ -353,7 +354,7 @@ def _get_alembic_config(plugin_dir=None, stdout=sys.stdout):
 
 def _get_alembic_revisions_dir(plugin_dir=None):
     if plugin_dir:
-        return next(plugin_dir.glob('*/migrations'))
+        return plugin_dir / _get_plugin_package(plugin_dir) / 'migrations'
     return Path(INDICO_DIR) / 'indico' / 'migrations' / 'versions'
 
 
@@ -386,14 +387,31 @@ def _set_test_environment(plugin_name=None, verbose=False):
 
 # -- Misc helper functions ---------------------------------------------------------------------------------------------
 
+def _get_plugin_entry_point(plugin_dir):
+    """Get the (name, value) of the plugin's indico.plugins entry point."""
+    pyproject = plugin_dir / 'pyproject.toml'
+    try:
+        metadata = tomllib.loads(pyproject.read_text())
+    except FileNotFoundError as e:
+        raise ClickException(f'{pyproject} not found') from e
+    except tomllib.TOMLDecodeError as e:
+        raise ClickException(f'{pyproject} is not valid TOML: {e}') from e
+    entry_points = metadata.get('project', {}).get('entry-points', {}).get('indico.plugins', {})
+    if not entry_points:
+        raise ClickException(f'No indico.plugins entry point found in {pyproject}')
+    if len(entry_points) > 1:
+        raise ClickException(f'More than one indico.plugins entry point found in {pyproject}')
+    return next(iter(entry_points.items()))
+
+
 def _get_plugin_name(plugin_dir):
-    # TODO: Is this the best way to get the plugin name?
-    packages = [x.parent.name for x in plugin_dir.glob('*/__init__.py')]
-    if not packages:
-        raise ClickException(f'No plugin package found in {plugin_dir}')
-    if len(packages) > 1:
-        raise ClickException(f'More than one plugin package in {plugin_dir}')
-    return packages[0]
+    # Plugins are loaded by their entry point name, which may not match their package name
+    return _get_plugin_entry_point(plugin_dir)[0]
+
+
+def _get_plugin_package(plugin_dir):
+    # The entry point value is `package.module:Class`
+    return _get_plugin_entry_point(plugin_dir)[1].split(':')[0].split('.')[0]
 
 
 def _indent(msg, level=4):
