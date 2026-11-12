@@ -20,7 +20,7 @@ import * as actions from './actions';
 import {useDraggable} from './dnd';
 import {EntryTitle} from './Entry';
 import {mapDataToEntry} from './mapperUtils';
-import {UNSCHEDULED_CONTRIB_EDIT_MODAL, useModal} from './ModalContext';
+import {CONFIRMATION_MODAL, UNSCHEDULED_CONTRIB_EDIT_MODAL, useModal} from './ModalContext';
 import * as selectors from './selectors';
 import {ContribEntry, ContribId, EntryType, ReduxState} from './types';
 import {
@@ -32,6 +32,7 @@ import {
   GRID_SIZE,
   pixelsToMinutes,
 } from './utils';
+
 import './Entry.module.scss';
 
 export function DraggableUnscheduledContributionEntry({
@@ -213,7 +214,11 @@ export function UnscheduledContributionEntry({
             size="small"
             onClick={e => {
               e.stopPropagation();
-              dispatch(actions.deleteUnscheduledContrib(objId, eventId));
+              openModal(CONFIRMATION_MODAL, {
+                header: Translate.string('Delete contribution?'),
+                description: Translate.string('Are you sure you want to delete this contribution?'),
+                onConfirm: () => dispatch(actions.deleteUnscheduledContrib(objId, eventId)),
+              });
             }}
           />
         </div>
