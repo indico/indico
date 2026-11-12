@@ -12,7 +12,7 @@ import {Button, Message, Modal, Icon, Popup} from 'semantic-ui-react';
 import {Translate, Param} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
-const DeleteDialog = ({
+export function DeleteDialog({
   open,
   title,
   message,
@@ -24,7 +24,7 @@ const DeleteDialog = ({
   isDeleting,
   recordName,
   countdownSeconds,
-}) => {
+}) {
   const initialCountdown = Number.isFinite(Number(countdownSeconds))
     ? Number(countdownSeconds)
     : 10;
@@ -97,9 +97,9 @@ const DeleteDialog = ({
       </Modal.Actions>
     </Modal>
   );
-};
+}
 
-const GenericDeleteButton = ({
+export function GenericDeleteButton({
   title,
   buttonLabel,
   message,
@@ -117,7 +117,7 @@ const GenericDeleteButton = ({
   method,
   dataParams,
   buttonClass,
-}) => {
+}) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -223,7 +223,7 @@ const GenericDeleteButton = ({
       />
     </>
   );
-};
+}
 
 GenericDeleteButton.propTypes = {
   title: PropTypes.string.isRequired,
@@ -263,5 +263,3 @@ DeleteDialog.defaultProps = {
   isDeleting: false,
   countdownSeconds: 10,
 };
-
-export {DeleteDialog, GenericDeleteButton};
