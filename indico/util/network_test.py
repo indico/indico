@@ -30,6 +30,14 @@ def test_is_private_url(url, expected):
     assert is_private_url(url) == expected
 
 
+def test_validate_request_url_weird(monkeypatch):
+    monkeypatch.setattr('indico.util.network.is_private_url', lambda u: False)
+    validate_request_url('https://public.test')
+    with pytest.raises(InsecureRequestError) as exc_info:
+        validate_request_url('http://publi%63.test')
+    assert str(exc_info.value) == 'Cannot make request to ambiguously parsed URL'
+
+
 def test_validate_request_url(monkeypatch):
     monkeypatch.setattr('indico.util.network.is_private_url', lambda u: u == 'https://private.test')
     validate_request_url('https://public.test')

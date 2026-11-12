@@ -12,6 +12,7 @@ from urllib.parse import urlsplit
 from flask import g, has_app_context
 from requests import Response
 from requests.exceptions import RequestException
+from urllib3.util import parse_url
 
 
 def _is_private_ip(ip):
@@ -42,6 +43,20 @@ class InsecureRequestError(RequestException):
     pass
 
 
+def _check_url_consistency(url: str):
+    u3_data = parse_url(url)
+    std_data = urlsplit(url)
+    if u3_data.scheme != (std_data.scheme or None):
+        return False
+    if u3_data.hostname != std_data.hostname:
+        return False
+    if u3_data.authority != std_data.netloc:
+        return False
+    if u3_data.path != (std_data.path or None):
+        return False
+    return True
+
+
 def validate_request_url(url: str):
     """Check that a user-provided URL is safe to be requested.
 
@@ -53,6 +68,9 @@ def validate_request_url(url: str):
     """
     # Enable getaddrinfo interception to spot DNS rebinding attacks
     g.setdefault('gai_cache', {})
+    # Reject any URL where parsers disagree (urllib3 is more lenient)
+    if not _check_url_consistency(url):
+        raise InsecureRequestError('Cannot make request to ambiguously parsed URL')
     # This could also allow for configurable whitelisting of specific hosts, but until
     # someone needs this let's keep it simple and just blacklist private ranges.
     if is_private_url(url):
