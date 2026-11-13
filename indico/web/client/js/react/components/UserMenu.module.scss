@@ -1,0 +1,207 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system/visibility';
+
+.visually-hidden {
+  @extend %visually-hidden;
+}
+
+.account-menu {
+  display: flex;
+  position: relative;
+  color: rgba(0, 0, 0, 0.87);
+  font-size: 1rem;
+  line-height: 1.4285em;
+}
+
+:global(.indico-top-bar):has(.account-menu) {
+  min-height: 50px;
+  height: auto;
+}
+
+.trigger {
+  display: inline-block;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 2px;
+  }
+}
+
+.trigger > :global(.dropdown.icon),
+.language-caret:global(.icon) {
+  position: relative;
+  width: auto;
+  height: 1em;
+  margin: 0 0 0 1em;
+  font-family: 'Dropdown', sans-serif;
+  font-size: 0.85714286em;
+  font-weight: normal;
+  line-height: 1;
+}
+
+.panel {
+  will-change: transform, opacity;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 103;
+  width: max-content;
+  min-width: 100%;
+  max-width: calc(100vw - 2.5rem);
+  margin-top: 1em;
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-radius: 0.28571429rem;
+  background: white;
+  box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -0.25em;
+    right: 1em;
+    width: 0.5em;
+    height: 0.5em;
+    background: white;
+    box-shadow: -1px -1px 0 rgba(34, 36, 38, 0.15);
+    transform: rotate(45deg);
+    pointer-events: none;
+  }
+
+  menu {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li > a,
+  li > button {
+    display: block;
+    position: relative;
+    width: 100%;
+    border: 0;
+    padding: 0.78571429rem 1.14285714rem;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    line-height: 1;
+    text-align: left;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.05);
+      color: rgba(0, 0, 0, 0.95);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #005272;
+      outline-offset: -3px;
+    }
+  }
+}
+
+.panel-content {
+  max-height: calc(100dvh - 4.5rem);
+  overflow: auto;
+  border-radius: inherit;
+}
+
+:global(body:has(dialog.account-impersonation[open])) .panel {
+  visibility: hidden;
+}
+
+.identity,
+.language-header {
+  position: relative;
+  margin: 1rem 0 1.32142857rem;
+  padding: 0 1.14285714rem;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 0.78571429em;
+  font-weight: bold;
+  overflow-wrap: anywhere;
+  text-transform: uppercase;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: calc(100% + 0.75rem);
+    right: 0;
+    left: 0;
+    border-top: 1px solid rgba(34, 36, 38, 0.1);
+  }
+}
+
+.languages {
+  display: inline-block;
+  max-width: 100%;
+
+  > button {
+    max-width: 100%;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    text-transform: inherit;
+    cursor: pointer;
+
+    &::after {
+      display: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #005272;
+      outline-offset: 2px;
+    }
+  }
+
+  > menu {
+    will-change: transform, opacity;
+    // The composited account panel is the fixed-position containing block.
+    top: calc(max(0.5rem, var(--target-top, 0px) - var(--anchor-height, 0px)) - var(--panel-top));
+    left: calc(max(0.5rem, var(--target-left, 0px)) - var(--panel-left));
+    z-index: 104;
+    max-width: calc(100vw - 2rem);
+    max-height: calc(
+      100dvh - max(0.5rem, var(--target-top, 0px) - var(--anchor-height, 0px)) - 0.5em - 0.5rem
+    );
+    margin: 0.5em 0 0 -0.5em;
+    overflow-y: auto;
+    border: 1px solid rgba(34, 36, 38, 0.15);
+    border-radius: 0.28571429rem;
+    background: white;
+    box-shadow:
+      0 2px 4px 0 rgba(34, 36, 38, 0.12),
+      0 2px 10px 0 rgba(34, 36, 38, 0.15);
+
+    button {
+      color: rgba(0, 0, 0, 0.87);
+      font-size: 1rem;
+      font-weight: normal;
+      line-height: 1;
+      text-transform: none;
+
+      &:has(.current-language) {
+        background: rgba(0, 0, 0, 0.03);
+        color: rgba(0, 0, 0, 0.95);
+      }
+    }
+  }
+}
+
+.current-language {
+  font-weight: bold;
+}
