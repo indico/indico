@@ -25,6 +25,8 @@ Bugfixes
   in the timetable export API (:pr:`7822`)
 - Fix cache inconsistencies in Book of Abstracts (:pr:`7870`)
 - Disable legacy API keys of blocked users (:pr:`7881`)
+- Show multi-line custom fields on the contribution page in their configured order
+  (:pr:`XXXX`, thanks :user:`adamjenkins`)
 
 Accessibility
 ^^^^^^^^^^^^^
