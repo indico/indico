@@ -6,7 +6,7 @@
 // LICENSE file for more details.
 
 // Global scripts that should be executed on all pages
-/* global showFormErrors, build_url, ajaxDialog */
+/* global build_url, ajaxDialog */
 
 import {$T} from 'indico/utils/i18n';
 
@@ -232,8 +232,6 @@ $(document).ready(() => {
   $('input.permalink').on('focus', function() {
     this.select();
   });
-
-  showFormErrors();
 
   // Show form creation dialog if hash is present in the URL
   const match = location.hash.match(

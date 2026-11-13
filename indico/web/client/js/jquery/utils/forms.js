@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-/* global countWords, initForms, showFormErrors, toggleAclField, cornerMessage */
+/* global countWords, initForms, toggleAclField, cornerMessage */
 
 import _ from 'lodash';
 
@@ -254,7 +254,7 @@ import {$T} from 'indico/utils/i18n';
 
     forms.find('fieldset.collapsible.initially-collapsed').each(function() {
       const $this = $(this);
-      if ($this.find('div.form-field[data-error]').length) {
+      if ($this.find('div.form-field[data-has-error]').length) {
         $this.find('legend').trigger('click');
       }
     });
@@ -529,7 +529,6 @@ import {$T} from 'indico/utils/i18n';
       const $forms = $target.find('form');
       if ($forms.length) {
         initForms($forms);
-        showFormErrors($target);
       }
     });
   });
