@@ -7,16 +7,50 @@
 
 @use 'base/palette' as *;
 
+.result-select {
+  display: flex;
+  align-items: center;
+  flex-grow: 1;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.result-detail {
+  display: block;
+}
+
+.result-status {
+  display: block;
+  font-size: 0.85em;
+}
+
+.remove-staged {
+  margin-left: 0.5rem;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.manual-entry-button {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: $blue;
+  font: inherit;
+  cursor: pointer;
+}
+
 .header {
   min-height: 4.55rem;
 }
 
 .search-buttons :global(.dropdown) {
   margin-left: 1em;
-}
-
-:global(.icon).event-person {
-  color: $blue;
 }
 
 .staged-label :global {
