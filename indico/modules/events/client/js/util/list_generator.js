@@ -53,10 +53,11 @@
 
     $obj.on('change', function() {
       $(this).closest('tr').toggleClass('selected', this.checked);
-      $('.js-requires-selected-row').toggleClass(
-        'disabled',
-        !$('.list input:checkbox:checked').length
-      );
+      const disabled = !$('.list input:checkbox:checked').length;
+      $('.js-requires-selected-row')
+        .toggleClass('disabled', disabled)
+        .attr('aria-disabled', disabled ? 'true' : null)
+        .attr('tabindex', disabled ? '-1' : null);
     });
 
     if (trigger) {
