@@ -5,7 +5,6 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import * as Sentry from '@sentry/react';
 import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -15,6 +14,7 @@ import {SidePanelView} from 'indico/modules/events/timetable/types';
 import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {camelizeKeys} from 'indico/utils/case';
 import createReduxStore from 'indico/utils/redux';
+import {initSentry, noSentry} from 'indico/utils/sentry';
 
 import {setSessionData, setTimetableData} from './actions';
 import {ModalProvider} from './ModalContext';
@@ -22,36 +22,6 @@ import reducers from './reducers';
 import Timetable from './Timetable';
 import {ToastProvider} from './ToastContext';
 import {getCurrentDateLocalStorage} from './utils';
-
-function initSentry(dsn) {
-  if (Indico.User) {
-    Sentry.setUser({
-      id: Indico.User.id,
-      email: Indico.User.email,
-      name: Indico.User.fullName,
-    });
-  }
-
-  Sentry.init({
-    dsn,
-    integrations: [
-      Sentry.replayIntegration({
-        maskAllText: false,
-        blockAllMedia: false,
-        networkDetailAllowUrls: [window.location.origin, '/'],
-      }),
-      Sentry.feedbackIntegration({
-        colorScheme: 'system',
-        useSentryUser: {
-          name: 'name',
-          email: 'email',
-        },
-      }),
-    ],
-    replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 1.0,
-  });
-}
 
 (function(global) {
   global.setupTimetable = function setupTimetable() {
@@ -63,9 +33,7 @@ function initSentry(dsn) {
         evt.preventDefault();
       });
 
-      if (root.dataset.sentryDsn) {
-        initSentry(root.dataset.sentryDsn);
-      }
+      const sentry = root.dataset.sentry ? initSentry(JSON.parse(root.dataset.sentry)) : noSentry;
 
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       moment.tz.setDefault(eventInfo.timezone);
@@ -107,7 +75,7 @@ function initSentry(dsn) {
         undefined,
         undefined,
         undefined,
-        Sentry.createReduxEnhancer()
+        sentry.reduxEnhancer
       );
       store.dispatch(setTimetableData(timetableData, eventInfo));
       store.dispatch(setSessionData(eventInfo.sessions));

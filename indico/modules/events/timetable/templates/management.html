@@ -14,7 +14,7 @@
          data-event-info="{{ event_info | tojson | forceescape }}"
          data-custom-links="{{ custom_links | tojson | forceescape }}"
          data-search-token="{{ make_user_search_token() }}"
-         data-sentry-dsn="{{ indico_config.SENTRY_DSN }}">
+         data-sentry="{{ sentry_settings | tojson | forceescape }}">
     </div>
     <script>
         setupTimetable();
