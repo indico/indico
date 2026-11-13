@@ -5,6 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import * as Sentry from '@sentry/react';
 import moment from 'moment';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -22,6 +23,36 @@ import Timetable from './Timetable';
 import {ToastProvider} from './ToastContext';
 import {getCurrentDateLocalStorage} from './utils';
 
+function initSentry(dsn) {
+  if (Indico.User) {
+    Sentry.setUser({
+      id: Indico.User.id,
+      email: Indico.User.email,
+      name: Indico.User.fullName,
+    });
+  }
+
+  Sentry.init({
+    dsn,
+    integrations: [
+      Sentry.replayIntegration({
+        maskAllText: false,
+        blockAllMedia: false,
+        networkDetailAllowUrls: [window.location.origin, '/'],
+      }),
+      Sentry.feedbackIntegration({
+        colorScheme: 'system',
+        useSentryUser: {
+          name: 'name',
+          email: 'email',
+        },
+      }),
+    ],
+    replaysSessionSampleRate: 0,
+    replaysOnErrorSampleRate: 1.0,
+  });
+}
+
 (function(global) {
   global.setupTimetable = function setupTimetable() {
     const root = document.querySelector('#timetable-container');
@@ -31,6 +62,10 @@ import {getCurrentDateLocalStorage} from './utils';
       root.addEventListener('dragstart', evt => {
         evt.preventDefault();
       });
+
+      if (root.dataset.sentryDsn) {
+        initSentry(root.dataset.sentryDsn);
+      }
 
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       moment.tz.setDefault(eventInfo.timezone);
@@ -65,7 +100,15 @@ import {getCurrentDateLocalStorage} from './utils';
         },
       };
 
-      const store = createReduxStore('timetable-management', reducers, initialData);
+      const store = createReduxStore(
+        'timetable-management',
+        reducers,
+        initialData,
+        undefined,
+        undefined,
+        undefined,
+        Sentry.createReduxEnhancer()
+      );
       store.dispatch(setTimetableData(timetableData, eventInfo));
       store.dispatch(setSessionData(eventInfo.sessions));
       ReactDOM.render(
