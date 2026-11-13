@@ -6,18 +6,51 @@
 // LICENSE file for more details.
 
 @use 'base/palette' as *;
+@use 'design_system';
+
+ind-share-widget ind-with-popup {
+  display: inline-flex;
+}
 
 .share-widget {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
   cursor: pointer;
-  filter: opacity(0.6);
 
-  &:hover {
+  img {
+    filter: opacity(0.6);
+    pointer-events: none;
+  }
+
+  &:hover img,
+  &:focus-visible img {
     filter: none;
   }
 }
 
-.show {
+:global(ind-with-popup[shown]) .share-widget img {
   filter: none;
+}
+
+ind-share-widget ind-with-popup > ind-with-tooltip:not([shown]) [data-tip-content] {
+  inset: auto 0 0 auto;
+}
+
+ind-share-widget ind-with-tooltip [data-tip-content] {
+  color: var(--tooltip-text-color);
+  line-height: normal;
+}
+
+.share-content {
+  width: 450px;
+  padding: 15px;
+}
+
+ind-with-popup .share-content,
+ind-with-popup .share-content * {
+  line-height: normal;
 }
 
 .share-header-title {
@@ -50,6 +83,10 @@
   .share-button {
     margin-right: 0;
 
+    &:focus-visible {
+      @extend %default-focus-ring;
+    }
+
     img {
       width: 20px;
       height: 20px;
@@ -69,6 +106,11 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+
+  &[aria-disabled='true'] {
+    opacity: 0.45;
+    cursor: default;
+  }
 }
 
 .empty-mastodon-server-notice :global(.icon.star) {
@@ -99,6 +141,15 @@
 
     input {
       text-overflow: ellipsis;
+    }
+
+    :global(.ui.right.labeled.input) > ind-with-tooltip {
+      align-self: stretch;
+      align-items: stretch;
+    }
+
+    :global(.ui.right.labeled.input) > ind-with-tooltip > :global(.ui.button) {
+      border-radius: 0 0.28571429rem 0.28571429rem 0;
     }
   }
 
