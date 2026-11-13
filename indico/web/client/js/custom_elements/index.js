@@ -12,4 +12,5 @@ import './ind_menu.js';
 import './ind_select';
 import './ind_share_widget.js';
 import './ind_vc_room_segment.js';
+import './ind_with_toggletip';
 import './ind_with_tooltip';
