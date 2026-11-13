@@ -12,13 +12,15 @@ import tosURL from 'indico-url:legal.display_tos';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {connect} from 'react-redux';
-import {Icon, Menu, Modal} from 'semantic-ui-react';
+import {Icon, Menu} from 'semantic-ui-react';
 
-import {ResponsivePopup} from 'indico/react/components';
 import {Translate} from 'indico/react/i18n';
-import {Responsive} from 'indico/react/util';
 
 import {selectors as configSelectors} from '../common/config';
+
+import SidebarDialog from './SidebarDialog';
+
+import './SidebarFooter.module.scss';
 
 const buildMenuItems = (
   helpURL,
@@ -107,74 +109,58 @@ function SidebarFooter({
 
   return (
     <>
-      <Responsive.Phone andLarger minHeight={600}>
-        <Menu.Item>
-          {items.map(([id, item]) => {
-            // XXX: Babel doesn't transpile [x, {y, ...rest}] correctly
-            // https://github.com/babel/babel/issues/10257
-            const {href, icon, modal, caption, ...extraProps} = item;
-            return (
-              <ResponsivePopup
-                key={id}
-                inverted
-                position="bottom right"
-                trigger={
-                  <a
-                    href={href}
-                    onClick={modal ? e => openModal(e, id) : undefined}
-                    {...extraProps}
-                  >
-                    <Icon size="large" name={icon} />
-                  </a>
-                }
+      <Menu.Item>
+        {items.map(([id, item]) => {
+          const {href, icon, modal, caption, ...extraProps} = item;
+          const Control = modal ? 'button' : 'a';
+          return (
+            <ind-with-tooltip key={id}>
+              <Control
+                href={modal ? undefined : href}
+                type={modal ? 'button' : undefined}
+                styleName="footer-control"
+                onClick={modal ? e => openModal(e, id) : undefined}
+                {...(modal ? {} : extraProps)}
               >
-                {caption}
-              </ResponsivePopup>
-            );
-          })}
-        </Menu.Item>
-      </Responsive.Phone>
+                <Icon size="large" name={icon} />
+                <span data-tip-content>{caption}</span>
+              </Control>
+            </ind-with-tooltip>
+          );
+        })}
+      </Menu.Item>
       {contactEmail && (
-        <Modal
+        <SidebarDialog
           open={currentModal === 'contact'}
-          size="tiny"
-          closeIcon
+          short
+          title={Translate.string('Contact')}
           onClose={() => setModal(null)}
         >
-          <Modal.Header>
-            <Translate>Contact</Translate>
-          </Modal.Header>
-          <Modal.Content>
-            <div>
-              <Translate>
-                If you need support, you can contact the following email address:
-              </Translate>
-            </div>
-            <div>
-              <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
-            </div>
-          </Modal.Content>
-        </Modal>
+          <div>
+            <Translate>If you need support, you can contact the following email address:</Translate>
+          </div>
+          <div>
+            <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+          </div>
+        </SidebarDialog>
       )}
       {tosHTML && (
-        <Modal open={currentModal === 'tos'} closeIcon onClose={() => setModal(null)}>
-          <Modal.Header>
-            <Translate>Terms and Conditions</Translate>
-          </Modal.Header>
-          <Modal.Content>
-            <div dangerouslySetInnerHTML={{__html: tosHTML}} />
-          </Modal.Content>
-        </Modal>
+        <SidebarDialog
+          open={currentModal === 'tos'}
+          title={Translate.string('Terms and Conditions')}
+          onClose={() => setModal(null)}
+        >
+          <div dangerouslySetInnerHTML={{__html: tosHTML}} />
+        </SidebarDialog>
       )}
       {privacyPolicyHTML && (
-        <Modal open={currentModal === 'privacy'} closeIcon onClose={() => setModal(null)}>
-          <Modal.Header>
-            <Translate>Privacy Policy</Translate>
-          </Modal.Header>
-          <Modal.Content>
-            <div dangerouslySetInnerHTML={{__html: privacyPolicyHTML}} />
-          </Modal.Content>
-        </Modal>
+        <SidebarDialog
+          open={currentModal === 'privacy'}
+          title={Translate.string('Privacy Policy')}
+          onClose={() => setModal(null)}
+        >
+          <div dangerouslySetInnerHTML={{__html: privacyPolicyHTML}} />
+        </SidebarDialog>
       )}
     </>
   );
