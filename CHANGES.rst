@@ -29,7 +29,10 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- The calendar export button on the dashboard, and the copy and download buttons
+  in the export popup, now have accessible names and show a tooltip on keyboard
+  focus instead of relying on the ``title`` attribute (:pr:`7609`, thanks
+  :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
