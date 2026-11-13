@@ -9,7 +9,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
-import {Header, List, Popup, Label} from 'semantic-ui-react';
+import {Header, List} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
@@ -31,20 +31,13 @@ class UpcomingBookings extends React.PureComponent {
     }).isRequired,
   };
 
-  renderPrebookingWarning() {
-    return <Label corner="right" icon="time" color="yellow" size="small" />;
-  }
-
   renderCard({reservation: {room, id: resvId, bookingReason, isAccepted}, startDt}) {
     const mStartDT = toMoment(startDt);
     const {actions} = this.props;
+    const fullDate = mStartDT.format('ddd D MMM YYYY, LT');
 
     return (
-      <List.Item
-        key={`${resvId}-${startDt}`}
-        styleName="upcoming-bookings-item"
-        onClick={() => actions.openBookingDetails(resvId)}
-      >
+      <List.Item key={`${resvId}-${startDt}`} styleName="upcoming-bookings-item">
         <List.Content>
           <div styleName="upcoming-item-img-container">
             <SpriteImage
@@ -53,16 +46,29 @@ class UpcomingBookings extends React.PureComponent {
               height="100px"
               styles={{margin: 'auto'}}
             />
-            {!isAccepted && this.renderPrebookingWarning()}
             <List.Header as="h3" styleName="upcoming-item-room-notch">
               <span styleName="upcoming-item-room-name">{room.name}</span>
             </List.Header>
           </div>
           <List.Description>
-            <Popup trigger={<span>{mStartDT.calendar()}</span>}>{mStartDT.format('ll LT')}</Popup>
+            <time dateTime={startDt}>{fullDate}</time>
+            {!isAccepted && (
+              <span styleName="pending-status">
+                <Translate>Pending confirmation</Translate>
+              </span>
+            )}
             <p styleName="booking-reason">{bookingReason}</p>
           </List.Description>
         </List.Content>
+        <button
+          type="button"
+          styleName="details-button"
+          onClick={() => actions.openBookingDetails(resvId)}
+        >
+          <span styleName="details-button-text">
+            <Translate>View booking details</Translate>: {room.name}, {fullDate}
+          </span>
+        </button>
       </List.Item>
     );
   }
