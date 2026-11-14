@@ -9,8 +9,15 @@
           reloadManagementAttachmentInfoColumn */
 
 import _ from 'lodash';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
+import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {$T} from 'indico/utils/i18n';
+
+import {EditSessionBlockButton} from './SessionBlockForm';
+import {CreateSessionButton, EditSessionButton} from './SessionForm';
+
 import 'indico/modules/events/util/types_dialog';
 
 import './session_display';
@@ -158,4 +165,65 @@ import './session_display';
       });
     });
   }
+
+  customElements.define(
+    'ind-edit-session',
+    class extends HTMLElement {
+      connectedCallback() {
+        ReactDOM.render(
+          <EditSessionButton
+            eventId={+this.getAttribute('event-id')}
+            sessionId={+this.getAttribute('session-id')}
+            eventType={this.getAttribute('event-type')}
+          />,
+          this
+        );
+      }
+
+      disconnectedCallback() {
+        ReactDOM.unmountComponentAtNode(this);
+      }
+    }
+  );
+
+  customElements.define(
+    'ind-create-session',
+    class extends HTMLElement {
+      connectedCallback() {
+        ReactDOM.render(
+          <CreateSessionButton
+            eventId={+this.getAttribute('event-id')}
+            eventType={this.getAttribute('event-type')}
+          />,
+          this
+        );
+      }
+
+      disconnectedCallback() {
+        ReactDOM.unmountComponentAtNode(this);
+      }
+    }
+  );
+
+  customElements.define(
+    'ind-edit-session-block',
+    class extends HTMLElement {
+      connectedCallback() {
+        ReactDOM.render(
+          <UserSearchTokenContext.Provider value={this.getAttribute('search-token')}>
+            <EditSessionBlockButton
+              eventId={+this.getAttribute('event-id')}
+              sessionId={+this.getAttribute('session-id')}
+              blockId={+this.getAttribute('block-id')}
+            />
+          </UserSearchTokenContext.Provider>,
+          this
+        );
+      }
+
+      disconnectedCallback() {
+        ReactDOM.unmountComponentAtNode(this);
+      }
+    }
+  );
 })(window);

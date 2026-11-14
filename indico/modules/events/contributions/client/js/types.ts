@@ -15,4 +15,5 @@ export interface Contribution {
   end_dt: string | null;
   url?: string;
   edit_url?: string;
+  edit_search_token?: string;
 }

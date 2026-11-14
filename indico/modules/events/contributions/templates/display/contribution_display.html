@@ -126,6 +126,11 @@
             <ind-favorite-contribution-icon contribution-id="{{ contribution.id }}" event-id="{{ event.id }}"></ind-favorite-contribution-icon>
         {% endif %}
         {% if contribution.can_edit(session.user) -%}
+            <ind-edit-contribution
+                event-id="{{ event.id }}"
+                contrib-id="{{ contribution.id }}"
+                search-token="{{ make_user_search_token() }}"
+                button-class="i-button icon-edit"></ind-edit-contribution>
             <button class="i-button icon-edit"
                     data-title
                     title="{% trans %}Edit contribution{% endtrans %}"

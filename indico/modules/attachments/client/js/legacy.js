@@ -37,7 +37,8 @@ import {$T} from 'indico/utils/i18n';
       const locator = $(this).data('locator');
       const title = $(this).data('title');
       const reloadOnChange = $this.data('reload-on-change') !== undefined;
-      openAttachmentManager(locator, title, reloadOnChange, $this);
+      const details = $this.data('details');
+      openAttachmentManager(locator, title, reloadOnChange, details, $this);
     });
   });
 
@@ -220,7 +221,7 @@ import {$T} from 'indico/utils/i18n';
       });
   };
 
-  function openAttachmentManager(itemLocator, title, reloadOnChange, trigger) {
+  function openAttachmentManager(itemLocator, title, reloadOnChange, details, trigger) {
     reloadOnChange = reloadOnChange === undefined ? true : reloadOnChange;
     ajaxDialog({
       trigger,
@@ -232,7 +233,15 @@ import {$T} from 'indico/utils/i18n';
         if (customData && reloadOnChange) {
           location.reload();
         } else if (customData && trigger) {
-          trigger.trigger('attachments:updated');
+          // in case the triggering element is now disconnected from the DOM,
+          // we still want to be able to listen to these events
+          const triggerElement = trigger[0].isConnected ? trigger[0] : document;
+          $(triggerElement).trigger('attachments:updated');
+          triggerElement.dispatchEvent(
+            new CustomEvent('indico:attachmentsUpdate', {
+              detail: details,
+            })
+          );
         }
       },
     });

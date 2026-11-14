@@ -1,0 +1,760 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import createSessionURL from 'indico-url:sessions.api_create_session';
+import sessionURL from 'indico-url:sessions.api_manage_session';
+import breakCreateURL from 'indico-url:timetable.tt_break_create';
+import breakURL from 'indico-url:timetable.tt_break_rest';
+import childLocationsURL from 'indico-url:timetable.tt_child_locations';
+import contributionCreateURL from 'indico-url:timetable.tt_contrib_create';
+import contributionURL from 'indico-url:timetable.tt_contrib_rest';
+import unscheduleContributionURL from 'indico-url:timetable.tt_contrib_unschedule';
+import scheduleContribURL from 'indico-url:timetable.tt_schedule';
+import sessionBlockCreateURL from 'indico-url:timetable.tt_session_block_create';
+import sessionBlockURL from 'indico-url:timetable.tt_session_block_rest';
+
+import _ from 'lodash';
+import {Moment} from 'moment';
+import {Dispatch} from 'redux';
+
+import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+
+import {getRandomColors, parseColorsToSchema} from './colors';
+import {mapDataToEntry, mapDataToSession} from './mapperUtils';
+import {
+  TopLevelEntry,
+  BlockEntry,
+  BreakEntry,
+  ChildBreakEntry,
+  ContribEntry,
+  ChildContribEntry,
+  Entry,
+  EntryType,
+  UnscheduledContribEntry,
+  Session,
+  ReduxState,
+  SidePanelView,
+  ContribId,
+  isChildEntry,
+  LayoutOverrides,
+  ContribEntryWithoutLayout,
+  SessionBlockId,
+  EntryUniqueID,
+  Attachment,
+  EventType,
+  ChildEntry,
+  TimetableDispatch,
+} from './types';
+import {getEntryUniqueId, getEntryURLByObjId} from './utils';
+
+export const SET_DRAFT_ENTRY = 'Set draft entry';
+export const SET_TIMETABLE_DATA = 'Set timetable data';
+export const SET_SESSION_DATA = 'Set session data';
+export const DELETE_SESSION = 'Delete session';
+export const CREATE_SESSION = 'Create session';
+export const EDIT_SESSION = 'Edit session';
+export const SET_CURRENT_DATE = 'Set current date';
+export const ADD_SESSION_DATA = 'Add session data';
+export const CHANGE_ENTRY_LAYOUT = 'Change entry layout';
+export const RESIZE_ENTRY = 'Resize entry';
+export const SELECT_ENTRY = 'Select entry';
+export const DESELECT_ENTRY = 'Deselect entry';
+export const DELETE_BREAK = 'Delete break';
+export const DELETE_UNSCHEDULED_CONTRIB = 'Delete unscheduled contrib';
+export const DELETE_SCHEDULED_CONTRIB = 'Delete scheduled contrib';
+export const ADD_UNSCHEDULED_CONTRIB = 'Add unscheduled contrib';
+export const DELETE_BLOCK = 'Delete block';
+export const SCHEDULE_ENTRY = 'Schedule entry';
+export const UNSCHEDULE_ENTRY = 'Unschedule entry';
+export const TOGGLE_EXPAND = 'Toggle expand';
+export const TOGGLE_DRAFT = 'Toggle draft mode';
+export const SET_ACTIVE_PANEL = 'Set active tab in side panel';
+export const SET_EXPANDED_SESSION_BLOCK_ID = 'Set expanded session block ID';
+export const CREATE_ENTRY = 'Create entry';
+export const UPDATE_UNSCHEDULED_ENTRY = 'Update unscheduled entry';
+export const UPDATE_ENTRY = 'Update entry';
+export const SET_ENTRY_ATTACHMENTS = 'Set entry attachments';
+export const UPDATE_LOCATION_DATA = 'Update location data';
+
+interface SetTimetableDataAction {
+  type: typeof SET_TIMETABLE_DATA;
+  data: any;
+  eventInfo: any;
+}
+
+interface SetDraftEntryAction {
+  type: typeof SET_DRAFT_ENTRY;
+  data: TopLevelEntry | null;
+}
+
+interface ResizeEntryAction {
+  type: typeof RESIZE_ENTRY;
+  date: string;
+  duration: number;
+  entry: Entry;
+}
+
+interface ChangeEntryLayoutAction {
+  type: typeof CHANGE_ENTRY_LAYOUT;
+  date: string;
+  entries: TopLevelEntry[];
+  entry: TopLevelEntry;
+  sessionBlockId?: number;
+}
+
+interface SelectEntryAction {
+  type: typeof SELECT_ENTRY;
+  id: string;
+}
+
+interface DeselectEntryAction {
+  type: typeof DESELECT_ENTRY;
+}
+
+interface ScheduleEntryAction {
+  type: typeof SCHEDULE_ENTRY;
+  id: ContribId;
+  startDt: Moment;
+  sessionId: number | null;
+  sessionBlockId: SessionBlockId | null;
+  layoutOverrides: LayoutOverrides;
+}
+
+interface UnscheduleEntryAction {
+  type: typeof UNSCHEDULE_ENTRY;
+  entry: ContribEntry | ChildContribEntry;
+}
+
+interface CreateEntryAction {
+  type: typeof CREATE_ENTRY;
+  entryType: string;
+  entry: Entry;
+}
+
+interface UpdateUnscheduledEntryAction {
+  type: typeof UPDATE_UNSCHEDULED_ENTRY;
+  id: ContribId;
+  changes: Partial<ContribEntry>;
+  entryType: EntryType;
+}
+
+interface UpdateEntryAction {
+  type: typeof UPDATE_ENTRY;
+  entry: TopLevelEntry;
+  entryType: string;
+  changes: Partial<Entry>;
+  currentDay: string;
+}
+
+interface SetEntryAttachments {
+  type: typeof SET_ENTRY_ATTACHMENTS;
+  attachments: Attachment[];
+  id: EntryUniqueID;
+  sessionId: number | null;
+}
+
+interface UpdateLocationData {
+  type: typeof UPDATE_LOCATION_DATA;
+  data: Record<EntryUniqueID, any>;
+}
+
+interface DeleteBreakAction {
+  type: typeof DELETE_BREAK;
+  entry: BlockEntry | BreakEntry | ChildBreakEntry;
+}
+
+interface DeleteBlockAction {
+  type: typeof DELETE_BLOCK;
+  entry: BlockEntry;
+  eventType: EventType;
+  deleteParentSession: boolean;
+}
+
+interface DeleteUnscheduledContribAction {
+  type: typeof DELETE_UNSCHEDULED_CONTRIB;
+  id: ContribId;
+  eventId: number;
+}
+
+interface DeleteScheduledContribAction {
+  type: typeof DELETE_SCHEDULED_CONTRIB;
+  id: ContribId;
+  eventId: number;
+}
+
+interface AddUnscheduledContribAction {
+  type: typeof ADD_UNSCHEDULED_CONTRIB;
+  entry: UnscheduledContribEntry;
+}
+
+interface SetSessionDataAction {
+  type: typeof SET_SESSION_DATA;
+  data: any;
+}
+
+interface EditSessionAction {
+  type: typeof EDIT_SESSION;
+  session: Session;
+}
+
+interface CreateSessionAction {
+  type: typeof CREATE_SESSION;
+  session: Session;
+}
+
+interface DeleteSessionAction {
+  type: typeof DELETE_SESSION;
+  sessionId: number;
+}
+
+interface SetActivePanelAction {
+  type: typeof SET_ACTIVE_PANEL;
+  panel: SidePanelView;
+}
+
+interface SetCurrentDateAction {
+  type: typeof SET_CURRENT_DATE;
+  date: Moment;
+  eventId: number;
+  pushState: boolean;
+}
+
+interface ToggleExpandAction {
+  type: typeof TOGGLE_EXPAND;
+}
+
+interface ToggleDraftAction {
+  type: typeof TOGGLE_DRAFT;
+}
+
+interface SetExpandedSessionBlockIdAction {
+  sessionBlockId: string | null;
+  type: typeof SET_EXPANDED_SESSION_BLOCK_ID;
+  eventId: number;
+  pushState: boolean;
+}
+
+export type Action =
+  | SetTimetableDataAction
+  | ResizeEntryAction
+  | ChangeEntryLayoutAction
+  | SelectEntryAction
+  | DeselectEntryAction
+  | ScheduleEntryAction
+  | UnscheduleEntryAction
+  | CreateEntryAction
+  | UpdateEntryAction
+  | SetEntryAttachments
+  | UpdateLocationData
+  | DeleteBreakAction
+  | DeleteUnscheduledContribAction
+  | DeleteScheduledContribAction
+  | AddUnscheduledContribAction
+  | DeleteBlockAction
+  | SetDraftEntryAction
+  | SetSessionDataAction
+  | EditSessionAction
+  | CreateSessionAction
+  | DeleteSessionAction
+  | SetActivePanelAction
+  | SetCurrentDateAction
+  | ToggleExpandAction
+  | ToggleDraftAction
+  | UpdateUnscheduledEntryAction
+  | SetExpandedSessionBlockIdAction;
+
+export function setTimetableData(data: any, eventInfo: any): SetTimetableDataAction {
+  return {type: SET_TIMETABLE_DATA, data, eventInfo};
+}
+
+export function setSessionData(data: any): SetSessionDataAction {
+  return {type: SET_SESSION_DATA, data};
+}
+
+export function editSession(sessionId: number, payload: Record<string, unknown>) {
+  return async (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {
+      staticData: {eventId},
+    } = getState();
+    const url = sessionURL({event_id: eventId, session_id: sessionId});
+    const resp = await indicoAxios.patch(url, payload);
+    const locResp = payload.location_data
+      ? await indicoAxios.get(childLocationsURL({event_id: eventId, session_id: sessionId}))
+      : null;
+
+    dispatch({
+      type: EDIT_SESSION,
+      session: mapDataToSession(resp.data),
+    });
+    if (locResp) {
+      dispatch({
+        type: UPDATE_LOCATION_DATA,
+        data: Object.fromEntries(
+          Object.entries(locResp.data).map(([id, data]) => [
+            id,
+            mapDataToEntry(data as Record<string, any>),
+          ])
+        ),
+      });
+    }
+  };
+}
+
+// TODO: (Ajob) Implement interface for raw data session (e.g. uses ColorSchema)
+export function createSession(session: any) {
+  return async (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {
+      staticData: {eventId},
+    } = getState();
+    const url = createSessionURL({event_id: eventId});
+
+    if (!session.colors) {
+      session.colors = parseColorsToSchema(getRandomColors());
+    }
+
+    const {data: newSession} = await indicoAxios.post(url, session);
+
+    return dispatch({
+      type: CREATE_SESSION,
+      session: mapDataToSession(newSession),
+    });
+  };
+}
+
+export function deleteSession(sessionId: number) {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {
+      staticData: {eventId},
+    } = getState();
+    const url = sessionURL({event_id: eventId, session_id: sessionId});
+
+    return dispatch(
+      synchronizedAjaxAction(() => indicoAxios.delete(url), {
+        type: DELETE_SESSION,
+        sessionId,
+      })
+    );
+  };
+}
+
+export function setDraftEntry(data: any): SetDraftEntryAction {
+  return {type: SET_DRAFT_ENTRY, data};
+}
+
+export function changeEntryLayout(
+  entry: Entry,
+  entries: TopLevelEntry[],
+  date: string,
+  sessionBlockId?: number
+) {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {
+      staticData,
+      entries: {entries: stateEntries},
+    } = getState();
+    const eventId = staticData.eventId;
+
+    const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
+
+    const entryData = {
+      start_dt: entry.startDt.format(),
+      session_block_id: sessionBlockId,
+    };
+
+    const entryBeforeChanges = stateEntries[entry.id];
+    if (
+      entryBeforeChanges && // XXX can this actually be undefined?
+      entryBeforeChanges.startDt.isSame(entry.startDt) &&
+      entryBeforeChanges.sessionId === entry.sessionId
+    ) {
+      // No changes were actually made, don't update state or backend
+      return;
+    }
+
+    const updateFunc = async () => {
+      const resp = await indicoAxios.patch(entryURL, entryData);
+      if (
+        (entryBeforeChanges as ChildEntry).sessionBlockId !== (entry as ChildEntry).sessionBlockId
+      ) {
+        const newData = mapDataToEntry(resp.data);
+        const changes: Record<string, any> = {};
+        if (!_.isEqual(newData.locationData, entry.locationData)) {
+          changes.locationData = newData.locationData;
+        }
+        if (!_.isEqual(newData.locationData, entry.locationData)) {
+          changes.locationParent = newData.locationParent;
+        }
+        if (Object.keys(changes).length) {
+          dispatch({
+            type: UPDATE_LOCATION_DATA,
+            data: {[entry.id]: changes},
+          });
+        }
+      }
+    };
+
+    dispatch(
+      synchronizedAjaxAction(updateFunc, {
+        type: CHANGE_ENTRY_LAYOUT,
+        date,
+        entry,
+        entries,
+      })
+    );
+  };
+}
+
+export function toggleExpand(): ToggleExpandAction {
+  return {type: TOGGLE_EXPAND};
+}
+
+export function toggleDraft(): ToggleDraftAction {
+  return {type: TOGGLE_DRAFT};
+}
+
+export function setExpandedSessionBlock(
+  sessionBlockId: string | null,
+  eventId: number,
+  pushState = true
+): SetExpandedSessionBlockIdAction {
+  return {type: SET_EXPANDED_SESSION_BLOCK_ID, sessionBlockId, pushState, eventId};
+}
+
+export function resizeEntry(id: EntryUniqueID, duration: number, date: string) {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {staticData, entries} = getState();
+    const entry = entries.entries[id];
+    const eventId = staticData.eventId;
+    const entryURL = getEntryURLByObjId(eventId, entry.type, entry.objId);
+    const entryData = {duration: duration * 60};
+
+    if (entry.duration === duration) {
+      // No changes were actually made, don't update state or backend
+      return;
+    }
+
+    const action = synchronizedAjaxAction(() => indicoAxios.patch(entryURL, entryData), {
+      type: RESIZE_ENTRY,
+      date,
+      duration,
+      entry,
+    } as ResizeEntryAction);
+    return dispatch(action);
+  };
+}
+
+export function selectEntry(id: string): SelectEntryAction {
+  return {type: SELECT_ENTRY, id};
+}
+
+export function deselectEntry(): DeselectEntryAction {
+  return {type: DESELECT_ENTRY};
+}
+
+export function deleteBreak(entry: BreakEntry, eventId: number) {
+  const entryURL = breakURL({event_id: eventId, break_id: entry.objId});
+  return synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
+    type: DELETE_BREAK,
+    entry,
+  });
+}
+
+export function deleteUnscheduledContrib(id: number, eventId: number) {
+  const unscheduledContribURL = contributionURL({event_id: eventId, contrib_id: id});
+  return synchronizedAjaxAction(() => indicoAxios.delete(unscheduledContribURL), {
+    type: DELETE_UNSCHEDULED_CONTRIB,
+    id: getEntryUniqueId(EntryType.Contribution, id) as ContribId,
+    eventId,
+  });
+}
+
+export function deleteScheduledContrib(id: number) {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {staticData} = getState();
+    const eventId = staticData.eventId;
+    const contribURL = contributionURL({event_id: eventId, contrib_id: id});
+    const action = synchronizedAjaxAction(() => indicoAxios.delete(contribURL), {
+      type: DELETE_SCHEDULED_CONTRIB,
+      id: getEntryUniqueId(EntryType.Contribution, id) as ContribId,
+      eventId,
+    });
+    return dispatch(action);
+  };
+}
+
+export function addUnscheduledContrib(entry: UnscheduledContribEntry): AddUnscheduledContribAction {
+  return {
+    type: ADD_UNSCHEDULED_CONTRIB,
+    entry,
+  };
+}
+
+export function deleteBlock(entry: BlockEntry, eventId: number) {
+  return (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {staticData, entries} = getState();
+    const eventType = staticData.eventType;
+    const entryURL = sessionBlockURL({event_id: eventId, block_id: entry.objId});
+    const deleteParentSession =
+      eventType === 'meeting' &&
+      !Object.values(entries.entries).find(
+        e => e.sessionId === entry.sessionId && e.id !== entry.id
+      );
+    const action = synchronizedAjaxAction(() => indicoAxios.delete(entryURL), {
+      type: DELETE_BLOCK,
+      eventType,
+      entry,
+      deleteParentSession,
+    });
+    return dispatch(action);
+  };
+}
+
+export function scheduleEntry(
+  eventId: number,
+  entry: ContribEntryWithoutLayout,
+  layoutOverrides: LayoutOverrides
+) {
+  const scheduleURL = scheduleContribURL(
+    isChildEntry(entry)
+      ? {event_id: eventId, block_id: entry.sessionBlockId?.slice(1)}
+      : {event_id: eventId}
+  );
+  const updateFunc = async (dispatch: TimetableDispatch) => {
+    const resp = await indicoAxios.post(scheduleURL, {
+      contribs: [{contrib_id: entry.objId, start_dt: entry.startDt.toISOString()}],
+    });
+    // TODO it would be nicer to actually sync the whole contrib with the data
+    // from the server and not just the location information
+    dispatch({
+      type: UPDATE_LOCATION_DATA,
+      data: Object.fromEntries(
+        resp.data.map((c: any) => {
+          const ce = mapDataToEntry(c);
+          return [ce.id, {locationData: ce.locationData}];
+        })
+      ),
+    });
+  };
+  // TODO only pass contribId and none of the other stuff here?!
+  return synchronizedAjaxAction(updateFunc, {
+    type: SCHEDULE_ENTRY,
+    id: entry.id,
+    startDt: entry.startDt,
+    sessionBlockId: isChildEntry(entry) ? entry.sessionBlockId! : null,
+    sessionId: entry.sessionId!,
+    layoutOverrides,
+  });
+}
+
+export function unscheduleEntry(entry: ContribEntry, eventId: number) {
+  const entryURL = unscheduleContributionURL({event_id: eventId, contrib_id: entry.objId});
+  const updateFunc = async (dispatch: TimetableDispatch) => {
+    const resp = await indicoAxios.post(entryURL);
+    const respEntry = mapDataToEntry(resp.data);
+    dispatch({
+      type: UPDATE_LOCATION_DATA,
+      data: {
+        [respEntry.id]: {locationData: respEntry.locationData},
+      },
+    });
+  };
+  return synchronizedAjaxAction(updateFunc, {
+    type: UNSCHEDULE_ENTRY,
+    entry,
+  });
+}
+
+export function setActivePanel(panel: SidePanelView): SetActivePanelAction {
+  return {
+    type: SET_ACTIVE_PANEL,
+    panel,
+  };
+}
+
+function _createEntry(entryType: EntryType, entry: Entry): CreateEntryAction {
+  return {type: CREATE_ENTRY, entryType, entry};
+}
+
+export function createEntry(entryType: EntryType, payload: any) {
+  return async (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {
+      staticData: {eventId},
+    } = getState();
+    const createURL = {
+      [EntryType.Contribution]: contributionCreateURL({event_id: eventId}),
+      [EntryType.SessionBlock]: sessionBlockCreateURL({event_id: eventId}),
+      [EntryType.Break]: breakCreateURL({event_id: eventId}),
+    }[entryType];
+
+    const data = (await indicoAxios.post(createURL, payload))?.data;
+    data.type = entryType;
+    const resEntry = mapDataToEntry(data);
+    return dispatch(_createEntry(resEntry.type, resEntry as Entry));
+  };
+}
+
+export function updateUnscheduledEntry(
+  entryType: EntryType, // In preperation for potentially using other draft types
+  id: ContribId,
+  changes: Partial<ContribEntry>
+): UpdateUnscheduledEntryAction {
+  return {type: UPDATE_UNSCHEDULED_ENTRY, entryType, id, changes};
+}
+
+export function _updateEntry(
+  entryType: EntryType,
+  entry: Entry,
+  currentDay: string,
+  changes: Partial<Entry>
+): UpdateEntryAction {
+  return {type: UPDATE_ENTRY, entryType, entry, currentDay, changes};
+}
+
+async function _updateEntryLocationData(
+  entryType: EntryType,
+  entry: Entry,
+  eventId: number,
+  customPayload: any
+): Promise<UpdateLocationData | undefined> {
+  if (entryType !== EntryType.SessionBlock || customPayload.location_data === undefined) {
+    return;
+  }
+  const locResp = await indicoAxios.get(
+    childLocationsURL({event_id: eventId, session_id: entry.sessionId, block_id: entry.objId})
+  );
+  return {
+    type: UPDATE_LOCATION_DATA,
+    data: Object.fromEntries(
+      Object.entries(locResp.data).map(([id, data]) => [
+        id,
+        mapDataToEntry(data as Record<string, any>),
+      ])
+    ),
+  };
+}
+
+export function updateEntry(
+  entryType: EntryType,
+  entry: Entry,
+  currentDay: string,
+  customPayload: any,
+  optimistic = true
+) {
+  return async (dispatch: TimetableDispatch, getState: () => ReduxState) => {
+    const {
+      staticData: {eventId},
+    } = getState();
+    const updateURL = {
+      [EntryType.Contribution]: contributionURL({event_id: eventId, contrib_id: entry.objId}),
+      [EntryType.SessionBlock]: sessionBlockURL({event_id: eventId, block_id: entry.objId}),
+      [EntryType.Break]: breakURL({event_id: eventId, break_id: entry.objId}),
+    }[entryType];
+
+    if (optimistic) {
+      // XXX we do not have optimistic update cases where we need to deal with location changes
+      const action = synchronizedAjaxAction(
+        () => indicoAxios.patch(updateURL, customPayload),
+        _updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload))
+      );
+      dispatch(action);
+    } else {
+      // eslint-disable-next-line no-use-before-define
+      await requestQueue.ensureEmpty();
+      await indicoAxios.patch(updateURL, customPayload);
+      const updateLocationDataAction = await _updateEntryLocationData(
+        entryType,
+        entry,
+        eventId,
+        customPayload
+      );
+      dispatch(_updateEntry(entryType, entry, currentDay, mapDataToEntry(customPayload)));
+      if (updateLocationDataAction) {
+        dispatch(updateLocationDataAction);
+      }
+    }
+  };
+}
+
+export function setEntryAttachments(
+  id: EntryUniqueID,
+  sessionId: number | null,
+  attachments: Attachment[]
+): SetEntryAttachments {
+  return {type: SET_ENTRY_ATTACHMENTS, id, sessionId, attachments};
+}
+
+export function setCurrentDate(
+  date: Moment,
+  eventId: number,
+  pushState = true
+): SetCurrentDateAction {
+  return {type: SET_CURRENT_DATE, date, eventId, pushState};
+}
+
+/**
+ * Manages a queue of requests to be processed in order.
+ * This ensures all timetable requests are handled sequentially.
+ */
+// TODO(tomas): On error, we just call `handleAxiosError` for now.
+// In the future, we might consider some undo mechanism.
+class RequestQueue {
+  requests: (() => Promise<object>)[];
+  working: boolean;
+
+  constructor() {
+    this.requests = [];
+    this.working = false;
+  }
+
+  submitRequest(request: () => Promise<object>) {
+    this.requests.push(request);
+    if (!this.working) {
+      this._processRequests().catch(error => {
+        console.error('Error processing request queue:', error);
+      });
+    }
+  }
+
+  async ensureEmpty() {
+    while (this.requests.length || this.working) {
+      await new Promise(r => setTimeout(r, 0));
+    }
+  }
+
+  async _processRequests() {
+    this.working = true;
+    while (this.requests.length) {
+      const requestFunc = this.requests.shift();
+      try {
+        await requestFunc?.();
+      } catch (error) {
+        handleAxiosError(error, true);
+      }
+    }
+    this.working = false;
+  }
+}
+
+const requestQueue = new RequestQueue();
+
+/**
+ * Dispatch an action immediately and submit the fetch request to the queue.
+ *
+ * @param requestFunc Function that does the AJAX request (typically an indicoAxios call).
+ * @param action Action to dispatch immediately before the request.
+ */
+export function synchronizedAjaxAction(
+  requestFunc: (dispatch: TimetableDispatch) => Promise<any>,
+  action?: Action
+) {
+  return (dispatch: Dispatch) => {
+    if (action) {
+      dispatch(action);
+    }
+    requestQueue.submitRequest(() => requestFunc(dispatch));
+  };
+}

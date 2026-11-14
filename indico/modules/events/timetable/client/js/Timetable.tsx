@@ -1,0 +1,125 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import moment from 'moment';
+import React, {useEffect} from 'react';
+import {useSelector} from 'react-redux';
+
+import * as actions from './actions';
+import {DayTimetable} from './DayTimetable';
+import {NavigationController} from './NavigationController';
+import * as selectors from './selectors';
+import Toolbar from './Toolbar';
+import {
+  minutesToPixels,
+  useDeleteOrUnscheduleEntryAfterConfirmation,
+  useTimetableDispatch,
+} from './utils';
+
+import './timetable.scss';
+import './Timetable.module.scss';
+
+export default function Timetable() {
+  const eventId = useSelector(selectors.getEventId);
+  const eventStartDt = useSelector(selectors.getEventStartDt);
+  const isExpanded = useSelector(selectors.getIsExpanded);
+  const currentDate = useSelector(selectors.getCurrentDate);
+  const currentEntries = useSelector(selectors.getCurrentEntries);
+  const minScrollHour = 8;
+  const minHour = 0;
+  const maxHour = 23;
+
+  const _getScrollMoment = () => {
+    let scrollMoment;
+    let shouldScrollBeforeTarget = true;
+
+    if (currentEntries.length) {
+      scrollMoment = moment.min(currentEntries.map(e => e.startDt));
+    } else if (currentDate.isSame(eventStartDt, 'day')) {
+      scrollMoment = eventStartDt;
+    } else {
+      scrollMoment = moment(currentDate).hours(minScrollHour).startOf('hour');
+      shouldScrollBeforeTarget = false;
+    }
+
+    return {
+      scrollMoment: moment(scrollMoment),
+      shouldScrollBeforeTarget,
+    };
+  };
+
+  const _getScrollOffset = () => {
+    const {scrollMoment, shouldScrollBeforeTarget} = _getScrollMoment();
+    const scrollMinutes = Math.max(
+      0,
+      scrollMoment.diff(moment(scrollMoment).startOf('day'), 'minutes') -
+        (shouldScrollBeforeTarget ? 60 : 0)
+    );
+    return minutesToPixels(scrollMinutes);
+  };
+
+  const initialScrollPosition = _getScrollOffset();
+
+  return (
+    <>
+      <NavigationController />
+      <div styleName={`timetable ${isExpanded ? 'expanded' : ''}`}>
+        <GlobalEvents />
+        <Toolbar />
+        <div styleName="content">
+          <DayTimetable
+            dt={currentDate}
+            eventId={eventId}
+            minHour={minHour}
+            maxHour={maxHour}
+            entries={currentEntries}
+            scrollPosition={initialScrollPosition}
+          />
+        </div>
+      </div>
+    </>
+  );
+}
+
+function GlobalEvents() {
+  const dispatch = useTimetableDispatch();
+  const eventId = useSelector(selectors.getEventId);
+  const selectedEntry = useSelector(selectors.getSelectedEntry);
+  const deleteEntry = useDeleteOrUnscheduleEntryAfterConfirmation();
+
+  useEffect(() => {
+    function onKeydown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        // deselect selected entry
+        if (selectedEntry) {
+          dispatch(actions.deselectEntry());
+        }
+      } else if (e.key === 'Delete' || e.key === 'Backspace') {
+        if (selectedEntry) {
+          dispatch(actions.deselectEntry());
+          deleteEntry(selectedEntry);
+        }
+      }
+    }
+
+    function onScroll() {
+      // deselect selected entry
+      if (selectedEntry) {
+        dispatch(actions.deselectEntry());
+      }
+    }
+
+    document.addEventListener('keydown', onKeydown);
+    document.addEventListener('scroll', onScroll, true);
+    return () => {
+      document.removeEventListener('keydown', onKeydown);
+      document.removeEventListener('scroll', onScroll, true);
+    };
+  }, [dispatch, eventId, selectedEntry, deleteEntry]);
+
+  return null;
+}

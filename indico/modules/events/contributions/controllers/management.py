@@ -9,7 +9,7 @@ import uuid
 from operator import attrgetter
 
 from flask import flash, jsonify, redirect, request, session
-from marshmallow import fields
+from marshmallow import RAISE, fields
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 from webargs.flaskparser import abort
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -40,16 +40,18 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             delete_contribution, delete_subcontribution,
                                                             log_contribution_update, update_contribution,
                                                             update_subcontribution)
-from indico.modules.events.contributions.schemas import ContributionFieldSchema
+from indico.modules.events.contributions.schemas import (ContributionFieldSchema, ContributionRESTSchema,
+                                                         ContributionTypeSchema, FullContributionSchema)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
-                                                      get_boa_export_formats, import_contributions_from_csv,
-                                                      make_contribution_form)
+                                                      get_boa_export_formats, get_contribution_person_link_field_params,
+                                                      import_contributions_from_csv, make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.controllers.base import EditEventSettingsMixin
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.management.controllers.emails import (EmailRolesMetadataMixin, EmailRolesPreviewMixin,
                                                                  EmailRolesSendMixin)
+from indico.modules.events.management.settings import global_event_settings
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
@@ -61,9 +63,10 @@ from indico.modules.events.util import (check_event_locked, get_field_values, se
 from indico.modules.logs import EventLogRealm, LogKind
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
+from indico.util.locations import LocationParentSchema
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
-from indico.web.args import use_kwargs
+from indico.web.args import use_args, use_kwargs, use_rh_args
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -224,17 +227,22 @@ class RHCreateContribution(RHManageContributionsBase):
         return jsonify_template('events/contributions/forms/contribution.html', form=form, can_manage=True)
 
 
-class RHEditContribution(RHManageContributionBase):
-    """Edit a contribution.
+class RHEditContributionBase(RHManageContributionBase):
+    """Base RH for editing a specific contribution.
 
     If configured in the contribution settings, editing is also
     allowed for the submitters.
     """
 
     def _check_access(self):
+        self.management = self.contrib.can_manage(session.user)
         if not self.contrib.can_edit(session.user):
             raise Forbidden
         check_event_locked(self, self.event)
+
+
+class RHEditContribution(RHEditContributionBase):
+    """Edit a contribution."""
 
     def _process(self):
         can_manage = self.contrib.can_manage(session.user)
@@ -294,26 +302,36 @@ class RHContributionACLMessage(RHManageContributionBase):
 
 
 class RHContributionREST(RHManageContributionBase):
+    def _process_GET(self):
+        return FullContributionSchema().jsonify(self.contrib)
+
     def _process_DELETE(self):
         delete_contribution(self.contrib)
         flash(_("Contribution '{}' successfully deleted").format(self.contrib.title), 'success')
         return jsonify_data(**self.list_generator.render_list())
 
-    def _process_PATCH(self):
-        data = request.json
+    @use_args({
+        'session_id': fields.Integer(allow_none=True),
+        'track_id': fields.Integer(allow_none=True),
+    }, partial=True)
+    def _process_PATCH(self, data):
+        # XXX this is ONLY used for the session/track dropdowns on the contribution management page
         updates = {}
-        if set(data.keys()) > {'session_id', 'track_id'}:
-            raise BadRequest
-        if not self.event.can_manage(session.user):
-            raise Forbidden
         if 'session_id' in data:
+            if not self._can_update_scheduling():
+                raise Forbidden
             updates.update(self._get_contribution_session_updates(data['session_id']))
         if 'track_id' in data:
+            if not self._can_update_scheduling():
+                raise Forbidden
             updates.update(self._get_contribution_track_updates(data['track_id']))
         rv = {}
         if updates:
             rv = update_contribution(self.contrib, updates)
         return jsonify(unscheduled=rv.get('unscheduled', False), undo_unschedule=rv.get('undo_unschedule'))
+
+    def _can_update_scheduling(self):
+        return self.event.can_manage(session.user)
 
     def _get_contribution_session_updates(self, session_id):
         updates = {}
@@ -338,6 +356,90 @@ class RHContributionREST(RHManageContributionBase):
             if track_id != self.contrib.track_id:
                 updates['track'] = track
         return updates
+
+
+class RHAPIContribution(RHEditContributionBase):
+    def _process_GET(self):
+        return ContributionRESTSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context},
+            only=self.only_fields,
+        ).jsonify(self.contrib)
+
+    @property
+    def only_fields(self):
+        return ContributionRESTSchema.get_editable_fields(self.contrib, self.management)
+
+    @property
+    def custom_fields_context(self):
+        return ContributionRESTSchema.get_custom_fields_context(self.event, self.management)
+
+    @use_rh_args(ContributionRESTSchema, rh_only='only_fields', unknown=RAISE, partial=True)
+    def _process_PATCH(self, data):
+        if (person_links := data.pop('person_links', None)) is not None:
+            data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
+        with (track_time_changes(), track_location_changes()):
+            update_contribution(self.contrib, data, data.pop('custom_fields', None))
+
+        return ContributionRESTSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context},
+            only=self.only_fields,
+        ).jsonify(self.contrib)
+
+
+class RHAPIContributionCreate(RHManageContributionsBase):
+    @property
+    def custom_fields_context(self):
+        return ContributionRESTSchema.get_custom_fields_context(self.event, management=True)
+
+    @use_rh_args(ContributionRESTSchema)
+    def _process_POST(self, data):
+        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
+        contrib = create_contribution(self.event, data, data.pop('custom_fields', None))
+        return ContributionRESTSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context}
+        ).jsonify(contrib)
+
+
+class ContributionFormMetadataMixin:
+    def _get_metadata(self, contrib: Contribution = None, *, management: bool):
+        if contrib and not management:
+            fields = ContributionRESTSchema.get_custom_fields_context(self.event)['allowed_fields']
+            limit_fields = ContributionRESTSchema.get_editable_fields(self.contrib)
+        else:
+            # creation is limited to full managers so we never have to restrict the fields
+            fields = self.event.contribution_fields.filter_by(is_active=True).all()
+            limit_fields = None
+
+        return {
+            'allowed_keywords': sorted(global_event_settings.get('allowed_contribution_keywords')),
+            'default_duration': int(contribution_settings.get(self.event, 'default_duration').total_seconds()),
+            'person_link_field_params': get_contribution_person_link_field_params(self.event, contrib),
+            'location_parent': LocationParentSchema().dump(contrib.location_parent if contrib else self.event),
+            'limit_fields': limit_fields,
+            # XXX If you ever copy this for a future react-based abstract submission dialog, make sure to filter
+            # the list of contribution types to non-private ones!
+            'types': ContributionTypeSchema(many=True).dump(self.event.contribution_types),
+            'custom_fields': ContributionFieldSchema(
+                # TODO maybe include visiblity here and display it in the dialog so managers know who can see
+                # a custom field?
+                many=True, only=('id', 'title', 'description', 'is_required', 'field_type', 'field_data')
+            ).dump(fields),
+            'ignore_required_custom_fields': management,
+        }
+
+
+class RHAPICreateContributionFormMetadata(ContributionFormMetadataMixin, RHManageContributionsBase):
+    """Return metadata needed in the contribution creation form."""
+
+    def _process(self):
+        return jsonify(self._get_metadata(management=True))
+
+
+class RHAPIEditContributionFormMetadata(ContributionFormMetadataMixin, RHEditContributionBase):
+    """Return metadata needed in the contribution edit form."""
+
+    def _process(self):
+        return jsonify(self._get_metadata(self.contrib, management=self.management))
 
 
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
@@ -521,7 +623,6 @@ class RHContributionsExportJSON(RHManageContributionsExportActionsBase):
     """Export list of contributions to JSON."""
 
     def _process(self):
-        from indico.modules.events.contributions.schemas import FullContributionSchema
         resp = FullContributionSchema(many=True).jsonify(sorted(self.contribs, key=attrgetter('friendly_id')))
         resp.headers['Content-Disposition'] = 'attachment; filename="contributions.json"'
         return resp

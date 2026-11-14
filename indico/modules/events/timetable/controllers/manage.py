@@ -6,24 +6,43 @@
 # LICENSE file for more details.
 
 import dateutil.parser
-from flask import jsonify, request, session
+from flask import jsonify, redirect, request, session
+from webargs import fields
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
+from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.core.errors import UserValueError
+from indico.core.marshmallow import mm
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
-from indico.modules.events.contributions.operations import delete_contribution
-from indico.modules.events.sessions.operations import delete_session_block
+from indico.modules.events.contributions.controllers.management import (RHManageContributionBase,
+                                                                        RHManageContributionsBase)
+from indico.modules.events.contributions.operations import create_contribution, delete_contribution, update_contribution
+from indico.modules.events.management.controllers.base import RHManageEventBase
+from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.operations import delete_session_block, update_session_block
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
 from indico.modules.events.timetable.legacy import (TimetableSerializer, serialize_entry_update, serialize_event_info,
                                                     serialize_session)
+from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.operations import (create_timetable_entry, delete_timetable_entry,
+from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
+                                                        create_timetable_entry, delete_timetable_entry,
+                                                        schedule_contribution, update_break_entry,
                                                         update_timetable_entry)
+from indico.modules.events.timetable.schemas import BreakSchema, ContributionSchema, SessionBlockSchema
+# TODO: (Ajob) Remove 'new' indications once old timetable is fully replaced
+from indico.modules.events.timetable.serializer import TimetableSerializer as TimetableSerializerNew
+from indico.modules.events.timetable.serializer import serialize_child_location_updates
+from indico.modules.events.timetable.serializer import serialize_event_info as serialize_event_info_new
 from indico.modules.events.timetable.util import render_entry_info_balloon
-from indico.modules.events.timetable.views import WPManageTimetable
-from indico.modules.events.util import should_show_draft_warning, track_time_changes
+from indico.modules.events.timetable.views import WPManageTimetable, WPManageTimetableLegacy
+from indico.modules.events.util import should_show_draft_warning, track_location_changes, track_time_changes
+from indico.util.i18n import _
+from indico.util.marshmallow import ModelField
+from indico.web.args import use_kwargs, use_rh_args
 from indico.web.forms.colors import get_colors
 from indico.web.util import jsonify_data
 
@@ -33,15 +52,49 @@ class RHManageTimetable(RHManageTimetableBase):
 
     session_management_level = SessionManagementLevel.coordinate
 
-    def _process(self):
+    @use_kwargs({'set_preference': fields.Bool()}, location='query')
+    def _process(self, set_preference=False):
+        # The set_preference field allows switching the default timetable from the legacy
+        # to the new.
+        # TODO: Remove once the legacy timetable is removed
+        if set_preference:
+            session.user.settings.set('prefer_legacy_timetable', False)
+            return redirect(request.base_url)
+        event_info = serialize_event_info_new(self.event, user=session.user)
+        # TODO: (Ajob) Rename TimetableSerializerNew to TimetableSerializer and remove the old one
+        timetable_data = TimetableSerializerNew(self.event).serialize_timetable()
+        return WPManageTimetable.render_template(
+            'management.html',
+            self.event,
+            event_info=event_info,
+            show_draft_warning=should_show_draft_warning(self.event),
+            timetable_data=timetable_data,
+        )
+
+
+class RHManageTimetableLegacy(RHManageTimetableBase):
+    """Display timetable management page."""
+
+    session_management_level = SessionManagementLevel.coordinate
+
+    @use_kwargs({'set_preference': fields.Bool()}, location='query')
+    def _process(self, set_preference=False):
+        if set_preference:
+            session.user.settings.set('prefer_legacy_timetable', True)
+            return redirect(request.base_url)
         event_info = serialize_event_info(self.event)
         timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
-        return WPManageTimetable.render_template('management.html', self.event, event_info=event_info,
-                                                 show_draft_warning=should_show_draft_warning(self.event),
-                                                 timetable_data=timetable_data)
+        return WPManageTimetableLegacy.render_template(
+            'management_legacy.html',
+            self.event,
+            event_info=event_info,
+            show_draft_warning=should_show_draft_warning(self.event),
+            timetable_data=timetable_data,
+            show_new_timetable_button=session.user.settings.get('prefer_legacy_timetable')
+        )
 
 
-class RHManageSessionTimetable(RHManageTimetableBase):
+class RHManageSessionTimetableLegacy(RHManageTimetableBase):
     """Display session timetable management page."""
 
     session_management_level = SessionManagementLevel.coordinate
@@ -54,14 +107,20 @@ class RHManageSessionTimetable(RHManageTimetableBase):
             'can_manage_event': self.event.can_manage(session.user),
             'can_manage_session': self.session.can_manage(session.user),
             'can_manage_blocks': self.session.can_manage_blocks(session.user),
-            'can_manage_contributions': self.session.can_manage_contributions(session.user)
+            'can_manage_contributions': self.session.can_manage_contributions(session.user),
         }
-        return WPManageTimetable.render_template('session_management.html', self.event, event_info=event_info,
-                                                 timetable_data=timetable_data, session_=self.session,
-                                                 **management_rights)
+        return WPManageTimetableLegacy.render_template(
+            'session_management.html',
+            self.event,
+            event_info=event_info,
+            timetable_data=timetable_data,
+            session_=self.session,
+            show_new_timetable_button=False,
+            **management_rights,
+        )
 
 
-class RHTimetableREST(RHManageTimetableEntryBase):
+class RHTimetableRESTLegacy(RHManageTimetableEntryBase):
     """RESTful timetable actions."""
 
     def _get_contribution_updates(self, data):
@@ -129,6 +188,282 @@ class RHTimetableREST(RHManageTimetableEntryBase):
             delete_timetable_entry(self.entry)
 
 
+# TODO: (Ajob) Full rest API endpoint
+
+
+class RHTimetableBreakCreate(RHManageEventBase):
+    @use_rh_args(BreakSchema)
+    def _process_POST(self, data: Break):
+        session_block_id = data.pop('session_block', {}).pop('id', None)
+        session_block = SessionBlock.get(session_block_id) if session_block_id else None
+        data['location_data'] = (
+            self._get_inherited_location(session_block)
+            if data['location_data'].get('inheriting')
+            else data['location_data']
+        )
+        break_entry = create_break_entry(self.event, data, extend_parent=False, session_block=session_block)
+        return BreakSchema(context={'event': self.event}).jsonify(break_entry.break_)
+
+    def _get_inherited_location(self, location_parent):
+        inherited_location = location_parent.location_data if location_parent else self.event.location_data
+        inherited_location['inheriting'] = True
+        return inherited_location
+
+
+class RHTimetableBreak(RHManageEventBase):
+    normalize_url_spec = {
+        'locators': {lambda self: self.break_},
+    }
+
+    @use_kwargs({
+        'break_': ModelField(Break, data_key='break_id'),
+    }, location='view_args')
+    def _process_args(self, break_):
+        RHManageEventBase._process_args(self)
+        self.break_ = break_
+
+    @use_rh_args(BreakSchema, partial=True)
+    def _process_PATCH(self, data):
+        missing = object()
+        session_block_id = data.pop('session_block', {}).pop('id', missing)
+
+        if session_block_id is not missing:
+            self._change_parent(session_block_id)
+
+        if not data.get('timetable_entry'):
+            data.pop('timetable_entry', None)
+
+        with (track_time_changes(), track_location_changes()):
+            update_break_entry(self.break_, data)
+
+        return BreakSchema(context={'event': self.event}).jsonify(self.break_)
+
+    def _process_GET(self):
+        return BreakSchema(context={'event': self.event}).jsonify(self.break_)
+
+    def _process_DELETE(self):
+        delete_timetable_entry(self.break_.timetable_entry)
+        return '', 204
+
+    @no_autoflush
+    def _change_parent(self, session_block_id):
+        entry = self.break_.timetable_entry
+        current_block = self.break_.session_block
+
+        if session_block_id is None:
+            if current_block is None:
+                return
+            if entry.parent is not None:
+                self.break_.session_block = None
+                self.break_.session = None
+                return
+
+        target_id = int(session_block_id)
+
+        if current_block is not None and current_block.id == target_id:
+            return
+        target_block = self.event.get_session_block(session_block_id)
+
+        self.break_.session_block = target_block
+        self.break_.session = target_block.session
+
+        update_timetable_entry(entry, {
+            'parent': target_block.timetable_entry,
+            'start_dt': entry.start_dt
+        })
+
+
+class RHTimetableContributionCreate(RHManageContributionsBase):
+    @use_rh_args(ContributionSchema)
+    def _process_POST(self, data):
+        data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in data.pop('person_links', [])}
+        session_block = SessionBlock.get(data['session_block_id']) if data.get('session_block_id') else None
+        data['location_data'] = (
+            self._get_inherited_location(session_block)
+            if data['location_data'].get('inheriting')
+            else data['location_data']
+        )
+        contrib = create_contribution(self.event, data, data.pop('custom_fields', None), session_block=session_block)
+        return ContributionSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context}
+        ).jsonify(contrib)
+
+    @property
+    def custom_fields_context(self):
+        return ContributionSchema.get_custom_fields_context(self.event, management=True)
+
+    def _get_inherited_location(self, location_parent):
+        inherited_location = location_parent.location_data if location_parent else self.event.location_data
+        inherited_location['inheriting'] = True
+        return inherited_location
+
+
+class RHTimetableContribution(RHManageContributionBase):
+    @use_rh_args(ContributionSchema, partial=True)
+    def _process_PATCH(self, data):
+        if (person_links := data.pop('person_links', None)) is not None:
+            data['person_link_data'] = {v['person_link']: v['is_submitter'] for v in person_links}
+
+        session_block_specified = 'session_block_id' in data
+        session_block_id = data.pop('session_block_id', None)
+
+        if session_block_specified:
+            self._change_parent(session_block_id)
+
+        with (track_time_changes(), track_location_changes()):
+            update_contribution(self.contrib, data, data.pop('custom_fields', None))
+
+        return ContributionSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context}
+        ).jsonify(self.contrib)
+
+    def _process_GET(self):
+        return ContributionSchema(
+            context={'event': self.event, 'custom_fields_context': self.custom_fields_context}
+        ).jsonify(self.contrib)
+
+    def _process_DELETE(self):
+        delete_contribution(self.contrib)
+        return '', 204
+
+    @property
+    def custom_fields_context(self):
+        return ContributionSchema.get_custom_fields_context(self.event, management=True)
+
+    def _change_parent(self, session_block_id):
+        entry = self.contrib.timetable_entry
+        current_block = self.contrib.session_block
+
+        if session_block_id is None:
+            if current_block is None:
+                return
+            self.contrib.session_block = None
+            self.contrib.session = None
+            update_timetable_entry(entry, {
+                'parent': None,
+                'start_dt': entry.start_dt
+            })
+
+        if current_block is not None and current_block.id == session_block_id:
+            return
+
+        if session_block_id is not None:
+            target_block = self.event.get_session_block(session_block_id)
+            if target_block is None:
+                raise BadRequest('Session block does not exist')
+
+            self.contrib.session_block = target_block
+            self.contrib.session = target_block.session
+
+            update_timetable_entry(entry, {
+                'parent': target_block.timetable_entry,
+                'start_dt': entry.start_dt
+            })
+
+
+class RHTimetableUnscheduleContribution(RHManageContributionBase):
+    def _process_POST(self):
+        delete_timetable_entry(self.contrib.timetable_entry)
+        return ContributionSchema(
+            context={
+                'event': self.event,
+                'custom_fields_context': ContributionSchema.get_custom_fields_context(self.event, management=True),
+            }
+        ).jsonify(self.contrib)
+
+
+class RHTimetableScheduleContribution(RHManageTimetableBase):
+    session_management_level = SessionManagementLevel.coordinate
+    class ScheduleContribSchema(mm.Schema):
+        contrib_id = fields.Int(required=True)
+        start_dt = fields.DateTime(required=True)
+
+    @use_kwargs({
+        'block_id': fields.Int(load_default=None),
+    }, location='view_args')
+    def _process_args(self, block_id):
+        RHManageTimetableBase._process_args(self)
+        self.session_block = None
+        if block_id is not None:
+            self.session_block = self.event.get_session_block(request.view_args['block_id'])
+
+    @use_kwargs({
+        'contribs': fields.List(fields.Nested(ScheduleContribSchema), required=True),
+    })
+    def _process(self, contribs):
+        contrib_map = {c['contrib_id']: c['start_dt'] for c in contribs}
+        contribs = (
+            Contribution
+                .query.with_parent(self.event)
+                .filter(Contribution.id.in_(contrib_map.keys()))
+                .all()
+        )
+
+        with track_time_changes():
+            for contrib in contribs:
+                if self.session_block is None:
+                    contrib.session = None
+                if self.session and contrib.session_id != self.session.id:
+                    # TODO(tomas): Allow scheduling contributions assigned to other sessions?
+                    raise Forbidden('Contribution not assigned to this session')
+
+                start_dt = contrib_map[contrib.id]
+                entry = schedule_contribution(contrib, start_dt, session_block=self.session_block,
+                                              extend_parent=False)
+                if entry.end_dt.astimezone(entry.event.tzinfo).date() > start_dt.date():
+                    raise UserValueError(_("Contribution '{}' could not be scheduled since it doesn't fit on this day.")
+                                         .format(contrib.title))
+        return ContributionSchema(
+            many=True,
+            context={
+                'event': self.event,
+                'custom_fields_context': ContributionSchema.get_custom_fields_context(self.event, management=True),
+            },
+        ).jsonify(contribs)
+
+
+class RHTimetableSessionBlockCreate(RHManageEventBase):
+    @use_rh_args(SessionBlockSchema)
+    def _process_POST(self, data: SessionBlockSchema):
+        session = self.event.get_session(data['session_id'])
+
+        if not session:
+            raise NotFound
+
+        block_entry = create_session_block_entry(session, data, extend_parent=False)
+        return SessionBlockSchema(context={'event': self.event}).jsonify(block_entry.session_block)
+
+
+class RHTimetableSessionBlock(RHManageEventBase):
+    normalize_url_spec = {
+        'locators': {lambda self: self.session_block},
+        'skipped_args': {'session_id'},
+    }
+
+    @use_kwargs({
+        'block': ModelField(SessionBlock, data_key='block_id'),
+    }, location='view_args')
+    def _process_args(self, block):
+        RHManageEventBase._process_args(self)
+        self.session_block = block
+
+    @use_rh_args(SessionBlockSchema, partial=True)
+    def _process_PATCH(self, data):
+        with (track_time_changes(), track_location_changes()):
+            update_session_block(self.session_block, data)
+
+        return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)
+
+    def _process_GET(self):
+        return SessionBlockSchema(context={'event': self.event}).jsonify(self.session_block)
+
+    def _process_DELETE(self):
+        delete_session_block(self.session_block)
+        return '', 204
+
+# END OF REST API
+
+
 class RHManageTimetableEntryInfo(RHManageTimetableEntryBase):
     """Display timetable entry info balloon in management mode."""
 
@@ -177,9 +512,32 @@ class RHCloneContribution(RHManageTimetableBase):
     def _process_args(self):
         RHManageTimetableBase._process_args(self)
         self.contrib = (Contribution.query.with_parent(self.event)
-                        .filter_by(id=request.args['contrib_id'])
-                        .one())
+                .filter_by(id=request.args['contrib_id'])
+                .one())
 
     def _process(self):
         contrib = ContributionCloner.clone_single_contribution(self.contrib, preserve_session=True)
         return jsonify_data(update=serialize_entry_update(contrib.timetable_entry, session_=contrib.session))
+
+
+class RHTimetableChildLocations(RHManageTimetableBase):
+    """Return location data for children of a session or block."""
+
+    normalize_url_spec = {
+        # It doesn't really matter here, but we want to avoid `self.session_block`
+        # ever being for a different session than `self.session`
+        'locators': {lambda self: self.obj},
+    }
+
+    @use_kwargs({
+        'block_id': fields.Int(load_default=None),
+    }, location='view_args')
+    def _process_args(self, block_id):
+        RHManageTimetableBase._process_args(self)
+        if block_id is not None:
+            self.obj = self.event.get_session_block(block_id)
+        else:
+            self.obj = self.session
+
+    def _process(self):
+        return jsonify(serialize_child_location_updates(self.obj))

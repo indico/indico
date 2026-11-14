@@ -272,6 +272,7 @@ def render_entry_info_balloon(entry, editable=False, sess=None, is_session_timet
                                event_locked=entry.event.is_locked)
     elif entry.session_block:
         return render_template('events/timetable/balloons/block.html', block=entry.session_block, editable=editable,
+                               event=entry.event,
                                can_manage_session=sess.can_manage(session.user) if sess else True,
                                can_manage_blocks=sess.can_manage_blocks(session.user) if sess else True,
                                color_list=get_colors(), event_locked=entry.event.is_locked,
