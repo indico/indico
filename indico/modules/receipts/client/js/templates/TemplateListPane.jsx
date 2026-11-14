@@ -17,9 +17,9 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
-import {Dropdown, Icon, Label, Accordion} from 'semantic-ui-react';
+import {Dropdown, Icon, Label} from 'semantic-ui-react';
 
-import {RequestConfirmDelete} from 'indico/react/components';
+import {CollapsibleContainer, RequestConfirmDelete} from 'indico/react/components';
 import {Param, Translate} from 'indico/react/i18n';
 import {handleAxiosError, indicoAxios} from 'indico/utils/axios';
 
@@ -193,13 +193,13 @@ export default function TemplateListPane({
       )}
       {!!otherTemplates.length && (
         <section>
-          <Accordion
+          <CollapsibleContainer
             panels={[
               {
                 key: 'other',
                 title: {
                   content: (
-                    <h4>
+                    <h4 style={{marginTop: 0}}>
                       <Translate>Other templates</Translate>
                     </h4>
                   ),
