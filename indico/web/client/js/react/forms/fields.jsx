@@ -146,7 +146,7 @@ FormFieldAdapter.propTypes = {
   hideValidationError: PropTypes.oneOf([true, false, 'message', 'never']),
   hideErrorWhileActive: PropTypes.bool,
   undefinedValue: PropTypes.any,
-  label: PropTypes.string,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
   componentLabel: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   placeholder: PropTypes.string,
   meta: PropTypes.object.isRequired,
@@ -448,7 +448,7 @@ FinalField.defaultProps = {
 
 /**
  * @typedef {FinalFieldProps & {
- *   label?: string;
+ *   label?: string | React.ReactNode;
  *   type?: 'text'|'email'|'number'|'tel'|'password';
  *   nullIfEmpty?: boolean;
  *   noAutoComplete?: boolean;
@@ -494,7 +494,7 @@ export function FinalInput({name, label, type, nullIfEmpty, noAutoComplete, ...r
 
 FinalInput.propTypes = {
   name: PropTypes.string.isRequired,
-  label: PropTypes.string,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   // XXX: just add new <input> types here as soon as you start using them,
   // but make sure to handle it properly above (like adding the trim formatter
   // for a field that lets users enter strings)
