@@ -62,6 +62,8 @@ _bp.add_url_rule('/manage/papers/deadlines/<any(judge,content_reviewer,layout_re
                  management.RHSetDeadline, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/settings', 'manage_reviewing_settings', management.RHManageReviewingSettings,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/papers/submission_settings', 'manage_submission_settings',
+                 management.RHManageSubmissionSettings, methods=('GET', 'PUT', 'DELETE'))
 _bp.add_url_rule('/manage/papers/questions/<any(content,layout):review_type>', 'manage_reviewing_questions',
                  management.RHManageReviewingQuestions, methods=('GET',))
 _bp.add_url_rule('/manage/papers/questions/<any(content,layout):review_type>/create', 'create_reviewing_question',
