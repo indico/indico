@@ -22,10 +22,31 @@ from werkzeug.datastructures import MultiDict
 import indico
 from indico.core.config import config
 from indico.core.logger import Logger
+from indico.core.settings.proxy import SettingsProxy
 from indico.util.i18n import set_best_lang
 
 
 logger = Logger.get('sentry')
+
+# these settings are sent to the client, do not put anything sensitive in there!
+sentry_client_settings = SettingsProxy('sentry_client', {
+    'enabled': False,
+    'feedback': False,
+    'replay': False,
+    'replay_error_sample_rate': 1.0,
+})
+
+
+def serialize_sentry_client_settings() -> dict:
+    """Return a dict with the client-side Sentry settings.
+
+    These must not contain anything sensitive (the DSN is *not* a secret),
+    and need to be JSON-serializable.
+    """
+    settings = sentry_client_settings.get_all()
+    if not config.SENTRY_DSN or not settings['enabled']:
+        return {'enabled': False}
+    return settings | {'dsn': config.SENTRY_DSN}
 
 
 def init_sentry(app):

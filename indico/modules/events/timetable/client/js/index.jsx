@@ -14,6 +14,7 @@ import {SidePanelView} from 'indico/modules/events/timetable/types';
 import {UserSearchTokenContext} from 'indico/react/components/principals/Search';
 import {camelizeKeys} from 'indico/utils/case';
 import createReduxStore from 'indico/utils/redux';
+import {initSentry, noSentry} from 'indico/utils/sentry';
 
 import {setSessionData, setTimetableData} from './actions';
 import {ModalProvider} from './ModalContext';
@@ -31,6 +32,8 @@ import {getCurrentDateLocalStorage} from './utils';
       root.addEventListener('dragstart', evt => {
         evt.preventDefault();
       });
+
+      const sentry = root.dataset.sentry ? initSentry(JSON.parse(root.dataset.sentry)) : noSentry;
 
       const eventInfo = JSON.parse(root.dataset.eventInfo);
       moment.tz.setDefault(eventInfo.timezone);
@@ -65,7 +68,15 @@ import {getCurrentDateLocalStorage} from './utils';
         },
       };
 
-      const store = createReduxStore('timetable-management', reducers, initialData);
+      const store = createReduxStore(
+        'timetable-management',
+        reducers,
+        initialData,
+        undefined,
+        undefined,
+        undefined,
+        sentry.reduxEnhancer
+      );
       store.dispatch(setTimetableData(timetableData, eventInfo));
       store.dispatch(setSessionData(eventInfo.sessions));
       ReactDOM.render(

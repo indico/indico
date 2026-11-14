@@ -14,6 +14,7 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.core.marshmallow import mm
+from indico.core.sentry import serialize_sentry_client_settings
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.management import (RHManageContributionBase,
@@ -69,6 +70,7 @@ class RHManageTimetable(RHManageTimetableBase):
             event_info=event_info,
             show_draft_warning=should_show_draft_warning(self.event),
             timetable_data=timetable_data,
+            sentry_settings=serialize_sentry_client_settings(),
         )
 
 
