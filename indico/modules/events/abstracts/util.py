@@ -10,6 +10,7 @@ import itertools
 import os
 import shutil
 from collections import defaultdict, namedtuple
+from operator import attrgetter
 
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
@@ -429,14 +430,17 @@ def get_events_with_abstract_persons(user, dt=None):
 
 
 def filter_field_values(fields, can_manage, owns_abstract):
-    active_fields = {field for field in fields if field.contribution_field.is_active}
+    """Get the field values visible to the user, sorted by field position."""
+    active_fields = [field for field in fields if field.contribution_field.is_active]
     if can_manage:
-        return active_fields
-    if owns_abstract:
-        return {field for field in active_fields
-                if field.contribution_field.visibility != ContributionFieldVisibility.managers_only}
-    return {field for field in active_fields
-            if field.contribution_field.visibility == ContributionFieldVisibility.public}
+        visible_fields = active_fields
+    elif owns_abstract:
+        visible_fields = [field for field in active_fields
+                          if field.contribution_field.visibility != ContributionFieldVisibility.managers_only]
+    else:
+        visible_fields = [field for field in active_fields
+                          if field.contribution_field.visibility == ContributionFieldVisibility.public]
+    return sorted(visible_fields, key=attrgetter('contribution_field.position'))
 
 
 def can_create_invited_abstracts(event):
