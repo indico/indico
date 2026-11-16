@@ -35,3 +35,7 @@ ul.rb-menu {
     overflow: visible;
   }
 }
+
+.accessible-label {
+  @extend %visually-hidden;
+}
