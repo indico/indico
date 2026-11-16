@@ -390,6 +390,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             - it has the same size as the frontside
             - the templates are linked to the same registration form or
               at least one template is not linked to any registration form
+            - the backside template belongs to the same ancestry (unless already set)
         """
         same_size = (
             self.template.data['width'] == backside_template.data['width'] and
@@ -409,6 +410,11 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             not linked_to_same_regform
         ):
             raise BadRequest('Incompatible backside template')
+
+        if backside_template != self.template.backside_template:
+            allowed_templates = set(self.target.designer_templates) | get_inherited_templates(self.target)
+            if backside_template not in allowed_templates:
+                raise Forbidden('This template is not available here.')
 
 
 class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):
