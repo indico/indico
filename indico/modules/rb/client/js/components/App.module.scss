@@ -28,6 +28,7 @@ $title-breakpoint: 500px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  row-gap: 1em;
 
   // make dropdown menus overlap whatever
   // is in the content page
@@ -94,6 +95,10 @@ $title-breakpoint: 500px;
 
   * {
     margin-left: auto;
+  }
+
+  i:global(.icon) {
+    color: $dark-black;
   }
 }
 
