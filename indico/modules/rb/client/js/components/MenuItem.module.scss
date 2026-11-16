@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/palette' as *;
+@use 'design_system/visibility';
 
 .rb-menu-item {
   background-color: $highlight-color;
@@ -17,8 +18,9 @@
 
   a,
   a:hover {
-    color: $white;
+    color: $dark-black;
     display: block;
+    position: relative;
   }
 
   &:hover {
@@ -38,4 +40,12 @@
 
 .rb-menu-item:global(.selected) {
   background: darken($highlight-color, 15%);
+
+  a {
+    box-shadow: inset 0 -0.18em $dark-black;
+  }
+}
+
+.current-page {
+  @extend %visually-hidden;
 }

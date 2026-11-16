@@ -10,7 +10,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
-import MediaQuery from 'react-responsive';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {Dimmer, Header, Icon, Loader, Segment, Sidebar} from 'semantic-ui-react';
 
@@ -138,9 +137,7 @@ class App extends React.Component {
               <h1>
                 <Link to="/" onClick={() => resetPageState('bookRoom')}>
                   <Icon name={iconName} />
-                  <MediaQuery as="span" minWidth={500}>
-                    {title}
-                  </MediaQuery>
+                  <span styleName="rb-title">{title}</span>
                 </Link>
               </h1>
             </div>

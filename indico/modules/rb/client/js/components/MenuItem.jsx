@@ -10,6 +10,8 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {Link, Route} from 'react-router-dom';
 
+import {Translate} from 'indico/react/i18n';
+
 import * as globalActions from '../actions';
 
 import './MenuItem.module.scss';
@@ -21,6 +23,12 @@ function MenuItem({namespace, path, children, resetPageState}) {
         <li className={match ? 'selected' : ''} styleName="rb-menu-item">
           <Link to={path} onClick={() => resetPageState(namespace)}>
             {children}
+            {match && (
+              <span styleName="current-page">
+                {' '}
+                <Translate>(current)</Translate>
+              </span>
+            )}
           </Link>
         </li>
       )}
