@@ -7,6 +7,7 @@
 
 // TODO: This file should be removed once the legacy timetable is removed
 
+import imageURL from 'indico-url:assets.image';
 import newTimetableURL from 'indico-url:timetable.management';
 
 import React, {useCallback, useEffect, useState} from 'react';
@@ -84,20 +85,15 @@ function NewTimetableDialog({eventId, onClose}: {eventId: number; onClose?: () =
 
   return (
     <Modal size="tiny" open={popupVisible} onClose={handleClose} closeIcon>
+      <Modal.Header style={{borderBottom: 'none'}}>
+        🎉 <Translate>Try out the new timetable!</Translate>
+      </Modal.Header>
       <Modal.Content>
-        <h2 style={{color: 'black', fontWeight: 'bold'}}>
-          🎉 <Translate>Try out the new timetable!</Translate>
-        </h2>
-        <strong
-          style={{
-            color: '#f0f',
-            fontFamily: 'Comic Sans MS',
-            fontSize: '1.5em',
-          }}
-        >
-          TODO - add an image here instead of this text!
-        </strong>
-        <br />
+        <img
+          src={imageURL({filename: 'drag_drop_timetable.svg'})}
+          alt="New timetable"
+          style={{width: '80%', maxWidth: '250px', margin: '0 auto 40px auto', display: 'block'}}
+        />
         The Indico team is proud to present a complete redesign of the timetable page! Featuring a
         modern look, it aims to be more intuitive and easy-to-use, while preserving all the
         functionality.
@@ -106,7 +102,7 @@ function NewTimetableDialog({eventId, onClose}: {eventId: number; onClose?: () =
         <Button styleName="dont-show-again" onClick={handleDontShowAgain}>
           <Translate>Don't show again</Translate>
         </Button>
-        <Button positive onClick={handleGoToNewTimetable}>
+        <Button positive styleName="try-new-timetable" onClick={handleGoToNewTimetable}>
           <Translate>Try it!</Translate>
         </Button>
       </Modal.Actions>
@@ -138,7 +134,7 @@ function NewTimetableButton({eventId}: {eventId: number}) {
         trigger={
           <Button
             primary
-            styleName="try-new-timetable"
+            styleName="try-new-timetable rounded"
             size="tiny"
             href={newTimetableURL({event_id: eventId, set_preference: true})}
           >

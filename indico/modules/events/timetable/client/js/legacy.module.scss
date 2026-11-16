@@ -7,11 +7,20 @@
 
 // TODO: This file should be removed once the legacy timetable is removed
 
+$call-to-action-color: rgb(138, 41, 171);
+
 .dont-show-again {
   background-color: transparent !important;
 }
 
 .try-new-timetable {
-  background-color: rgb(138, 41, 171) !important;
-  border-radius: 10em !important;
+  background-color: $call-to-action-color !important;
+
+  &.rounded {
+    border-radius: 10em !important;
+  }
+
+  &:hover {
+    background-color: darken($call-to-action-color, 10%) !important;
+  }
 }
