@@ -10,6 +10,7 @@ import fs from 'fs';
 import Module from 'node:module';
 import path from 'path';
 
+import {sentryWebpackPlugin} from '@sentry/bundler-plugins/webpack';
 import autoprefixer from 'autoprefixer';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import MonacoEditorWebpackPlugin from 'monaco-editor-webpack-plugin';
@@ -225,6 +226,24 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
         contextRegExp: /moment$/,
       });
 
+  const sentryPlugin =
+    !isPlugin &&
+    process.env.SENTRY_AUTH_TOKEN &&
+    process.env.SENTRY_ORG &&
+    process.env.SENTRY_PROJECT
+      ? [
+          sentryWebpackPlugin({
+            authToken: process.env.SENTRY_AUTH_TOKEN,
+            org: process.env.SENTRY_ORG,
+            project: process.env.SENTRY_PROJECT,
+          }),
+        ]
+      : [];
+
+  if (sentryPlugin.length) {
+    console.log('Sentry credentials found -> source map uploads enabled');
+  }
+
   return {
     devtool: 'source-map',
     cache: true,
@@ -305,6 +324,7 @@ export function webpackDefaults(env, config, bundles, isPlugin = false) {
         filename: 'js/monaco.[name].worker.js',
         languages: ['html', 'yaml', 'css'],
       }),
+      ...sentryPlugin,
     ],
     resolve: {
       alias: [{name: 'indico', alias: path.join(indicoClientPath, 'js/')}],

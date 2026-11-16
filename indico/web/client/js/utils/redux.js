@@ -43,7 +43,8 @@ export default function createReduxStore(
   initialData = {},
   additionalMiddleware = [],
   postReducers = [],
-  enhancer = r => r
+  enhancer = r => r,
+  sentryReduxEnhancer = undefined
 ) {
   const middleware = [thunkMiddleware, ...additionalMiddleware];
   const composeEnhancers = composeWithDevTools({name: `Indico:${name}`});
@@ -60,7 +61,10 @@ export default function createReduxStore(
       )
     ),
     initialData,
-    composeEnhancers(applyMiddleware(...middleware))
+    composeEnhancers(
+      applyMiddleware(...middleware),
+      ...(sentryReduxEnhancer ? [sentryReduxEnhancer] : [])
+    )
   );
 }
 
