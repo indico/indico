@@ -12,10 +12,10 @@ from webargs.flaskparser import abort
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration.fields.simple import KEEP_EXISTING_FILE_UUID
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.util import (check_registration_email, get_flat_section_submission_data,
-                                                     get_form_registration_data, load_registration_schema,
-                                                     make_registration_schema, modify_registration,
-                                                     process_registration_picture)
+from indico.modules.events.registration.util import (can_moderate_registrations, check_registration_email,
+                                                     get_flat_section_submission_data, get_form_registration_data,
+                                                     load_registration_schema, make_registration_schema,
+                                                     modify_registration, process_registration_picture)
 from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users.models.affiliations import Affiliation
 from indico.util.i18n import _
@@ -83,7 +83,9 @@ class RegistrationEditMixin:
         notify_user = not self.management or form_data.pop('notify_user', False)
         if self.management:
             session['registration_notify_user_default'] = notify_user
-        modify_registration(self.registration, form_data, management=self.management, notify_user=notify_user)
+        skip_moderation = self.management and can_moderate_registrations(self.event, session.user)
+        modify_registration(self.registration, form_data, management=self.management, notify_user=notify_user,
+                            skip_moderation=skip_moderation)
         return jsonify({'redirect': self.success_url})
 
     def _process_GET(self):
