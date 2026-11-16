@@ -128,6 +128,8 @@ class App extends React.Component {
   render() {
     const {title, history, iconName, resetPageState, isInitializing} = this.props;
     const {userActionsVisible} = this.state;
+    const shortTitle =
+      title === Translate.string('Room Booking') ? Translate.string('Room') : title;
 
     return (
       <ConnectedRouter history={history}>
@@ -137,7 +139,10 @@ class App extends React.Component {
               <h1>
                 <Link to="/" onClick={() => resetPageState('bookRoom')}>
                   <Icon name={iconName} />
-                  <span styleName="rb-title">{title}</span>
+                  <span aria-hidden="true" styleName="rb-title">
+                    {shortTitle}
+                  </span>
+                  <span styleName="accessible-title">{title}</span>
                 </Link>
               </h1>
             </div>

@@ -75,6 +75,10 @@ $title-breakpoint: 500px;
   }
 }
 
+.accessible-title {
+  @extend %visually-hidden;
+}
+
 @mixin rb-menu-bar-side {
   flex-grow: 1;
   display: flex;

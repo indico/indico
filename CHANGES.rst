@@ -29,8 +29,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Keep room-booking navigation links named on mobile screens, improve their text and icon
-  contrast, identify the current destination and keep navigation usable with enlarged text
+- Keep compact room-booking navigation links fully named for screen readers, improve their text
+  and icon contrast, identify the current destination and keep navigation usable with enlarged text
   (:pr:`7898`, thanks :user:`foxbunny`)
 
 Internal Changes
