@@ -8,6 +8,9 @@
 @use 'rb:styles/util' as *;
 @use 'rb:styles/palette' as *;
 @use 'rb:styles/responsive' as *;
+@use 'design_system/visibility';
+
+$title-breakpoint: 500px;
 
 .rb-layout {
   // this will reset the stacking context,
@@ -20,9 +23,11 @@
   background-color: $highlight-color;
   padding: 0 20px;
   margin: 0;
-  height: $menu-height;
+  min-height: $menu-height;
   line-height: $menu-height;
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
 
   // make dropdown menus overlap whatever
   // is in the content page
@@ -37,19 +42,35 @@
   }
 
   h1 {
-    display: inline-block;
+    display: flex;
     margin: 0;
-    color: $white;
-    line-height: $menu-height;
+    color: $dark-black;
+    line-height: 1.2;
 
     a {
-      color: $white;
+      color: $dark-black;
+      display: inline-flex;
+      align-items: center;
+      min-height: $menu-height;
       margin-left: 0.2em;
+      position: relative;
     }
   }
 
   :global(.column) {
     display: flex;
+  }
+}
+
+.rb-title {
+  @extend %visually-hidden;
+
+  @media (min-width: $title-breakpoint) {
+    position: static;
+    clip-path: none;
+    width: auto;
+    height: auto;
+    overflow: visible;
   }
 }
 
@@ -60,6 +81,8 @@
 
 .rb-menu-bar-side-left {
   @include rb-menu-bar-side();
+  min-width: 0;
+  max-width: 100%;
 
   * {
     margin-right: auto;

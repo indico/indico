@@ -10,7 +10,6 @@ import React from 'react';
 import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {Responsive} from 'indico/react/util';
 
 import MenuItem from './MenuItem';
 
@@ -53,9 +52,7 @@ export default function Menu({labels}) {
       {menuItems.map(([key, {path, icon}]) => (
         <MenuItem key={key} path={path} namespace={key}>
           <Icon name={icon} />
-          <Responsive.Tablet as="span" andLarger>
-            {finalLabels[key]}
-          </Responsive.Tablet>
+          <span styleName="menu-label">{finalLabels[key]}</span>
         </MenuItem>
       ))}
     </ul>
