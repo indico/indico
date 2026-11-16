@@ -34,6 +34,7 @@ sentry_client_settings = SettingsProxy('sentry_client', {
     'feedback': False,
     'replay': False,
     'replay_error_sample_rate': 1.0,
+    'tunnel': None,
 })
 
 
