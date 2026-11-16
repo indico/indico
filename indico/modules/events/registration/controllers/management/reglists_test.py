@@ -12,6 +12,7 @@ from flask import request, session
 from werkzeug.exceptions import Forbidden, UnprocessableEntity
 
 from indico.core import signals
+from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.registration.controllers.management.fields import _fill_form_field_with_data
 from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationCreate,
                                                                                 RHRegistrationDetails,
@@ -243,3 +244,98 @@ def test_registration_management_requires_manageable_registration(db, dummy_regf
             else:
                 with pytest.raises(Forbidden, match='this registration'):
                     rh._check_access()
+
+
+_CSRF_TOKEN = '00000000-0000-0000-0000-000000000001'
+
+
+@pytest.fixture
+def moderation_manager(dummy_regform, create_user, test_client):
+    """Log in a manager of a moderated regform with the given permissions."""
+    set_feature_enabled(dummy_regform.event, 'registration', True)
+    dummy_regform.moderation_enabled = True
+
+    def _login(permissions):
+        user = create_user(123, email='manager@example.test')
+        if permissions == 'full':
+            dummy_regform.event.update_principal(user, full_access=True)
+        else:
+            dummy_regform.event.update_principal(user, add_permissions=permissions)
+        with test_client.session_transaction() as sess:
+            sess.set_session_user(user)
+            sess['_csrf_token'] = _CSRF_TOKEN
+        return user
+
+    return _login
+
+
+_moderation_matrix = pytest.mark.parametrize(('permissions', 'expected_state'), (
+    ({'registration_edit'}, RegistrationState.pending),
+    ({'registration_edit', 'registration_moderation'}, RegistrationState.complete),
+    ({'registration'}, RegistrationState.complete),
+    ('full', RegistrationState.complete),
+))
+
+
+@_moderation_matrix
+@pytest.mark.usefixtures('smtp', 'no_csrf_check')
+def test_registration_create_moderation(dummy_regform, test_client, moderation_manager, permissions, expected_state):
+    moderation_manager(permissions)
+    url = f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/registrations/create'
+    resp = test_client.post(url, json={'first_name': 'Greater', 'last_name': 'Capybara',
+                                       'email': 'capybara@example.test'})
+    assert resp.status_code == 200
+    registration = dummy_regform.get_registration(email='capybara@example.test')
+    assert registration.state == expected_state
+    with test_client.session_transaction() as sess:
+        expected_message = ('The registration was created and is awaiting approval.'
+                            if expected_state == RegistrationState.pending else 'The registration was created.')
+        assert sess['_flashes'] == [('success', expected_message)]
+
+
+@pytest.mark.usefixtures('smtp', 'no_csrf_check')
+def test_registration_create_unmoderated(dummy_regform, test_client, moderation_manager):
+    moderation_manager({'registration_edit'})
+    dummy_regform.moderation_enabled = False
+    url = f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/registrations/create'
+    resp = test_client.post(url, json={'first_name': 'Greater', 'last_name': 'Capybara',
+                                       'email': 'capybara@example.test'})
+    assert resp.status_code == 200
+    registration = dummy_regform.get_registration(email='capybara@example.test')
+    assert registration.state == RegistrationState.complete
+
+
+@_moderation_matrix
+@pytest.mark.usefixtures('smtp')
+def test_registration_create_multiple_moderation(dummy_regform, dummy_user, test_client, moderation_manager,
+                                                 permissions, expected_state):
+    moderation_manager(permissions)
+    url = f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/registrations/create-multiple'
+    resp = test_client.post(url, data={'csrf_token': _CSRF_TOKEN, 'user_principals': f'["{dummy_user.identifier}"]'})
+    assert resp.status_code == 200
+    registration = dummy_regform.get_registration(user=dummy_user)
+    assert registration.state == expected_state
+
+
+@pytest.mark.parametrize(('permissions', 'reset_approval', 'expected_state'), (
+    ({'registration_edit'}, True, RegistrationState.pending),
+    ({'registration_edit'}, False, RegistrationState.complete),
+    ({'registration_edit', 'registration_moderation'}, True, RegistrationState.complete),
+    ({'registration'}, True, RegistrationState.complete),
+    ('full', True, RegistrationState.complete),
+))
+@pytest.mark.usefixtures('smtp', 'no_csrf_check')
+def test_registration_edit_moderation(dummy_regform, test_client, moderation_manager, permissions, reset_approval,
+                                      expected_state):
+    dummy_regform.reset_approval_on_modification = reset_approval
+    registration = create_registration(dummy_regform, {'email': 'capybara@example.test', 'first_name': 'Greater',
+                                                       'last_name': 'Capybara'},
+                                       management=True, notify_user=False)
+    assert registration.state == RegistrationState.complete
+    moderation_manager(permissions)
+    url = (f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/registrations/'
+           f'{registration.id}/edit')
+    resp = test_client.post(url, json={'last_name': 'Lesser'})
+    assert resp.status_code == 200
+    assert registration.last_name == 'Lesser'
+    assert registration.state == expected_state

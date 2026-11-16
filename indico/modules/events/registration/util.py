@@ -433,6 +433,10 @@ def create_personal_data_fields(regform):
         section.children.append(field)
 
 
+def can_moderate_registrations(event, user):
+    return any(event.can_manage(user, permission=p) for p in ('registration', 'registration_moderation'))
+
+
 @no_autoflush
 def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
@@ -488,10 +492,12 @@ def create_registration(regform, data, invitation=None, management=False, notify
 
 
 @no_autoflush
-def modify_registration(registration, data, management=False, notify_user=True):
+def modify_registration(registration, data, management=False, notify_user=True, skip_moderation=None):
     from indico.modules.events.registration.tasks import delete_previous_registration_file
 
     user = session.user if session else None
+    if skip_moderation is None:
+        skip_moderation = management
     old_data = snapshot_registration_data(registration)
     old_price = registration.price
     personal_data_changes = {}
@@ -570,7 +576,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
         if consent_to_publish is not None:
             update_registration_consent_to_publish(registration, consent_to_publish)
 
-    registration.sync_state(_skip_moderation=management)
+    registration.sync_state(_skip_moderation=skip_moderation)
     registration.set_modified()
     db.session.flush()
     # sanity check
