@@ -340,7 +340,11 @@ function TimetableSidePanel() {
                     onCreate: contrib => {
                       // TODO: (Ajob) Instead of manual conversion we should
                       //              adjust the actual endpoint and its usages
-                      contrib = mapDataToEntry({...contrib, type: EntryType.Contribution});
+                      contrib = mapDataToEntry({
+                        ...contrib,
+                        type: EntryType.Contribution,
+                        attachments: [],
+                      });
                       dispatch(actions.addUnscheduledContrib(contrib));
                       setSelectedFilters([]);
                       setDraftSearchQuery('');
