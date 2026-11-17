@@ -47,7 +47,7 @@ def serialize_sentry_client_settings() -> dict:
     settings = sentry_client_settings.get_all()
     if not config.SENTRY_DSN or not settings['enabled']:
         return {'enabled': False}
-    return settings | {'dsn': config.SENTRY_DSN}
+    return settings | {'dsn': config.SENTRY_DSN, 'release': indico.__version__}
 
 
 def init_sentry(app):

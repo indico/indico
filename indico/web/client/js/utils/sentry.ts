@@ -13,6 +13,7 @@ type SentryConfig =
       enabled: true;
       dsn: string;
       tunnel: string | null;
+      release: string;
       feedback: boolean;
       replay: boolean;
       replay_error_sample_rate: number;
@@ -55,6 +56,7 @@ export function initSentry(config: SentryConfig): {reduxEnhancer: unknown} {
   Sentry.init({
     dsn: config.dsn,
     tunnel: config.tunnel ?? undefined,
+    release: config.release,
     integrations,
     replaysSessionSampleRate: 0,
     replaysOnErrorSampleRate: config.replay_error_sample_rate,
