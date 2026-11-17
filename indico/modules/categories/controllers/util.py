@@ -144,6 +144,16 @@ def get_event_query_filter(category, is_flat=False, hidden_event_ids=None):
     return db.and_(*criteria)
 
 
+def get_category_managers(category):
+    managers = {
+        user
+        for entry in category.acl_entries
+        if entry.has_management_permission()
+        for user in entry.get_users()
+    }
+    return sorted(managers, key=lambda user: (user.first_name.lower(), user.last_name.lower(), user.id))
+
+
 def get_category_view_params(category, now, is_flat=False):
     from .display import RHDisplayCategoryEventsBase
 

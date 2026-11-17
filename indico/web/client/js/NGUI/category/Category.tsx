@@ -101,7 +101,7 @@ export function Category({categoryId, isFlat}: CategoryProps) {
             />
           )}
         </section>
-        <CategorySidebar categoryId={categoryId} isFlat={isFlat} />
+        {!category.isRoot && <CategorySidebar categoryId={categoryId} />}
       </section>
     </div>
   );

@@ -17,6 +17,19 @@ export interface Category {
   hasChildren: boolean;
 }
 
+export interface CategoryManager {
+  id: number;
+  fullName: string;
+  avatarURL: string;
+}
+
+export interface CategoryMaterial {
+  id: number;
+  title: string;
+  url: string;
+  isProtected: boolean;
+}
+
 export interface CategoryChildMetadata {
   id: number;
   title: string;

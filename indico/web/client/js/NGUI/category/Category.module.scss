@@ -12,6 +12,13 @@
   background: #e8e8e8;
 }
 
+:global(.category-container) {
+  overflow-x: clip;
+  min-height: 100vh;
+  box-sizing: border-box;
+  align-content: start;
+}
+
 :global(.indico-ui) {
   .category-wrapper {
     display: flex;

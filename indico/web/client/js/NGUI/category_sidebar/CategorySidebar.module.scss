@@ -10,9 +10,38 @@
 :global(.indico-ui) {
   .category-sidebar {
     position: sticky;
+    top: var(--space-3);
+    align-self: flex-start;
     min-width: 300px;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
+  }
+
+  .manager-avatar {
+    flex: 0 0 auto;
+    width: calc(var(--icon-size-md) * 2);
+    height: calc(var(--icon-size-md) * 2);
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .manager-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1-5);
+  }
+
+  .sidebar-list {
+    margin-top: var(--space-3);
+    gap: var(--space-1);
+  }
+
+  .material-list {
+    gap: 0;
+
+    :global(.list-item-content) {
+      padding-block: var(--space-1);
+    }
   }
 }

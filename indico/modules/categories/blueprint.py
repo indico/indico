@@ -13,6 +13,7 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHCategoryChildrenJSON, RHCategoryClosestEvent,
                                                            RHCategoryEventListWithMetadataJSON, RHCategoryIcon,
                                                            RHCategoryInfo, RHCategoryLogo, RHCategoryManagedEventSearch,
+                                                           RHCategoryManagersJSON, RHCategoryMaterialsJSON,
                                                            RHCategoryOverview, RHCategoryPreviousEvent,
                                                            RHCategorySearch, RHCategoryStatistics,
                                                            RHCategoryStatisticsJSON, RHCategoryUpcomingEvent,
@@ -116,6 +117,8 @@ _bp.add_url_rule('/api/children', 'api_category_children', RHCategoryChildrenJSO
 _bp.add_url_rule('/api/event-list', 'api_event_list', RHEventListJSON)
 _bp.add_url_rule('/api/event-list-with-metadata', 'api_event_list_with_metadata', RHCategoryEventListWithMetadataJSON)
 _bp.add_url_rule('/api/info', 'api_category_info', RHDisplayCategoryJSON)
+_bp.add_url_rule('/api/managers', 'api_category_managers', RHCategoryManagersJSON)
+_bp.add_url_rule('/api/materials', 'api_category_materials', RHCategoryMaterialsJSON)
 _bp.add_url_rule('/api/event-move-requests', 'api_event_move_requests', RHAPIEventMoveRequests, methods=('GET', 'POST'))
 _bp.add_url_rule('/api/events/search-for-series', 'event_search', RHCategoryManagedEventSearch)
 

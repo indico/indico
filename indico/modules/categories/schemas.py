@@ -30,6 +30,30 @@ class CategoryUserSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'full_name', 'first_name', 'last_name', 'title', 'affiliation', 'avatar_url')
 
 
+class CategoryManagerSchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
+        model = User
+        fields = ('id', 'full_name', 'avatar_url')
+
+
+class CategoryMaterialSchema(mm.Schema):
+    id = fields.Integer()
+    title = fields.String()
+    url = fields.Method('_get_url')
+    is_protected = fields.Boolean()
+    attachments = fields.List(fields.Nested('self'))
+
+    def _get_url(self, material):
+        if not hasattr(material, 'type'):
+            return None
+        return material.link_url if material.type.name == 'link' else material.download_url
+
+
+class CategoryMaterialsSchema(mm.Schema):
+    files = fields.List(fields.Nested(CategoryMaterialSchema), dump_default=list)
+    folders = fields.List(fields.Nested(CategoryMaterialSchema), dump_default=list)
+
+
 class EventMoveRequestSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = EventMoveRequest

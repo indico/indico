@@ -109,8 +109,6 @@ def serialize_manager(acl_entry):
 
 
 def serialize_category(category, with_favorite=False, with_path=False, parent_path=None, child_path=None):
-    print('preeeeeeeeeeeee----')
-    print('pre data', [acl_entry.user.name for acl_entry in category.acl_entries])
     data = {
         'id': category.id,
         'title': category.title,
@@ -125,7 +123,7 @@ def serialize_category(category, with_favorite=False, with_path=False, parent_pa
         'can_manage': category.can_manage(session.user),
         'managers': [serialize_manager(m) for m in iter(category.acl_entries)],
     }
-    print('post data', data)
+
     if with_path:
         if child_path:
             data['path'] = child_path[:]
