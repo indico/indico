@@ -907,7 +907,7 @@ function layoutAfterDropOnCalendar(
   if (startDt.isBefore(minStartDt)) {
     startDt = minStartDt.clone();
   }
-  let endDt = startDt.clone().add(fromEntry.duration);
+  let endDt = startDt.clone().add(fromEntry.duration, 'minutes');
   if (endDt.isAfter(maxEndDt)) {
     const diff = endDt.diff(maxEndDt, 'minutes');
     startDt = startDt.subtract(diff, 'minutes');
