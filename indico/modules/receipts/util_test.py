@@ -38,9 +38,12 @@ def test_named_field_lookup(name, key, access):
     expression = f'registration.field_data_by_name{access}.friendly_value'
     assert compile_jinja_code('{{ ' + expression + ' }}', context) == 'Zero-Point-Module'
     placeholders = dict(get_preview_placeholders(context))
-    assert expression in placeholders
-    assert f'registration.field_data_by_name{access}.config' in placeholders
-    assert not any(f'registration.field_data_by_name{access}.config.' in key for key in placeholders)
+    assert {key for key in placeholders if key.startswith(f'registration.field_data_by_name{access}.')} == {expression}
+    assert 'registration.field_data[0].config' in placeholders
+    assert 'registration.field_data[0].raw_value' in placeholders
+    assert compile_jinja_code(
+        '{{ registration.field_data_by_name' + access + '.config.item_type }}', context
+    ) == 'dropdown'
     expression = f'registration.custom_data{access}'
     assert compile_jinja_code('{{ ' + expression + ' }}', context) == 'Zero-Point-Module'
     assert expression in placeholders
