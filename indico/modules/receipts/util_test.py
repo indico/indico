@@ -87,9 +87,9 @@ def test_named_fields_from_registration(db, dummy_event, dummy_reg, dummy_regfor
 
 def test_personal_fields_excluded_from_custom_data(db, dummy_event, dummy_reg, dummy_regform):
     field = next(field for field in dummy_regform.active_fields if field.internal_name == 'first-name')
-    dummy_reg.data.append(RegistrationData(field_data=field.current_data, data='Guinea'))
+    dummy_reg.data.append(RegistrationData(field_data=field.current_data, data='Jane'))
     db.session.flush()
     registration = get_safe_template_context(dummy_event, dummy_reg, {})['registration']
-    assert registration['field_data_by_name']['first_name']['friendly_value'] == 'Guinea'
-    assert registration['personal_data']['first_name'] == 'Guinea'
+    assert registration['field_data_by_name']['first_name']['friendly_value'] == 'Jane'
+    assert registration['personal_data']['first_name'] == 'Jane'
     assert registration['custom_data'] == {}
