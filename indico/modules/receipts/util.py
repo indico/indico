@@ -334,11 +334,13 @@ def _get_preview_placeholders(value: t.Any, _name: str = ''):
         for k, v in value.items():
             if _name in ('registration.field_data_by_name', 'registration.custom_data'):
                 key = f'.{k}' if k.isidentifier() and not hasattr(value, k) else f'[{k!r}]'
-                yield from _get_preview_placeholders(v, f'{_name}{key}')
+                if _name == 'registration.field_data_by_name':
+                    yield f'{_name}{key}.friendly_value', _render_placeholder_value(v['friendly_value'])
+                else:
+                    yield from _get_preview_placeholders(v, f'{_name}{key}')
                 continue
             prefix = f'{_name}.' if _name else ''
-            if (prefix.startswith(('registration.field_data[', 'registration.field_data_by_name'))
-                    and k in ('config', 'raw_value')):
+            if prefix.startswith('registration.field_data[') and k in ('config', 'raw_value'):
                 # don't descend into config and raw value of a field
                 yield f'{prefix}{k}', _render_placeholder_value(v)
             else:
