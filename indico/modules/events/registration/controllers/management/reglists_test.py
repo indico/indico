@@ -276,10 +276,18 @@ _moderation_matrix = pytest.mark.parametrize(('permissions', 'expected_state'), 
 ))
 
 
-@_moderation_matrix
+@pytest.mark.parametrize(('permissions', 'moderation_enabled', 'expected_state'), (
+    ({'registration_edit'}, True, RegistrationState.pending),
+    ({'registration_edit'}, False, RegistrationState.complete),
+    ({'registration_edit', 'registration_moderation'}, True, RegistrationState.complete),
+    ({'registration'}, True, RegistrationState.complete),
+    ('full', True, RegistrationState.complete),
+))
 @pytest.mark.usefixtures('smtp', 'no_csrf_check')
-def test_registration_create_moderation(dummy_regform, test_client, moderation_manager, permissions, expected_state):
+def test_registration_create_moderation(dummy_regform, test_client, moderation_manager, permissions,
+                                        moderation_enabled, expected_state):
     moderation_manager(permissions)
+    dummy_regform.moderation_enabled = moderation_enabled
     url = f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/registrations/create'
     resp = test_client.post(url, json={'first_name': 'Greater', 'last_name': 'Capybara',
                                        'email': 'capybara@example.test'})
@@ -290,18 +298,6 @@ def test_registration_create_moderation(dummy_regform, test_client, moderation_m
         expected_message = ('The registration was created and is awaiting approval.'
                             if expected_state == RegistrationState.pending else 'The registration was created.')
         assert sess['_flashes'] == [('success', expected_message)]
-
-
-@pytest.mark.usefixtures('smtp', 'no_csrf_check')
-def test_registration_create_unmoderated(dummy_regform, test_client, moderation_manager):
-    moderation_manager({'registration_edit'})
-    dummy_regform.moderation_enabled = False
-    url = f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/registrations/create'
-    resp = test_client.post(url, json={'first_name': 'Greater', 'last_name': 'Capybara',
-                                       'email': 'capybara@example.test'})
-    assert resp.status_code == 200
-    registration = dummy_regform.get_registration(email='capybara@example.test')
-    assert registration.state == RegistrationState.complete
 
 
 @_moderation_matrix
