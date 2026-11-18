@@ -235,7 +235,7 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
                                       for field in data['field_data'] if field.get('internal_name')}
         data['custom_data'] = {name: field['friendly_value']
                                for name, field in data['field_data_by_name'].items()
-                               if not field.get('is_personal_data', False)}
+                               if not field.get('is_personal_data')}
         return data
 
 
