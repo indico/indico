@@ -30,10 +30,10 @@ class CategoryUserSchema(mm.SQLAlchemyAutoSchema):
         fields = ('id', 'full_name', 'first_name', 'last_name', 'title', 'affiliation', 'avatar_url')
 
 
-class CategoryManagerSchema(mm.SQLAlchemyAutoSchema):
-    class Meta:
-        model = User
-        fields = ('id', 'full_name', 'avatar_url')
+class CategoryManagerSchema(mm.Schema):
+    id = fields.Integer()
+    full_name = fields.String()
+    avatar_url = fields.String()
 
 
 class CategoryMaterialSchema(mm.Schema):
@@ -41,7 +41,7 @@ class CategoryMaterialSchema(mm.Schema):
     title = fields.String()
     url = fields.Method('_get_url')
     is_protected = fields.Boolean()
-    attachments = fields.List(fields.Nested('self'))
+    attachments = fields.List(fields.Nested(lambda: CategoryMaterialSchema()))
 
     def _get_url(self, material):
         if not hasattr(material, 'type'):

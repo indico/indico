@@ -71,7 +71,11 @@ export function Category({categoryId, isFlat}: CategoryProps) {
   // (Ajob) Honestly, I think the whole idea of checking the string for 'Home' is very hacky
   let title;
   if (isUntitledRoot) {
-    title = <Translate>{category.hasChildren ? 'Main categories' : 'All events'}</Translate>;
+    title = category.hasChildren ? (
+      <Translate>Main categories</Translate>
+    ) : (
+      <Translate>All events</Translate>
+    );
   } else {
     title = category.title;
   }
