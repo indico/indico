@@ -1,0 +1,56 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system/visibility';
+
+.dialog:global(.ui.modal) {
+  position: fixed;
+  inset: 0;
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  overflow: auto;
+
+  &[open] {
+    display: block;
+  }
+
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.85);
+  }
+
+  > :global(.header) {
+    padding-right: 3rem;
+
+    h2 {
+      margin: 0;
+      font-size: inherit;
+      line-height: inherit;
+    }
+  }
+}
+
+.close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+  border: 0;
+  background: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 2px;
+  }
+}
+
+.visually-hidden {
+  @extend %visually-hidden;
+}
