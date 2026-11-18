@@ -19,12 +19,12 @@
   align-content: start;
 }
 
-:global(.main) {
+:global(.main):has(:global(.category-container)) {
   display: flex;
   flex-direction: column;
 }
 
-:global(.main > div) {
+:global(.main):has(:global(.category-container)) > :global(div) {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
