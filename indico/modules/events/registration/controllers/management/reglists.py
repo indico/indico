@@ -451,6 +451,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
                 'uuid': PROFILE_PICTURE_SENTINEL,
                 'previewUrl': user.avatar_url,
             }
+        skip_moderation = can_moderate_registrations(self.event, session.user)
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,
                                                     form_data=form_data,
@@ -460,6 +461,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     invitation=None,
                                                     registration=None,
                                                     management=True,
+                                                    skip_moderation=skip_moderation,
                                                     login_required=False,
                                                     is_restricted_access=False,
                                                     captcha_required=False)

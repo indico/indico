@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import json
 from decimal import Decimal
 
 import pytest
@@ -339,3 +340,30 @@ def test_registration_edit_moderation(dummy_regform, test_client, moderation_man
     assert resp.status_code == 200
     assert registration.last_name == 'Lesser'
     assert registration.state == expected_state
+
+
+@_moderation_matrix
+def test_registration_create_page_moderation(dummy_regform, test_client, moderation_manager, permissions,
+                                             expected_state):
+    moderated = expected_state == RegistrationState.pending
+    moderation_manager(permissions)
+    resp = test_client.get(f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/'
+                           'registrations/create')
+    assert resp.status_code == 200
+    assert f'data-moderated="{json.dumps(moderated)}"' in resp.text
+    assert ('Participation in this event is moderated' in resp.text) == moderated
+
+
+@_moderation_matrix
+def test_registration_edit_page_reset_approval_warning(dummy_regform, test_client, moderation_manager, permissions,
+                                                       expected_state):
+    warning_shown = expected_state == RegistrationState.pending
+    dummy_regform.reset_approval_on_modification = True
+    registration = create_registration(dummy_regform, {'email': 'capybara@example.test', 'first_name': 'Greater',
+                                                       'last_name': 'Capybara'},
+                                       management=True, notify_user=False)
+    moderation_manager(permissions)
+    resp = test_client.get(f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/'
+                           f'registrations/{registration.id}/edit')
+    assert resp.status_code == 200
+    assert ('it needs to be approved again by the event organizer' in resp.text) == warning_shown

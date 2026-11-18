@@ -13,7 +13,7 @@
 
 
 {% set moderated = (regform.moderation_enabled and
-                    not management and
+                    not (management and skip_moderation) and
                     (not invitation or not invitation.skip_moderation)) %}
 
 

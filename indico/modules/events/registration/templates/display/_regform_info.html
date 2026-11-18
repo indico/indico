@@ -75,3 +75,12 @@
         {{ message_box('info', regform.introduction | markdown) }}
     {% endif %}
 {% endmacro %}
+
+
+{% macro render_modification_resets_approval_warning() %}
+    {% call message_box('warning') %}
+        {%- trans -%}
+            If you modify this registration, it needs to be approved again by the event organizer.
+        {%- endtrans -%}
+    {% endcall %}
+{% endmacro %}
