@@ -7,6 +7,7 @@
 
 @use 'base' as *;
 @use 'partials/boxes' as *;
+@use 'design_system';
 
 $editor-preview-bg-color: $light-gray;
 $display-preview-bg-color: white;
@@ -161,6 +162,10 @@ $display-preview-bg-color: white;
   display: flex;
   align-items: center;
   justify-content: flex-end;
+
+  > li:not(.wmd-spacer) {
+    display: contents;
+  }
 }
 
 .wmd-spacer {
@@ -209,70 +214,81 @@ $display-preview-bg-color: white;
 }
 
 .wmd-button {
+  @extend %button-clear;
   @include transition(color);
+  padding: 0;
   width: 2em;
   height: 2em;
-  line-height: 2em;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: $black;
-  text-align: center;
   cursor: pointer;
 
   &:hover {
     color: $gray;
   }
+
+  &:focus-visible {
+    @extend %default-focus-ring;
+  }
 }
 
-.wmd-button > span {
+.wmd-button > .text-label {
+  @extend %visually-hidden;
+}
+
+.wmd-button > span:not([data-tip-content]):not(.text-label) {
   font-family: 'icomoon-ultimate';
-  vertical-align: middle;
+  display: inline-flex;
+  line-height: 1;
 }
 
-[id^='wmd-bold-button'] span {
+[id^='wmd-bold-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-bold');
 }
 
-[id^='wmd-italic-button'] span {
+[id^='wmd-italic-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-italic');
 }
 
-[id^='wmd-link-button'] span {
+[id^='wmd-link-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-link');
 }
 
-[id^='wmd-quote-button'] span {
+[id^='wmd-quote-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-bubble-quote');
 }
 
-[id^='wmd-code-button'] span {
+[id^='wmd-code-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-code');
 }
 
-[id^='wmd-image-button'] span {
+[id^='wmd-image-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-image');
 }
 
-[id^='wmd-olist-button'] span {
+[id^='wmd-olist-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-numbered-list');
 }
 
-[id^='wmd-ulist-button'] span {
+[id^='wmd-ulist-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-list');
 }
 
-[id^='wmd-heading-button'] span {
+[id^='wmd-heading-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-type');
 }
 
-[id^='wmd-hr-button'] span {
+[id^='wmd-hr-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-pagebreak');
 }
 
-[id^='wmd-undo-button'] span {
+[id^='wmd-undo-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-undo');
 }
 
-[id^='wmd-redo-button'] span {
+[id^='wmd-redo-button'] span:not([data-tip-content]):not(.text-label) {
   @include icon-before('icon-redo');
 }
 
