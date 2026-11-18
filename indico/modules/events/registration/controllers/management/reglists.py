@@ -486,17 +486,18 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
     def _process(self):
         form = CreateMultipleRegistrationsForm(regform=self.regform, open_add_user_dialog=(request.method == 'GET'),
                                                notify_users=session.get('registration_notify_user_default', True))
+        skip_moderation = can_moderate_registrations(self.event, session.user)
 
         if form.validate_on_submit():
             if self.regform.is_purged:
                 raise Forbidden(_('Registration is disabled due to an expired retention period'))
             session['registration_notify_user_default'] = form.notify_users.data
-            skip_moderation = can_moderate_registrations(self.event, session.user)
             for user in form.user_principals.data:
                 self._register_user(user, form.notify_users.data, skip_moderation)
             return jsonify_data(**self.list_generator.render_list())
 
-        return jsonify_template('events/registration/management/registration_create_multiple.html', form=form)
+        return jsonify_template('events/registration/management/registration_create_multiple.html', form=form,
+                                moderated=(self.regform.moderation_enabled and not skip_moderation))
 
 
 class RHRegistrationCheckEmail(CheckEmailMixin, RHManageRegFormBase):
