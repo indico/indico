@@ -51,6 +51,10 @@ class RegistrationFormMixin:
 
 
 class RegistrationEditMixin:
+    @property
+    def skip_moderation(self):
+        return self.management and can_moderate_registrations(self.event, session.user)
+
     def _get_file_data(self):
         locator_name = 'file' if self.management else 'registrant_file'
         return {r.field_data.field.html_field_name: {'filename': r.filename, 'size': r.size,
@@ -83,9 +87,8 @@ class RegistrationEditMixin:
         notify_user = not self.management or form_data.pop('notify_user', False)
         if self.management:
             session['registration_notify_user_default'] = notify_user
-        skip_moderation = self.management and can_moderate_registrations(self.event, session.user)
         modify_registration(self.registration, form_data, management=self.management, notify_user=notify_user,
-                            skip_moderation=skip_moderation)
+                            skip_moderation=self.skip_moderation)
         return jsonify({'redirect': self.success_url})
 
     def _process_GET(self):
@@ -100,6 +103,7 @@ class RegistrationEditMixin:
                                                payment_enabled=self.event.has_feature('payment'),
                                                registration=self.registration,
                                                management=self.management,
+                                               skip_moderation=self.skip_moderation,
                                                paid=self.registration.is_paid,
                                                registration_data=registration_data,
                                                file_data=self._get_file_data())
