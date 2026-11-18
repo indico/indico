@@ -105,8 +105,12 @@ export class Landing extends React.Component {
   renderCarousel() {
     const {upcomingBookings} = this.props;
     const panes = [
-      {key: 'upcoming', content: <UpcomingBookings bookings={upcomingBookings} />, delay: 20},
-      {key: 'stats', content: <LandingStatistics />},
+      {
+        key: 'upcoming',
+        label: Translate.string('Your bookings'),
+        content: <UpcomingBookings bookings={upcomingBookings} />,
+      },
+      {key: 'stats', label: Translate.string('Statistics'), content: <LandingStatistics />},
     ];
     return <Carousel panes={panes} />;
   }
