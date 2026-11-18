@@ -82,17 +82,21 @@ export function Category({categoryId, isFlat}: CategoryProps) {
         <section styleName="category-main">
           <Card styleName="category-info">
             <h1>{title}</h1>
-            <div styleName="category-info-sub">
-              {category.logoURL && (
-                <img styleName="category-logo" src={category.logoURL} alt={category.title} />
-              )}
-              <div styleName="category-description">
-                {/* Markdown will be replaced by custom solution */}
-                <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
+            {(category.logoURL || category.description) && (
+              <div styleName="category-info-sub">
+                {category.logoURL && (
+                  <img styleName="category-logo" src={category.logoURL} alt={category.title} />
+                )}
+                {category.description && (
+                  <div styleName="category-description">
+                    {/* Markdown will be replaced by custom solution */}
+                    <Markdown rehypePlugins={[remarkRehype]}>{category.description}</Markdown>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </Card>
-          {!isFlat && <CategoryCardList data={categoryChildren} />}
+          {!isFlat && categoryChildren.length > 0 && <CategoryCardList data={categoryChildren} />}
           {!categoryEventListWithMetaDataLoading && categoryEventListWithMeta && (
             <EventList
               viewData={categoryEventListWithMeta}

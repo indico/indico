@@ -14,13 +14,27 @@
 
 :global(.category-container) {
   overflow-x: clip;
-  min-height: 100vh;
+  flex-grow: 1;
   box-sizing: border-box;
   align-content: start;
 }
 
+:global(.main) {
+  display: flex;
+  flex-direction: column;
+}
+
+:global(.main > div) {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 :global(.indico-ui) {
   .category-wrapper {
+    width: 100%;
+    max-width: var(--container-xl);
+    margin-inline: auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;

@@ -39,38 +39,50 @@ export function CategorySidebar({categoryId}: CategorySidebarProps) {
 
   return (
     <div styleName="category-sidebar">
-      {!managersLoading && managers?.length ? (
+      {!managersLoading ? (
         <Card>
           <Card.Header styleName="manager-header">
             <Card.Icon icon="fas:folder" />
             <Translate>Managers</Translate>
           </Card.Header>
-          <List styleName="sidebar-list">
-            {managers.map(manager => (
-              <List.Item key={manager.id}>
-                <img styleName="manager-avatar" src={manager.avatarURL} alt="" />
-                <List.Item.Details>{manager.fullName}</List.Item.Details>
-              </List.Item>
-            ))}
-          </List>
+          {managers?.length ? (
+            <List styleName="sidebar-list">
+              {managers.map(manager => (
+                <List.Item key={manager.id}>
+                  <img styleName="manager-avatar" src={manager.avatarURL} alt="" />
+                  <List.Item.Details>{manager.fullName}</List.Item.Details>
+                </List.Item>
+              ))}
+            </List>
+          ) : (
+            <Card.Description styleName="sidebar-empty">
+              <Translate>There are no managers.</Translate>
+            </Card.Description>
+          )}
         </Card>
       ) : null}
-      {!materialsLoading && materialItems.length ? (
+      {!materialsLoading ? (
         <Card>
           <Card.Header styleName="manager-header">
             <Card.Icon icon="fas:paperclip" />
             <Translate>Materials</Translate>
           </Card.Header>
-          <List styleName="sidebar-list material-list">
-            {materialItems.map(material => (
-              <List.Item
-                key={material.id}
-                contentProps={{href: material.url, target: '_blank', rel: 'noopener noreferrer'}}
-              >
-                <List.Item.Details title={material.title}>{material.title}</List.Item.Details>
-              </List.Item>
-            ))}
-          </List>
+          {materialItems.length ? (
+            <List styleName="sidebar-list material-list">
+              {materialItems.map(material => (
+                <List.Item
+                  key={material.id}
+                  contentProps={{href: material.url, target: '_blank', rel: 'noopener noreferrer'}}
+                >
+                  <List.Item.Details title={material.title}>{material.title}</List.Item.Details>
+                </List.Item>
+              ))}
+            </List>
+          ) : (
+            <Card.Description styleName="sidebar-empty">
+              <Translate>There are no materials.</Translate>
+            </Card.Description>
+          )}
         </Card>
       ) : null}
     </div>
