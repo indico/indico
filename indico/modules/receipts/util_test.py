@@ -19,25 +19,29 @@ pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
 
 @pytest.mark.usefixtures('app_context')
-@pytest.mark.parametrize('name', ('billing-address', 'items', '123'))
-def test_named_field_lookup(name):
+@pytest.mark.parametrize(('name', 'key', 'access'), (
+    ('billing-address', 'billing_address', '.billing_address'),
+    ('items', 'items', "['items']"),
+    ('123', '123', "['123']"),
+))
+def test_named_field_lookup(name, key, access):
     from indico.modules.receipts.schemas import RegistrationDataSchema
 
     context = get_dummy_preview_data([])
     registration = context['registration']
-    field = registration['field_data_by_name']['preferred-energy-source']
+    field = registration['field_data_by_name']['preferred_energy_source']
     field['internal_name'] = name
     registration = RegistrationDataSchema().load(RegistrationDataSchema().dump(registration))
     context['registration'] = registration
-    assert registration['field_data_by_name'][name] == field
-    assert registration['custom_data'] == {name: 'Zero-Point-Module'}
-    expression = f"registration.field_data_by_name['{name}'].friendly_value"
+    assert registration['field_data_by_name'][key] == field
+    assert registration['custom_data'] == {key: 'Zero-Point-Module'}
+    expression = f'registration.field_data_by_name{access}.friendly_value'
     assert compile_jinja_code('{{ ' + expression + ' }}', context) == 'Zero-Point-Module'
     placeholders = dict(get_preview_placeholders(context))
     assert expression in placeholders
-    assert f"registration.field_data_by_name['{name}'].config" in placeholders
-    assert not any(f"registration.field_data_by_name['{name}'].config." in key for key in placeholders)
-    expression = f"registration.custom_data['{name}']"
+    assert f'registration.field_data_by_name{access}.config' in placeholders
+    assert not any(f'registration.field_data_by_name{access}.config.' in key for key in placeholders)
+    expression = f'registration.custom_data{access}'
     assert compile_jinja_code('{{ ' + expression + ' }}', context) == 'Zero-Point-Module'
     assert expression in placeholders
 
@@ -46,9 +50,9 @@ def test_named_field_lookup(name):
 def test_dummy_named_fields():
     context = get_dummy_preview_data([])
     registration = context['registration']
-    assert registration['field_data_by_name']['first-name']['friendly_value'] == 'Jack'
-    assert registration['field_data_by_name']['preferred-energy-source']['friendly_value'] == 'Zero-Point-Module'
-    assert registration['custom_data'] == {'preferred-energy-source': 'Zero-Point-Module'}
+    assert registration['field_data_by_name']['first_name']['friendly_value'] == 'Jack'
+    assert registration['field_data_by_name']['preferred_energy_source']['friendly_value'] == 'Zero-Point-Module'
+    assert registration['custom_data'] == {'preferred_energy_source': 'Zero-Point-Module'}
     assert compile_jinja_code(
         "{% if 'missing' in registration.field_data_by_name %}present{% else %}absent{% endif %}", context
     ) == 'absent'
@@ -73,12 +77,12 @@ def test_named_fields_from_registration(db, dummy_event, dummy_reg, dummy_regfor
     db.session.flush()
     registration = get_safe_template_context(dummy_event, dummy_reg, {})['registration']
     named = registration['field_data_by_name']
-    assert named['billing-address']['friendly_value'] == 'Somewhere'
-    assert named['billing-address']['internal_name'] == 'billing-address'
-    assert named['billing-address'] == registration['field_data'][0]
-    assert set(named) == {'billing-address'}
+    assert named['billing_address']['friendly_value'] == 'Somewhere'
+    assert named['billing_address']['internal_name'] == 'billing-address'
+    assert named['billing_address'] == registration['field_data'][0]
+    assert set(named) == {'billing_address'}
     assert len(registration['field_data']) == (2 if excluded == 'unnamed' else 1)
-    assert registration['custom_data'] == {'billing-address': 'Somewhere'}
+    assert registration['custom_data'] == {'billing_address': 'Somewhere'}
 
 
 def test_personal_fields_excluded_from_custom_data(db, dummy_event, dummy_reg, dummy_regform):
@@ -86,6 +90,6 @@ def test_personal_fields_excluded_from_custom_data(db, dummy_event, dummy_reg, d
     dummy_reg.data.append(RegistrationData(field_data=field.current_data, data='Guinea'))
     db.session.flush()
     registration = get_safe_template_context(dummy_event, dummy_reg, {})['registration']
-    assert registration['field_data_by_name']['first-name']['friendly_value'] == 'Guinea'
+    assert registration['field_data_by_name']['first_name']['friendly_value'] == 'Guinea'
     assert registration['personal_data']['first_name'] == 'Guinea'
     assert registration['custom_data'] == {}

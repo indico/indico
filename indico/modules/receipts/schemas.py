@@ -231,7 +231,7 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
 
     @post_load
     def _add_named_field_data(self, data, **kwargs):
-        data['field_data_by_name'] = {field['internal_name']: field
+        data['field_data_by_name'] = {field['internal_name'].replace('-', '_'): field
                                       for field in data['field_data'] if field.get('internal_name')}
         data['custom_data'] = {name: field['friendly_value']
                                for name, field in data['field_data_by_name'].items()
