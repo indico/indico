@@ -36,13 +36,15 @@ def test_bookings_are_split_on_time_changes(create_reservation):
     assert should_split_booking(reservation, dict(new_booking_data, repeat_interval=2))
 
 
+@pytest.mark.parametrize('hour', (0, 13, 19))
 @pytest.mark.parametrize(('start_dt', 'end_dt'), (
-    (datetime.today().replace(hour=8, minute=30), datetime.today().replace(hour=17, minute=30) + timedelta(days=5)),
-    (datetime.today().replace(hour=8, minute=30), datetime.today().replace(hour=17, minute=30) + timedelta(days=1)),
+    (datetime(2026, 11, 17, hour=8, minute=30), datetime(2026, 11, 17, hour=17, minute=30) + timedelta(days=5)),
+    (datetime(2026, 11, 17, hour=8, minute=30), datetime(2026, 11, 17, hour=17, minute=30) + timedelta(days=1)),
 ))
-def test_ongoing_bookings_are_not_split(create_reservation, start_dt, end_dt):
+def test_ongoing_bookings_are_not_split(create_reservation, freeze_time, hour, start_dt, end_dt):
     from indico.modules.rb.operations.bookings import split_booking
 
+    freeze_time(datetime(2026, 11, 17, hour))
     reservation = create_reservation(start_dt=start_dt, end_dt=end_dt, repeat_frequency=RepeatFrequency.DAY)
     assert split_booking(reservation, {}, extra_fields={}) is None
 
