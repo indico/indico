@@ -350,6 +350,23 @@ def test_registration_create_page_moderation(dummy_regform, test_client, moderat
     assert ('Participation in this event is moderated' in resp.text) == moderated
 
 
+@pytest.mark.parametrize(('permissions', 'moderation_enabled', 'warning_shown'), (
+    ({'registration_edit'}, True, True),
+    ({'registration_edit'}, False, False),
+    ({'registration_edit', 'registration_moderation'}, True, False),
+    ({'registration'}, True, False),
+    ('full', True, False),
+))
+def test_registration_create_multiple_page_moderation(dummy_regform, test_client, moderation_manager, permissions,
+                                                      moderation_enabled, warning_shown):
+    moderation_manager(permissions)
+    dummy_regform.moderation_enabled = moderation_enabled
+    resp = test_client.get(f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/'
+                           'registrations/create-multiple')
+    assert resp.status_code == 200
+    assert ('Participation in this event is moderated' in resp.json['html']) == warning_shown
+
+
 @pytest.mark.parametrize(('permissions', 'reset_approval', 'state', 'invitation_skips_moderation', 'warning_shown'), (
     ({'registration_edit'}, True, RegistrationState.complete, False, True),
     ({'registration_edit'}, False, RegistrationState.complete, False, False),
