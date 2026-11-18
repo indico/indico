@@ -15,6 +15,8 @@ Improvements
   thanks :user:`titcsl`)
 - Show long options in the editing and affiliation list filters in full instead of
   truncating them (:pr:`7925`, thanks :user:`mindouro, unconventionaldotdev`)
+- Allow referencing registration fields by internal name in document templates (:pr:`7907`,
+  thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

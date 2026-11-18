@@ -214,6 +214,8 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
             if is_lazy_string(friendly_value):
                 friendly_value = str(friendly_value)
             fields.append({
+                'internal_name': field.internal_name,
+                'is_personal_data': field.personal_data_type is not None,
                 'title': field.title,
                 'section_title': field.parent.title,
                 'input_type': field.input_type,
@@ -226,6 +228,15 @@ class RegistrationDataSchema(mm.SQLAlchemyAutoSchema):
 
     def _load_field_data(self, value):
         return value
+
+    @post_load
+    def _add_named_field_data(self, data, **kwargs):
+        data['field_data_by_name'] = {field['internal_name']: field
+                                      for field in data['field_data'] if field.get('internal_name')}
+        data['custom_data'] = {name: field['friendly_value']
+                               for name, field in data['field_data_by_name'].items()
+                               if not field.get('is_personal_data', False)}
+        return data
 
 
 class TemplateDataSchema(mm.Schema):
