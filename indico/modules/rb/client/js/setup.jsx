@@ -85,5 +85,8 @@ export default function setup(overrides = {}, postReducers = []) {
       </OverridableContext.Provider>,
       appContainer
     );
+    customElements.whenDefined('ind-bypass-block-links').then(() => {
+      document.querySelector('ind-bypass-block-links')?.updateLinks();
+    });
   });
 }
