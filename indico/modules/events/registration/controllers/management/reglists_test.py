@@ -23,6 +23,7 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationsConfigBadges,
                                                                                 RHRegistrationsExportCSV)
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
+from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.items import RegistrationFormSection
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import create_registration
@@ -349,14 +350,27 @@ def test_registration_create_page_moderation(dummy_regform, test_client, moderat
     assert ('Participation in this event is moderated' in resp.text) == moderated
 
 
-@_moderation_matrix
+@pytest.mark.parametrize(('permissions', 'reset_approval', 'state', 'invitation_skips_moderation', 'warning_shown'), (
+    ({'registration_edit'}, True, RegistrationState.complete, False, True),
+    ({'registration_edit'}, False, RegistrationState.complete, False, False),
+    ({'registration_edit'}, True, RegistrationState.pending, False, False),
+    ({'registration_edit'}, True, RegistrationState.complete, True, False),
+    ({'registration_edit', 'registration_moderation'}, True, RegistrationState.complete, False, False),
+    ({'registration'}, True, RegistrationState.complete, False, False),
+    ('full', True, RegistrationState.complete, False, False),
+))
 def test_registration_edit_page_reset_approval_warning(dummy_regform, test_client, moderation_manager, permissions,
-                                                       expected_state):
-    warning_shown = expected_state == RegistrationState.pending
-    dummy_regform.reset_approval_on_modification = True
+                                                       reset_approval, state, invitation_skips_moderation,
+                                                       warning_shown):
+    dummy_regform.reset_approval_on_modification = reset_approval
+    invitation = (RegistrationInvitation(registration_form=dummy_regform, email='capybara@example.test',
+                                         first_name='Greater', last_name='Capybara', affiliation='',
+                                         skip_moderation=True)
+                  if invitation_skips_moderation else None)
     registration = create_registration(dummy_regform, {'email': 'capybara@example.test', 'first_name': 'Greater',
                                                        'last_name': 'Capybara'},
-                                       management=True, notify_user=False)
+                                       invitation=invitation, management=True, notify_user=False)
+    registration.state = state
     moderation_manager(permissions)
     resp = test_client.get(f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/'
                            f'registrations/{registration.id}/edit')
