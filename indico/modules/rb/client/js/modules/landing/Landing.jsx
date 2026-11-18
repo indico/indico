@@ -131,7 +131,7 @@ export class Landing extends React.Component {
           <Grid.Row styleName="landing-page-form">
             <Card styleName="landing-page-card">
               <Card.Content>
-                <Card.Header>
+                <Card.Header as="h2" styleName="booking-heading">
                   <Translate>Start your booking...</Translate>
                 </Card.Header>
               </Card.Content>
