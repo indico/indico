@@ -30,6 +30,8 @@ from indico.modules.events.registration.util import create_registration
 
 pytest_plugins = 'indico.modules.events.registration.testing.fixtures'
 
+_CSRF_TOKEN = '00000000-0000-0000-0000-000000000001'
+
 
 def test_registration_edit_override_required(db, dummy_regform, app_context, create_user):
     # Add a section and a required field
@@ -247,9 +249,6 @@ def test_registration_management_requires_manageable_registration(db, dummy_regf
                     rh._check_access()
 
 
-_CSRF_TOKEN = '00000000-0000-0000-0000-000000000001'
-
-
 @pytest.fixture
 def moderation_manager(dummy_regform, create_user, test_client):
     """Log in a manager of a moderated regform with the given permissions."""
@@ -257,7 +256,7 @@ def moderation_manager(dummy_regform, create_user, test_client):
     dummy_regform.moderation_enabled = True
 
     def _login(permissions):
-        user = create_user(123, email='manager@example.test')
+        user = create_user(9123, email='manager@example.test')
         if permissions == 'full':
             dummy_regform.event.update_principal(user, full_access=True)
         else:
@@ -265,7 +264,6 @@ def moderation_manager(dummy_regform, create_user, test_client):
         with test_client.session_transaction() as sess:
             sess.set_session_user(user)
             sess['_csrf_token'] = _CSRF_TOKEN
-        return user
 
     return _login
 
@@ -312,7 +310,8 @@ def test_registration_create_multiple_moderation(dummy_regform, dummy_user, test
                                                  permissions, expected_state):
     moderation_manager(permissions)
     url = f'/event/{dummy_regform.event_id}/manage/registration/{dummy_regform.id}/registrations/create-multiple'
-    resp = test_client.post(url, data={'csrf_token': _CSRF_TOKEN, 'user_principals': f'["{dummy_user.identifier}"]'})
+    resp = test_client.post(url, data={'csrf_token': _CSRF_TOKEN,
+                                       'user_principals': json.dumps([dummy_user.identifier])})
     assert resp.status_code == 200
     registration = dummy_regform.get_registration(user=dummy_user)
     assert registration.state == expected_state

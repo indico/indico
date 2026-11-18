@@ -88,8 +88,8 @@ class RegistrationFormEditForm(IndicoForm):
                                                   widget=SwitchWidget(),
                                                   description=_('If enabled, modifying a registration resets its '
                                                                 'approval status back to pending, unless it is '
-                                                                'modified by a manager who can moderate '
-                                                                'registrations.'))
+                                                                'modified from the management area by a manager '
+                                                                'who can moderate registrations.'))
     private = BooleanField(_('Private'), widget=SwitchWidget(),
                            description=_('The registration form will not be publicly displayed on the event page. '
                                          'Only people with the secret link or an invitation will be able to register.'))

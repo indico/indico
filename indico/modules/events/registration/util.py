@@ -492,7 +492,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
 
 
 @no_autoflush
-def modify_registration(registration, data, management=False, notify_user=True, skip_moderation=None):
+def modify_registration(registration, data, management=False, notify_user=True, *, skip_moderation=None):
     from indico.modules.events.registration.tasks import delete_previous_registration_file
 
     user = session.user if session else None
