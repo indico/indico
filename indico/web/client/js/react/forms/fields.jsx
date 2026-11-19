@@ -856,13 +856,14 @@ FinalTimePicker.defaultProps = {
   defaultValue: moment().startOf('day').minutes(20).toISOString(),
 };
 
-export function FinalDuration({name, label, defaultValue, ...rest}) {
+export function FinalDuration({name, label, defaultValue, validate, ...rest}) {
   return (
     <FinalField
       name={name}
       component={DurationComponent}
       label={label}
       defaultValue={defaultValue}
+      validate={validate}
       {...rest}
     />
   );
@@ -872,11 +873,13 @@ FinalDuration.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
   defaultValue: PropTypes.number,
+  validate: PropTypes.func,
 };
 
 FinalDuration.defaultProps = {
   label: null,
   defaultValue: 1200, // 20 minutes
+  validate: validators.nonZeroDuration(),
 };
 
 export function FinalDateTimePicker({name, label, defaultValue, validate, required, ...rest}) {
