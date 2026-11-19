@@ -6,10 +6,32 @@
 // LICENSE file for more details.
 
 @use 'rb:styles/responsive' as *;
+@use 'design_system/visibility';
+
+.booking-type {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.booking-type-legend {
+  @extend %visually-hidden;
+}
 
 .booking-type-field {
   display: flex;
   justify-content: center;
+
+  :global(.ui.radio.checkbox input[type='radio'] ~ label)::before {
+    border-color: var(--control-border-color);
+  }
+
+  :global(.ui.radio.checkbox input:focus-visible ~ label) {
+    outline: 2px solid var(--accent-border-color);
+    outline-offset: 2px;
+  }
 }
 
 :global(.ui.form) .recurrence-field:global(.inline.fields) {
