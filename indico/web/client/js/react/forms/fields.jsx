@@ -384,7 +384,7 @@ function TimePickerComponent({value, onChange, onBlur, onFocus, ...rest}) {
 
   function handleOnChange(v) {
     markTouched();
-    onChange(v.toISOString());
+    onChange(v?.toISOString() ?? null);
   }
 
   return (
@@ -453,8 +453,17 @@ function DateTimePickerComponent({
   const dt = moment(value);
 
   const handleDateChange = newDate => onChange(`${newDate || ''}T${timeValue}`);
-  const handleTimeChange = newTime =>
-    onChange(`${dateValue}T${moment(newTime).format('HH:mm:00')}`);
+  const handleTimeChange = newTime => {
+    let newTimeString;
+    if (newTime) {
+      newTimeString = moment(newTime).format('HH:mm:00');
+    } else if (minStartDt && minStartDt.isSame(dt, 'day')) {
+      newTimeString = minStartDt.format('HH:mm:00');
+    } else {
+      newTimeString = '00:00:00';
+    }
+    onChange(`${dateValue}T${newTimeString}`);
+  };
 
   const _getDisabledHours = () => getDisabledHours(dt, minStartDt, maxEndDt);
   const _getDisabledMinutes = hour => getDisabledMinutes(hour, dt, minStartDt, maxEndDt);
