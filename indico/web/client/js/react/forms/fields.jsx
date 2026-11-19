@@ -385,7 +385,7 @@ function TimePickerComponent({value, onChange, onBlur, onFocus, ...rest}) {
   function handleOnChange(v) {
     markTouched();
     if (v) {
-      // when we hada null value and set a real one again, we end up with the seconds
+      // when we had a null value and set a real one again, we end up with the seconds
       // of the current time...
       v = moment(v).seconds(0);
     }
