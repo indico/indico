@@ -135,7 +135,7 @@ function datetime() {
   };
 }
 
-function nonZeroDuration() {
+function positiveDuration() {
   return value => {
     if (!value) {
       return Translate.string('Please enter a valid duration that is not zero.');
@@ -157,6 +157,6 @@ export default {
   or,
   dates,
   datetime,
-  nonZeroDuration,
+  positiveDuration,
   STOP_VALIDATION,
 };

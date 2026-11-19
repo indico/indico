@@ -887,7 +887,7 @@ FinalDuration.propTypes = {
 FinalDuration.defaultProps = {
   label: null,
   defaultValue: 1200, // 20 minutes
-  validate: validators.nonZeroDuration(),
+  validate: validators.positiveDuration(),
 };
 
 export function FinalDateTimePicker({name, label, defaultValue, validate, required, ...rest}) {
