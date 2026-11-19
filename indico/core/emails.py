@@ -9,6 +9,7 @@ import os
 import pickle
 import tempfile
 from datetime import date
+from email.header import decode_header, make_header
 from email.utils import formataddr, make_msgid, parseaddr
 from fnmatch import fnmatch
 from urllib.parse import urlsplit
@@ -81,6 +82,10 @@ def get_actual_sender_address(sender_address: str, reply_address: set[str]) -> t
         # this may result in spoofing
         return sender_address, reply_address
     orig_name, orig_address = parseaddr(sender_address)
+    if orig_name:
+        # the name may already be RFC 2047-encoded (e.g. non-ASCII names from `formataddr`);
+        # decode it so it does not get encoded twice when building the new display name
+        orig_name = str(make_header(decode_header(orig_name)))
     fallback = config.SMTP_SENDER_FALLBACK
     if any(fnmatch(orig_address, pattern) for pattern in config.SMTP_ALLOWED_SENDERS):
         # valid sender address for which we are authorized to send emails
