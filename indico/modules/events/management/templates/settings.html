@@ -64,6 +64,14 @@
                         <strong>Please note:</strong> If you want to preserve events long-term, you should consider publishing them to a category.
                     {% endtrans %}
                 </div>
+                <div class="toolbar">
+                    <div class="group">
+                        <span class="hide-if-locked"
+                              id="event-action-publish-container"
+                              data-event-id="{{ event.id }}"
+                              {{ 'data-pending-request' if event.pending_move_request }}></span>
+                    </div>
+                </div>
             </div>
         </div>
     {%- endif -%}
