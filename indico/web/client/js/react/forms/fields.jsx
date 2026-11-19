@@ -384,6 +384,11 @@ function TimePickerComponent({value, onChange, onBlur, onFocus, ...rest}) {
 
   function handleOnChange(v) {
     markTouched();
+    if (v) {
+      // when we hada null value and set a real one again, we end up with the seconds
+      // of the current time...
+      v = moment(v).seconds(0);
+    }
     onChange(v?.toISOString() ?? null);
   }
 
@@ -404,7 +409,7 @@ function TimePickerComponent({value, onChange, onBlur, onFocus, ...rest}) {
 }
 
 TimePickerComponent.propTypes = {
-  value: PropTypes.string.isRequired,
+  value: PropTypes.string,
   onChange: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
@@ -413,8 +418,10 @@ TimePickerComponent.propTypes = {
 function DurationComponent({value, onChange, max, ...rest}) {
   return (
     <TimePickerComponent
-      value={moment().startOf('day').seconds(value).toISOString()}
-      onChange={v => onChange(moment(v).diff(moment().startOf('day'), 'seconds'))}
+      value={value ? moment().startOf('day').seconds(value).toISOString() : null}
+      onChange={v => {
+        onChange(v ? moment(v).diff(moment().startOf('day'), 'seconds') : null);
+      }}
       disabledHours={max ? () => [...Array(24).keys()].filter(h => h > max / (60 * 60)) : undefined}
       disabledMinutes={
         max
@@ -430,7 +437,7 @@ function DurationComponent({value, onChange, max, ...rest}) {
 }
 
 DurationComponent.propTypes = {
-  value: PropTypes.number.isRequired,
+  value: PropTypes.number,
   onChange: PropTypes.func.isRequired,
   max: PropTypes.number,
 };
@@ -864,6 +871,7 @@ export function FinalDuration({name, label, defaultValue, validate, ...rest}) {
       label={label}
       defaultValue={defaultValue}
       validate={validate}
+      allowNull
       {...rest}
     />
   );
