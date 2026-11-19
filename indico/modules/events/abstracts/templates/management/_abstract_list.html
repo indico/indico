@@ -144,7 +144,7 @@
                                             {% endif %}
                                         </td>
                                     {% elif item.id == 'submitter' %}
-                                        <td class="i-table" data-searchable="{{ abstract.submitter.display_full_name }}">
+                                        <td class="i-table" data-searchable="{{ abstract.submitter.display_full_name | lower }}">
                                             {{- abstract.submitter.display_full_name }}
                                             {% if abstract.submitter.affiliation %}
                                                 <span class="text-superfluous">({{ render_person_affiliation(abstract.submitter, compact=true) }})</span>
