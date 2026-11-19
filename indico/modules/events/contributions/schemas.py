@@ -30,7 +30,8 @@ from indico.modules.events.tracks.schemas import TrackSchema
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.i18n import _
 from indico.util.locations import LocationDataSchema
-from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList, not_empty
+from indico.util.marshmallow import (EventTimezoneDateTimeField, ModelField, NonPartialNested, SortedList, not_empty,
+                                     positive_timedelta)
 from indico.util.user import make_user_search_token
 from indico.web.flask.util import url_for
 
@@ -235,7 +236,7 @@ class ContributionRESTSchema(CustomFieldsMixin, mm.SQLAlchemyAutoSchema):
     references = fields.List(NonPartialNested(ContributionReferenceSchema))
     location_data = NonPartialNested(LocationDataSchema)
     session_block = NonPartialNested(TimezoneAwareSessionBlockSchema)
-    duration = fields.TimeDelta(required=True)
+    duration = fields.TimeDelta(required=True, validate=positive_timedelta)
     _description = fields.String(attribute='description')
     type = ModelField(ContributionType, with_parent='event', data_key='type_id', allow_none=True)
 

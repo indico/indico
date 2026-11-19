@@ -141,6 +141,12 @@ def max_words(max):
     return validate
 
 
+def positive_timedelta(value):
+    """Ensure a strictly positive timedelta."""
+    if not value or value <= timedelta():
+        raise ValidationError(_('This duration cannot be negative or zero'))
+
+
 def _naive_isoformat(dt, **unused):
     assert dt.tzinfo is None, 'expected naive datetime'
     return dt.isoformat()
