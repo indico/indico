@@ -67,7 +67,7 @@ export function BreakFormFields({
           </Field>
         </>
       ) : (
-        <FinalDuration name="duration" label={Translate.string('Duration')} />
+        <FinalDuration name="duration" label={Translate.string('Duration')} required />
       )}
       <FinalLocationField
         name="location_data"

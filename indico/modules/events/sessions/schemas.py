@@ -18,7 +18,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.types import SessionType
 from indico.modules.users.schemas import AffiliationSchema
 from indico.util.locations import LocationDataSchema, LocationParentSchema
-from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested
+from indico.util.marshmallow import EventTimezoneDateTimeField, ModelField, NonPartialNested, positive_timedelta
 from indico.web.forms.colors import get_colors
 
 
@@ -102,5 +102,6 @@ class SessionBlockRESTSchema(mm.SQLAlchemyAutoSchema):
 
     id = fields.Int(dump_only=True)
     start_dt = EventTimezoneDateTimeField()
+    duration = fields.TimeDelta(required=True, validate=positive_timedelta)
     location_data = NonPartialNested(LocationDataSchema)
     person_links = fields.List(NonPartialNested(_SessionBlockPersonLinkSchema, unknown=EXCLUDE))

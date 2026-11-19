@@ -218,12 +218,13 @@ export function ContributionFormFields({
                   name="duration"
                   label={Translate.string('Duration')}
                   max={maxEndDt ? moment(maxEndDt).diff(startDt, 'seconds') : null}
+                  required
                 />
               )}
             </Field>
           </>
         ) : (
-          <FinalDuration name="duration" label={Translate.string('Duration')} />
+          <FinalDuration name="duration" label={Translate.string('Duration')} required />
         ))}
       {showField('person_links') && (
         <FinalContributionPersonLinkField

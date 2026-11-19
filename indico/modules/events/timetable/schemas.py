@@ -14,7 +14,7 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.serializer import TimetableSerializer, get_entry_type
 from indico.util.locations import LocationDataSchema, LocationParentSchema
-from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested
+from indico.util.marshmallow import EventTimezoneDateTimeField, NonPartialNested, positive_timedelta
 
 
 class SessionBlockSchema(SessionBlockRESTSchema):
@@ -51,7 +51,7 @@ class BreakSchema(mm.SQLAlchemyAutoSchema):
     title = fields.String(required=True)
     description = fields.String()
     start_dt = EventTimezoneDateTimeField()
-    duration = fields.TimeDelta(required=True)
+    duration = fields.TimeDelta(required=True, validate=positive_timedelta)
     location_data = fields.Nested(LocationDataSchema)
     location_parent = fields.Nested(LocationParentSchema, attribute='resolved_location_parent')
     colors = fields.Nested(SessionColorSchema)
