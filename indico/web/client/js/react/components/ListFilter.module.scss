@@ -11,12 +11,22 @@
 }
 
 .filters-menu {
-  max-width: 15em;
+  width: 15em;
 
   :global(.ui.dropdown.item > .menu.left) {
     left: auto !important;
     right: 100% !important;
     margin-right: 0 !important;
+  }
+
+  :global(.ui.dropdown.item > .menu) {
+    // override `width: auto !important`, which squeezes submenus to the parent's width
+    width: max-content !important;
+    max-width: 25em;
+
+    > :global(.item) {
+      white-space: normal;
+    }
   }
 }
 
