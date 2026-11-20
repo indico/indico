@@ -113,6 +113,9 @@ class ICalSerializer(Serializer):
         cal = ical.Calendar()
         cal.add('version', '2.0')
         cal.add('prodid', '-//CERN//INDICO//EN')
+        if name := self._extra_args.get('calendar_name'):
+            cal.add('name', name)
+            cal.add('x-wr-calname', name)
         now = now_utc()
         for fossil in results:
             if '_fossil' in fossil:
