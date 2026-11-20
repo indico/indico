@@ -1,7 +1,5 @@
 {% extends 'categories/display/base_ngui.html' %}
-{% from 'categories/display/sidebar.html' import render_attachments, render_managers %}
 {% from 'message_box.html' import message_box %}
-
 {% block content %}
     {% block category_content %}
         {% if not is_flat %}
@@ -23,13 +21,3 @@
         {% endif %}
     {% endblock %}
 {% endblock %}
-
-{% block sidebar -%}
-    {%- block sidebar_managers %}
-        {{- render_managers(managers) -}}
-    {% endblock -%}
-    {%- block sidebar_attachments %}
-        {{- render_attachments(category) -}}
-    {% endblock -%}
-    {{ template_hook('category-sidebar', category=category) }}
-{%- endblock %}

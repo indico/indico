@@ -7,12 +7,56 @@
 
 @use 'NGUI/styles/base' as *;
 
+:global(.category-container),
+:global(.category-header) {
+  background: #e8e8e8;
+}
+
+:global(.category-container) {
+  overflow-x: clip;
+  flex-grow: 1;
+  box-sizing: border-box;
+  align-content: start;
+}
+
+:global(.main):has(:global(.category-container)) {
+  display: flex;
+  flex-direction: column;
+}
+
+:global(.main):has(:global(.category-container)) > :global(div) {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 :global(.indico-ui) {
   .category-wrapper {
+    width: 100%;
+    max-width: var(--container-xl);
+    margin-inline: auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     gap: var(--space-6);
+  }
+
+  .category {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+  }
+
+  .category-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    flex: 3 1 40rem;
+    min-width: 0;
+  }
+
+  .category-title {
     margin-top: var(--space-6);
     @media (max-width: $viewport-mobile) {
       margin-top: var(--space-3);
@@ -21,9 +65,16 @@
 
   .category-info {
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    flex-direction: column;
     gap: var(--space-6);
+    padding: var(--space-6);
+
+    .category-info-sub {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: var(--space-6);
+    }
 
     .category-description {
       @include typography('text-md', 'regular');

@@ -19,13 +19,14 @@ interface CategoryCardListProps {
   columns?: 1 | 2 | 3;
 }
 
-export function CategoryCardList({data, columns = 2}: CategoryCardListProps) {
+export function CategoryCardList({data, columns}: CategoryCardListProps) {
   const categories = data ?? [];
 
-  const gridClass = columns > 1 ? `grid-${columns}-responsive` : '';
+  // By default auto columns
+  const gridCSS = columns ? {gridTemplateColumns: `repeat(${columns}, 1fr)`} : {};
 
   return (
-    <div className={gridClass} role="list">
+    <div styleName="category-card-list" style={gridCSS} role="list">
       {categories.map(category => (
         <div role="listitem" key={category.id} styleName="wrapper">
           <Card styleName="category-card" href={category.displayURL}>

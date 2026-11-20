@@ -13,6 +13,12 @@
     min-width: 0;
   }
 
+  .category-card-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-3);
+  }
+
   .category-card-main {
     display: flex;
     flex-direction: column;
@@ -24,6 +30,9 @@
   }
 
   .category-card {
+    display: flex;
+    align-items: center;
+
     &:hover,
     &:focus-visible {
       .category-card-arrow-icon {

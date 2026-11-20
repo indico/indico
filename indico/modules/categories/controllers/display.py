@@ -26,11 +26,11 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.modules.categories.controllers.base import RHCategoryBase, RHDisplayCategoryBase
-from indico.modules.categories.controllers.util import (get_category_view_params, get_category_year_view_params,
-                                                        get_event_list_view_params, get_event_query_filter,
-                                                        group_by_month, make_format_event_date_func,
-                                                        make_happening_now_func, make_is_recent_func,
-                                                        serialize_events_by_month)
+from indico.modules.categories.controllers.util import (get_category_managers, get_category_view_params,
+                                                        get_category_year_view_params, get_event_list_view_params,
+                                                        get_event_query_filter, group_by_month,
+                                                        make_format_event_date_func, make_happening_now_func,
+                                                        make_is_recent_func, serialize_events_by_month)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain, serialize_category_child)
@@ -269,6 +269,25 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         upcoming_events = get_upcoming_events()
         return WPCategory.render_template('display/root_category_ngui.html', self.category, news=news,
                                           upcoming_events=upcoming_events, **params)
+
+
+class RHCategoryManagersJSON(RHDisplayCategoryEventsBase):
+    """Return the managers of a category in JSON format."""
+
+    def _process(self):
+        from indico.modules.categories.schemas import CategoryManagerSchema
+        return CategoryManagerSchema(many=True).jsonify(get_category_managers(self.category))
+
+
+class RHCategoryMaterialsJSON(RHDisplayCategoryBase):
+    """Return the materials of a category in JSON format."""
+
+    def _process(self):
+        from indico.modules.attachments.util import get_attached_items
+        from indico.modules.categories.schemas import CategoryMaterialsSchema
+        return CategoryMaterialsSchema().jsonify(
+            get_attached_items(self.category, include_empty=False, include_hidden=False)
+        )
 
 
 class RHDisplayCategoryJSON(RHDisplayCategoryEventsBase):

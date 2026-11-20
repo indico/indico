@@ -101,6 +101,13 @@ def serialize_category_atom(category, url, user, event_filter):
     return BytesIO(feed.atom_str(pretty=True))
 
 
+def serialize_manager(acl_entry):
+    return {
+        'name': acl_entry.user.name,
+        'principal_type': acl_entry.type,
+    }
+
+
 def serialize_category(category, with_favorite=False, with_path=False, parent_path=None, child_path=None):
     data = {
         'id': category.id,
@@ -115,6 +122,7 @@ def serialize_category(category, with_favorite=False, with_path=False, parent_pa
         'can_propose_events': category.can_propose_events(session.user),
         'can_manage': category.can_manage(session.user),
     }
+
     if with_path:
         if child_path:
             data['path'] = child_path[:]
