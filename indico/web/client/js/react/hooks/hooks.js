@@ -25,7 +25,8 @@ const useAxios = makeUseAxios({
   },
 });
 
-export const useFavoriteUsers = (userId = null, lazy = false) => {
+/** Load favorite users with an optional stable callback for local error feedback. */
+export const useFavoriteUsers = (userId = null, lazy = false, onError = handleAxiosError) => {
   // XXX: this state should ideally be global so if this hook is used more than
   // once on the same page we keep the favorites in sync and don't send multiple
   // requests to load the initial list
@@ -50,24 +51,31 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
           signal,
         });
       } catch (error) {
-        handleAxiosError(error);
+        if (!indicoAxios.isCancel(error)) {
+          onError(error);
+        }
         return null;
       }
       return response.data;
     },
-    [userId]
+    [userId, onError]
   );
 
-  const fetchDetails = async (identifiers, signal = null) => {
-    let response;
-    try {
-      response = await indicoAxios.post(principalsURL(), {values: identifiers}, {signal});
-    } catch (error) {
-      handleAxiosError(error);
-      return null;
-    }
-    return _.fromPairs(Object.values(camelizeKeys(response.data)).map(x => [x.identifier, x]));
-  };
+  const fetchDetails = useCallback(
+    async (identifiers, signal = null) => {
+      let response;
+      try {
+        response = await indicoAxios.post(principalsURL(), {values: identifiers}, {signal});
+      } catch (error) {
+        if (!indicoAxios.isCancel(error)) {
+          onError(error);
+        }
+        return null;
+      }
+      return _.fromPairs(Object.values(camelizeKeys(response.data)).map(x => [x.identifier, x]));
+    },
+    [onError]
+  );
 
   const del = async identifier => {
     if ((await apiCall('DELETE', identifier)) !== null) {
@@ -108,7 +116,7 @@ export const useFavoriteUsers = (userId = null, lazy = false) => {
     return () => {
       controller.abort();
     };
-  }, [apiCall, shouldLoad]);
+  }, [apiCall, fetchDetails, shouldLoad]);
 
   return [favorites, [add, del, load], loading];
 };

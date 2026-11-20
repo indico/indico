@@ -29,7 +29,9 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Improve keyboard and screen reader access to the room-booking logo, account menu, language choices and
+  impersonation chooser. Improve focus handling, action names and tooltips, search feedback, error messages,
+  contrast of enabled actions and layout on small screens in the chooser (:pr:`7866`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
