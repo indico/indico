@@ -1,6 +1,7 @@
 {% extends 'events/registration/management/_regform_base.html' %}
 
 {% from 'events/registration/_template_hooks.html' import regform_attrs_template_hook %}
+{% from 'events/registration/display/_regform_info.html' import render_approval_reset_warning %}
 
 {% block subtitle %}
     {% trans id=registration.friendly_id, name=registration.full_name, regform_title=registration.registration_form.title -%}
@@ -9,6 +10,9 @@
 {% endblock %}
 
 {% block content %}
+    {% if registration.modification_resets_approval and not skip_moderation %}
+        {{ render_approval_reset_warning() }}
+    {% endif %}
     <div id="registration-form-submission-container"
          data-event-id="{{ event.id }}"
          data-regform-id="{{ regform.id }}"

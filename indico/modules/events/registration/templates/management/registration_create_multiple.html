@@ -5,6 +5,17 @@
 {{ form_header(form) }}
 {{ form_rows(form) }}
 
+{% if moderated %}
+    {% call message_box('warning') %}
+        <div class="label">
+            {% trans %}Participation in this event is moderated{% endtrans %}
+        </div>
+        {% trans -%}
+            The organizers will have to approve your application.
+        {%- endtrans %}
+    {% endcall %}
+{% endif %}
+
 {{ message_box('info', message=_('The registrations will be filled with personal data only. Additional fields will be left blank.')) }}
 
 <button class="i-button big highlight" type="submit">{% trans %}Add registrations{% endtrans %}</button>
