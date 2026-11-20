@@ -47,6 +47,7 @@
 
 :global(.ui.label).filter {
   display: flex;
+  flex-wrap: wrap;
   margin: 0;
 
   p {
@@ -55,13 +56,20 @@
 
   :global(.detail) {
     overflow: hidden;
+    order: 1;
+    flex-basis: 100%;
+    white-space: normal;
 
+    // hanging indent and a faint divider so wrapped options stay distinguishable
     p {
-      overflow: hidden;
-      text-overflow: ellipsis;
+      overflow-wrap: anywhere;
+      padding-left: 1em;
+      text-indent: -1em;
 
       &:not(:last-child) {
-        margin-block-end: 0.1em;
+        margin-block-end: 0.3em;
+        padding-block-end: 0.3em;
+        border-bottom: 1px solid color-mix(in srgb, currentcolor 35%, transparent);
       }
     }
   }

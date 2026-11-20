@@ -26,7 +26,7 @@ const optionSchema = PropTypes.shape({
 const FilterLabel = ({text, options, onClick}) => (
   <Label styleName="filter" className="fluid" color="orange" basic>
     <p>{text}</p>
-    <Label.Detail className="float right">
+    <Label.Detail>
       {_.sortBy(options, 'text').map(o => (
         <p key={o.value}>{o.text}</p>
       ))}
