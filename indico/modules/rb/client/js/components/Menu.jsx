@@ -10,7 +10,6 @@ import React from 'react';
 import {Icon} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
-import {Responsive} from 'indico/react/util';
 
 import MenuItem from './MenuItem';
 
@@ -20,6 +19,12 @@ const defaultLabels = {
   bookRoom: <Translate>Book a Room</Translate>,
   roomList: <Translate>List of Rooms</Translate>,
   calendar: <Translate>Bookings</Translate>,
+};
+
+const defaultVisibleLabels = {
+  bookRoom: <Translate>Book</Translate>,
+  roomList: <Translate>List</Translate>,
+  calendar: null,
 };
 
 const menuItems = [
@@ -48,14 +53,16 @@ const menuItems = [
 
 export default function Menu({labels}) {
   const finalLabels = {...defaultLabels, ...labels};
+  const visibleLabels = {...defaultVisibleLabels, ...labels};
   return (
     <ul styleName="rb-menu">
       {menuItems.map(([key, {path, icon}]) => (
         <MenuItem key={key} path={path} namespace={key}>
           <Icon name={icon} />
-          <Responsive.Tablet as="span" andLarger>
-            {finalLabels[key]}
-          </Responsive.Tablet>
+          <span aria-hidden="true" styleName="menu-label">
+            {visibleLabels[key]}
+          </span>
+          <span styleName="accessible-label">{finalLabels[key]}</span>
         </MenuItem>
       ))}
     </ul>
