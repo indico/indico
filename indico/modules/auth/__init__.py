@@ -21,6 +21,7 @@ from indico.modules.auth.models.identities import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import save_identity_info
 from indico.modules.users import User
+from indico.modules.users.models.sessions import UserSession
 from indico.modules.users.util import log_user_update
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -109,6 +110,15 @@ def login_user(user, identity=None, admin_impersonation=False):
         if changes := user.synchronize_data():
             log_user_update(user, changes, from_sync=True)
     signals.users.logged_in.send(user, identity=identity, admin_impersonation=admin_impersonation)
+
+
+def delete_old_user_sessions(user, *skip_sids):
+    """Invalidates a user session.
+
+    :param user: The :class:`~indico.modules.users.User` to delete sessions.
+    :param skip_sids: A tuple of session ids that should not be deleted.
+    """
+    UserSession.query.with_parent(user).filter(UserSession.sid.notin_(skip_sids)).delete()
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')

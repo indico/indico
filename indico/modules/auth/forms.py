@@ -8,7 +8,7 @@
 from fnmatch import fnmatch
 
 from flask import session
-from wtforms import HiddenField
+from wtforms import BooleanField, HiddenField
 from wtforms.fields import EmailField, PasswordField, SelectField, StringField
 from wtforms.validators import DataRequired, Email, Optional, ValidationError
 
@@ -21,7 +21,8 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.string import validate_email
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.validators import ConfirmPassword, SecurePassword
+from indico.web.forms.validators import ConfirmPassword, HiddenUnless, SecurePassword
+from indico.web.forms.widgets import SwitchWidget
 
 
 def _tolower(s):
@@ -96,6 +97,9 @@ class EditLocalIdentityForm(IndicoForm):
                                  render_kw={'autocomplete': 'new-password'})
     confirm_new_password = PasswordField(_('Confirm password'), [ConfirmPassword('new_password')],
                                          render_kw={'autocomplete': 'new-password'})
+    force_logout = BooleanField(_('Logout of other devices'), [HiddenUnless('new_password')], widget=SwitchWidget(),
+                                description=_('This will log you out of all other devices and sessions '
+                                              'where you are currently logged in.'))
 
     def __init__(self, *args, identity=None, **kwargs):
         self.identity = identity
@@ -193,6 +197,9 @@ class ResetPasswordForm(IndicoForm):
                              render_kw={'autocomplete': 'new-password'})
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')],
                                      render_kw={'autocomplete': 'new-password'})
+    force_logout = BooleanField(_('Logout of other devices'), widget=SwitchWidget(),
+                                description=_('This will log you out of all other devices and sessions '
+                                              'where you are currently logged in.'))
 
     def __init__(self, *args, user_emails, **kwargs):
         self.user_emails = user_emails
