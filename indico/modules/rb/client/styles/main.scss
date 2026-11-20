@@ -28,6 +28,10 @@ a {
   cursor: pointer;
 }
 
+ind-bypass-block-links a {
+  @extend %link;
+}
+
 /* SemanticUI overrides for small screens */
 .ui.selection.dropdown {
   @media (max-width: $tablet-width) {

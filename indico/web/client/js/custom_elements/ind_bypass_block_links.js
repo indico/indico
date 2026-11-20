@@ -12,6 +12,11 @@ CustomElementBase.defineWhenDomReady(
   'ind-bypass-block-links',
   class extends CustomElementBase {
     setup() {
+      this.updateLinks();
+    }
+
+    updateLinks() {
+      this.replaceChildren();
       const bypassBlockTargets = document.querySelectorAll('[id][data-bypass-target]');
       for (const target of bypassBlockTargets) {
         this.append(
