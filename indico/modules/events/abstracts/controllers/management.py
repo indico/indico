@@ -256,8 +256,10 @@ class RHCreateAbstractReviewingQuestion(RHManageAbstractsBase):
 
 
 class RHReviewingQuestionBase(RHManageAbstractsBase):
-    locator_args = {
-        lambda self: self.question
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.question
+        }
     }
 
     def _process_args(self):
