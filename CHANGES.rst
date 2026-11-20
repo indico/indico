@@ -25,6 +25,8 @@ Bugfixes
   in the timetable export API (:pr:`7822`)
 - Fix cache inconsistencies in Book of Abstracts (:pr:`7870`)
 - Disable legacy API keys of blocked users (:pr:`7881`)
+- Fix images with a fixed size being stretched in event descriptions, minutes, conference
+  pages and news (:issue:`7889`, :pr:`7904`, thanks :user:`zuhairkhalid229`)
 
 Accessibility
 ^^^^^^^^^^^^^
