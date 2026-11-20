@@ -40,3 +40,7 @@
     margin-top: 2em;
   }
 }
+
+.time-picker :global(.rc-time-picker-input) {
+  height: unset;
+}

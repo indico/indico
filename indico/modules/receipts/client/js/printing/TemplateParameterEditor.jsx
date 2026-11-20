@@ -7,9 +7,9 @@
 
 import PropTypes from 'prop-types';
 import React from 'react';
-import {Accordion, Checkbox, Dropdown, Form, Input, TextArea} from 'semantic-ui-react';
+import {Checkbox, Dropdown, Form, Input, TextArea} from 'semantic-ui-react';
 
-import {PlaceholderInfo} from 'indico/react/components';
+import {PlaceholderInfo, CollapsibleContainer} from 'indico/react/components';
 import {useIndicoAxios} from 'indico/react/hooks';
 
 import EventImageSelectField from './EventImageSelectField';
@@ -182,36 +182,25 @@ export default function TemplateParameterEditor({
     return null;
   }
   return (
-    <Accordion
-      defaultActiveIndex={defaultOpen ? 0 : undefined}
-      panels={[
-        {
-          key: 'template-params',
-          title,
-          content: {
-            content: customFields.map(({name, description, type, attributes, validations = {}}) => (
-              <CustomField
-                key={name}
-                type={type}
-                value={value[name]}
-                onChange={v => {
-                  onChange({...value, [name]: v});
-                }}
-                name={name}
-                description={description}
-                attributes={attributes}
-                validations={validations}
-                eventImages={eventImages}
-                fetchImages={fetchImagesURL && reFetch}
-                loadingImages={loading}
-              />
-            )),
-          },
-        },
-      ]}
-      styled
-      fluid
-    />
+    <CollapsibleContainer title={title} defaultOpen={defaultOpen} styled>
+      {customFields.map(({name, description, type, attributes, validations = {}}) => (
+        <CustomField
+          key={name}
+          type={type}
+          value={value[name]}
+          onChange={v => {
+            onChange({...value, [name]: v});
+          }}
+          name={name}
+          description={description}
+          attributes={attributes}
+          validations={validations}
+          eventImages={eventImages}
+          fetchImages={fetchImagesURL && reFetch}
+          loadingImages={loading}
+        />
+      ))}
+    </CollapsibleContainer>
   );
 }
 
