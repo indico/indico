@@ -13,6 +13,8 @@ Improvements
 - Only allow logged-in users to generate contribution PDFs (:pr:`7836`)
 - Include the event's category path in iCalendar exports (:issue:`7711`, :pr:`7885`,
   thanks :user:`titcsl`)
+- Allow referencing registration fields by internal name in document templates (:pr:`7907`,
+  thanks :user:`duartegalvao, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^

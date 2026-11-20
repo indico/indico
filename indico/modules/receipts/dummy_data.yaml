@@ -64,6 +64,8 @@ registration:
       with_extra_slots: false
     friendly_value: Dr
     input_type: single_choice
+    internal_name: title
+    is_personal_data: true
     raw_value:
       a825a410-4d28-447c-b124-9236914a6490: 1
     section_title: Personal Data
@@ -72,6 +74,8 @@ registration:
     config: {}
     friendly_value: Jack
     input_type: text
+    internal_name: first-name
+    is_personal_data: true
     raw_value: Jack
     section_title: Personal Data
     title: First Name
@@ -79,6 +83,8 @@ registration:
     config: {}
     friendly_value: O'Neill
     input_type: text
+    internal_name: last-name
+    is_personal_data: true
     raw_value: O'Neill
     section_title: Personal Data
     title: Last Name
@@ -86,6 +92,8 @@ registration:
     config: {}
     friendly_value: myemail@example.ch
     input_type: email
+    internal_name: email
+    is_personal_data: true
     raw_value: myemail@example.ch
     section_title: Personal Data
     title: Email Address
@@ -93,6 +101,8 @@ registration:
     config: {}
     friendly_value: AF
     input_type: text
+    internal_name: affiliation
+    is_personal_data: true
     raw_value: AF
     section_title: Personal Data
     title: Affiliation
@@ -100,6 +110,8 @@ registration:
     config: {}
     friendly_value: Colonel
     input_type: text
+    internal_name: position
+    is_personal_data: true
     raw_value: Colonel
     section_title: Personal Data
     title: Position
@@ -109,6 +121,8 @@ registration:
 
       00000 Space'
     input_type: textarea
+    internal_name: address
+    is_personal_data: true
     raw_value: 'Wormhole Road 1
 
       00000 Space'
@@ -118,6 +132,8 @@ registration:
     config: {}
     friendly_value: United States
     input_type: country
+    internal_name: country
+    is_personal_data: true
     raw_value: US
     section_title: Personal Data
     title: Country
@@ -125,6 +141,8 @@ registration:
     config: {}
     friendly_value: '+123456789'
     input_type: phone
+    internal_name: phone
+    is_personal_data: true
     raw_value: '+123456789'
     section_title: Personal Data
     title: Phone Number
@@ -227,6 +245,7 @@ registration:
       with_extra_slots: false
     friendly_value: Zero-Point-Module
     input_type: single_choice
+    internal_name: preferred-energy-source
     raw_value:
       04f62ad8-9a74-417a-a885-3221b561986f: 1
     section_title: Details
