@@ -170,15 +170,14 @@ def cli(obj, target_dir: Path):
 @click.option('--no-assets', 'assets', is_flag=True, flag_value=False, default=True, help='skip building assets')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
-@click.option('--no-git', is_flag=True, help='Skip git checks and assume clean working tree')
 @click.pass_obj
-def build_indico(obj, assets, add_version_suffix, ignore_unclean, no_git):
+def build_indico(obj, assets, add_version_suffix, ignore_unclean):
     """Build the indico wheel."""
     target_dir = obj['target_dir']
-    if no_git:
+    if os.environ.get('INDICO_NO_GIT'):
         warn('Assuming clean non-git working tree')
         if add_version_suffix:
-            fail('The --no-git option cannot be used with --add-version-suffix')
+            fail('INDICO_NO_GIT cannot be used with --add-version-suffix')
     else:
         # check for unclean git status
         clean, output = git_is_clean('indico')
@@ -211,20 +210,19 @@ def _plugin_has_assets(plugin_dir):
 @click.option('--no-assets', 'assets', is_flag=True, flag_value=False, default=True, help='skip building assets')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
-@click.option('--no-git', is_flag=True, help='Skip git checks and assume clean working tree')
 @click.pass_obj
-def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no_git):
+def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean):
     """Build a plugin wheel.
 
     PLUGIN_DIR is the path to the folder containing the plugin's pyproject.toml
     """
     target_dir = obj['target_dir']
     with _chdir(plugin_dir):
-        if no_git:
+        if os.environ.get('INDICO_NO_GIT'):
             clean, output = True, None
             warn('Assuming clean non-git working tree')
             if add_version_suffix:
-                fail('The --no-git option cannot be used with --add-version-suffix')
+                fail('INDICO_NO_GIT cannot be used with --add-version-suffix')
         else:
             clean, output = git_is_clean('.')
             if not clean and ignore_unclean:
@@ -250,9 +248,8 @@ def build_plugin(obj, assets, plugin_dir, add_version_suffix, ignore_unclean, no
 @click.option('--no-assets', 'assets', is_flag=True, flag_value=False, default=True, help='skip building assets')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
-@click.option('--no-git', is_flag=True, help='Skip checks and assume clean non-git working tree')
 @click.pass_context
-def build_all_plugins(ctx, assets, plugins_dir, add_version_suffix, ignore_unclean, no_git):
+def build_all_plugins(ctx, assets, plugins_dir, add_version_suffix, ignore_unclean):
     """Build all plugin wheels in a directory.
 
     PLUGINS_DIR is the path to the folder containing the plugin directories
@@ -262,7 +259,7 @@ def build_all_plugins(ctx, assets, plugins_dir, add_version_suffix, ignore_uncle
     for plugin in plugins:
         step('plugin: {}', plugin)
         ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin), assets=assets,
-                   add_version_suffix=add_version_suffix, ignore_unclean=ignore_unclean, no_git=no_git)
+                   add_version_suffix=add_version_suffix, ignore_unclean=ignore_unclean)
 
 
 if __name__ == '__main__':

@@ -37,6 +37,8 @@ Internal Changes
 - Require all IPs used in outgoing connections to be public IPs (ie disallow RFC 6598 IPs
   in addition to private ranges, loopback, etc.) (:pr:`7877`)
 - Tighten external URL check in document generation (:pr:`7886`)
+- Remove the ``--no-git`` option of ``build-wheel.py``, use ``INDICO_NO_GIT`` instead
+  (:issue:`7285`)
 
 
 Version 3.3.14
