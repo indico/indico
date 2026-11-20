@@ -5,6 +5,9 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+
+from flask import session
+
 from indico.core.marshmallow import fields, mm
 from indico.modules.categories import Category
 from indico.modules.categories.models.event_move_request import EventMoveRequest
@@ -39,14 +42,29 @@ class CategoryManagerSchema(mm.Schema):
 class CategoryMaterialSchema(mm.Schema):
     id = fields.Integer()
     title = fields.String()
-    url = fields.Method('_get_url')
+    url = fields.Method('_get_url', allow_none=True)
+    type = fields.Method('_get_type')
+    content_type = fields.Method('_get_content_type', allow_none=True)
     is_protected = fields.Boolean()
     attachments = fields.List(fields.Nested(lambda: CategoryMaterialSchema()))
 
     def _get_url(self, material):
         if not hasattr(material, 'type'):
             return None
+
+        if material.is_protected and not material.can_access(session.user):
+            return None
         return material.link_url if material.type.name == 'link' else material.download_url
+
+    def _get_type(self, material):
+        if not hasattr(material, 'type'):
+            return None
+        return material.type.name
+
+    def _get_content_type(self, material):
+        if not hasattr(material, 'file') or material.file is None:
+            return None
+        return material.file.content_type
 
 
 class CategoryMaterialsSchema(mm.Schema):

@@ -62,12 +62,6 @@ def serialize_event(event, format_event_date, is_recent, happening_now):
     }
 
 
-def serialize_managers(managers):
-    return {
-        ''
-    }
-
-
 def serialize_events_by_month(events_by_month, category, now):
     format_event_date = make_format_event_date_func(category, omit_year=True)
     is_recent = make_is_recent_func(now)

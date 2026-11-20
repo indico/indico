@@ -12,7 +12,11 @@
     position: sticky;
     top: var(--space-3);
     align-self: flex-start;
-    min-width: 300px;
+    flex: 1 1 225px;
+    min-width: 225px;
+    max-width: none;
+    max-height: calc(100vh - (var(--space-3) * 2));
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: var(--space-3);
@@ -44,8 +48,29 @@
   .material-list {
     gap: 0;
 
-    :global(.list-item-content) {
+    .material {
       padding-block: var(--space-1);
+
+      &.protected {
+        background: var(--bg-color-warning);
+        color: var(--text-color-warning);
+      }
+
+      &.inaccessible {
+        background: var(--color-surface-soft);
+        color: var(--color-text-muted);
+        opacity: 0.65;
+      }
+    }
+
+    .material-folder {
+      :global(.list-item-content) {
+        align-items: center;
+      }
+    }
+
+    .material-nested {
+      margin-left: var(--space-5);
     }
   }
 }

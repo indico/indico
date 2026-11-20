@@ -15,6 +15,7 @@ import remarkRehype from 'remark-rehype';
 import {Card} from 'indico/NGUI/card/Card';
 import {CategoryCardList} from 'indico/NGUI/category/CategoryCardList';
 import {EventList} from 'indico/NGUI/category/EventList';
+import {CategorySidebar} from 'indico/NGUI/category_sidebar/CategorySidebar';
 import {
   CategoryEventListWithMetaData,
   CategoryChildMetadata,
@@ -25,7 +26,6 @@ import {Translate} from 'indico/react/i18n';
 import {Markdown} from 'indico/react/util';
 
 import './Category.module.scss';
-import {CategorySidebar} from '../category_sidebar/CategorySidebar';
 
 interface CategoryProps {
   categoryId: number;
@@ -71,11 +71,9 @@ export function Category({categoryId, isFlat}: CategoryProps) {
   // (Ajob) Honestly, I think the whole idea of checking the string for 'Home' is very hacky
   let title;
   if (isUntitledRoot) {
-    title = category.hasChildren ? (
-      <Translate>Main categories</Translate>
-    ) : (
-      <Translate>All events</Translate>
-    );
+    title = category.hasChildren
+      ? Translate.string('Main categories')
+      : Translate.string('All events');
   } else {
     title = category.title;
   }

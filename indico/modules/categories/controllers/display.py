@@ -272,6 +272,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
 
 
 class RHCategoryManagersJSON(RHDisplayCategoryEventsBase):
+    """Return the managers of a category in JSON format."""
 
     def _process(self):
         from indico.modules.categories.schemas import CategoryManagerSchema
@@ -279,6 +280,7 @@ class RHCategoryManagersJSON(RHDisplayCategoryEventsBase):
 
 
 class RHCategoryMaterialsJSON(RHDisplayCategoryBase):
+    """Return the materials of a category in JSON format."""
 
     def _process(self):
         from indico.modules.attachments.util import get_attached_items

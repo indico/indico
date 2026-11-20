@@ -26,8 +26,11 @@ export interface CategoryManager {
 export interface CategoryMaterial {
   id: number;
   title: string;
-  url: string;
+  url: string | null;
+  type: 'link' | 'file' | null;
+  contentType: string | null;
   isProtected: boolean;
+  attachments?: CategoryMaterial[];
 }
 
 export interface CategoryChildMetadata {
