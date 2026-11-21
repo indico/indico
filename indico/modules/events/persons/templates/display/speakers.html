@@ -1,0 +1,9 @@
+{% extends 'events/display/conference/base.html' %}
+
+{% block title %}
+    {% trans %}Speakers{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <ind-speakers-display event-id="{{event.id}}"></ind-speakers-display>
+{% endblock %}
