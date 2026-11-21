@@ -162,6 +162,8 @@ _bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/invite/import'
 _bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/import/upload',
                  'api_invitations_import_upload', invitations.RHRegistrationFormImportInvitesUpload,
                  methods=('POST',))
+_bp.add_url_rule('/api/registration/<int:reg_form_id>/invitations/image/upload', 'api_invitations_image_upload',
+                 invitations.RHRegistrationFormInvitationImageUpload, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>', 'delete_invitation',
                  invitations.RHRegistrationFormDeleteInvitation, methods=('DELETE',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>/decline',
