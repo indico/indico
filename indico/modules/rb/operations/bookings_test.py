@@ -8,7 +8,6 @@
 from datetime import datetime, timedelta
 
 import pytest
-
 from flask import session
 
 from indico.modules.rb.models.reservations import RepeatFrequency
