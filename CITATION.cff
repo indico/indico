@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use Indico in your work, please cite it as below."
+title: "Indico"
+abstract: "A feature-rich event management system, made at CERN, the place where the Web was born."
+type: software
+authors:
+  - name: "Indico Team, CERN"
+license: MIT
+repository-code: "https://github.com/indico/indico"
+url: "https://getindico.io"
+keywords:
+  - event management
+  - conference management
+  - meeting management
+version: 3.3.14
+date-released: 2026-10-13
