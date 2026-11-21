@@ -116,6 +116,13 @@ class RHApiCompileNotes(RHManageNoteBase):
 
 
 class RHGotoNote(RH):
+    def _process_args(self):
+        self.note = EventNote.get_or_404(request.view_args['note_id'])
+
+    def _check_access(self):
+        if not self.note.object.can_access(session.user):
+            raise Forbidden
+
     def _get_embed_url(self, note):
         if note.event.type_ == EventType.conference:
             # we have no pretty note pages for conferences
@@ -132,7 +139,6 @@ class RHGotoNote(RH):
             return url_for('events.display', note.event, note=note.id, _anchor=note.object.slug)
 
     def _process(self):
-        note = EventNote.get_or_404(request.view_args['note_id'])
-        if embed_url := self._get_embed_url(note):
+        if embed_url := self._get_embed_url(self.note):
             return redirect(embed_url)
-        return redirect(url_for('.view', note))
+        return redirect(url_for('.view', self.note))
