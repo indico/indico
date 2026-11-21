@@ -412,8 +412,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             raise BadRequest('Incompatible backside template')
 
         if backside_template != self.template.backside_template:
-            allowed_templates = set(self.target.designer_templates) | get_inherited_templates(self.target)
-            if backside_template not in allowed_templates:
+            if backside_template not in get_all_templates(self.target):
                 raise Forbidden('This template is not available here.')
 
 
