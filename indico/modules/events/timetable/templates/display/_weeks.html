@@ -10,11 +10,11 @@
     </span>
 {% endmacro %}
 
-{% macro _render_contrib_list(session) %}
+{% macro _render_contrib_list(sess) %}
     <div class="contrib-list">
         <strong>{% trans %}Contributions{% endtrans %}</strong>
         <ul>
-            {% for contrib in session.contributions | sort(attribute='start_dt') %}
+            {% for contrib in sess.contributions | sort(attribute='start_dt') if contrib.can_access(session.user) %}
                 <li>
                     <div class="tooltip-contrib">
                         <span class="time">

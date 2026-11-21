@@ -70,7 +70,7 @@
                     <a href="{{ url_for('sessions.export_ics', sess) }}" class="i-button icon-calendar" title="{% trans %}Export{% endtrans %}"></a>
                 {% else %}
                     <div id="session-calendar-link" data-session-id="{{ sess.id }}" data-event-id="{{ sess.event_id }}"
-                         data-session-contrib-count="{{ sess.contributions|length }}"></div>
+                         data-session-contrib-count="{{ contributions|length }}"></div>
                 {% endif %}
             {%- endif %}
         </div>
@@ -134,7 +134,7 @@
 
     <section>
         <div class="item-subitems toolbar">
-            {% if sess.contributions %}
+            {% if contributions %}
                 <button class="i-button icon-list js-switch-view"
                         data-show="session-contrib-list">
                     {%- trans %}Contribution list{% endtrans -%}
@@ -150,9 +150,9 @@
     </section>
 
     <div class="js-container">
-        {% if sess.contributions %}
+        {% if contributions %}
             <div id="session-contrib-list" class="contribution-list js-view">
-                {{ render_contribution_list(event, event.display_tzinfo, sess.contributions, with_session_info=false) }}
+                {{ render_contribution_list(event, event.display_tzinfo, contributions, with_session_info=false) }}
             </div>
         {% endif %}
 
