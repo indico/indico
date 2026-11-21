@@ -25,6 +25,8 @@ Bugfixes
   in the timetable export API (:pr:`7822`)
 - Fix cache inconsistencies in Book of Abstracts (:pr:`7870`)
 - Disable legacy API keys of blocked users (:pr:`7881`)
+- Fix list rows still being edited getting lost when saving a form (:pr:`7702`, thanks
+  :user:`moliholy, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
