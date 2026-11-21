@@ -15,7 +15,7 @@ from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
 from wtforms import BooleanField, EmailField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.fields import HiddenField, IntegerField, URLField
-from wtforms.validators import URL, DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, Email, InputRequired, NumberRange, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
@@ -45,7 +45,7 @@ from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, Indic
                                      IndicoWeekDayRepetitionField, MultiStringField, RelativeDeltaField)
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.fields.simple import IndicoLinkListField, validate_keywords_field
-from indico.web.forms.validators import HiddenUnless, LinkedDateTime
+from indico.web.forms.validators import URL, HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import PrefixedTextWidget, SwitchWidget, TinyMCEWidget
 
 

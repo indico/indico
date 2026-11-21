@@ -7,13 +7,14 @@
 
 from markupsafe import Markup
 from wtforms.fields import BooleanField, TextAreaField, URLField
-from wtforms.validators import URL, InputRequired, Optional
+from wtforms.validators import InputRequired, Optional
 
 from indico.modules.legal import legal_settings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoDateField
+from indico.web.forms.validators import URL
 from indico.web.forms.widgets import TinyMCEWidget
 
 

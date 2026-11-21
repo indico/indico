@@ -8,7 +8,7 @@
 from flask import session
 from wtforms.fields import BooleanField, TextAreaField, URLField
 from wtforms.fields.simple import HiddenField, StringField
-from wtforms.validators import URL, DataRequired, Optional, ValidationError
+from wtforms.validators import DataRequired, Optional, ValidationError
 from wtforms_sqlalchemy.fields import QuerySelectField
 
 from indico.core.config import config
@@ -24,7 +24,7 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (AccessControlListField, EditableFileField, FileField, IndicoDateField,
                                      IndicoRadioField, IndicoSelectMultipleCheckboxField)
 from indico.web.forms.fields.enums import IndicoEnumSelectField
-from indico.web.forms.validators import HiddenUnless, UsedIf
+from indico.web.forms.validators import URL, HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
 
 
