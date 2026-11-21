@@ -66,6 +66,7 @@ class BookingBootstrapForm extends React.Component {
   constructor(props) {
     super(props);
 
+    this.bookingTypeId = _.uniqueId('booking-type-');
     const startTime = moment().startOf('hour').add(1, 'h');
     const endTime = moment().startOf('hour').add(2, 'h');
     const startsNextDay = startTime > moment().endOf('day');
@@ -316,35 +317,43 @@ class BookingBootstrapForm extends React.Component {
     return (
       <Form>
         {showRecurrenceOptions && (
-          <Form.Group inline styleName="booking-type-field">
-            {!hideOptions.single && (
-              <Form.Radio
-                label={Translate.string('Single booking')}
-                name="type"
-                value="single"
-                checked={type === 'single'}
-                onChange={(e, {value}) => this.updateBookingType(value)}
-              />
-            )}
-            {!hideOptions.daily && (
-              <Form.Radio
-                label={Translate.string('Daily booking')}
-                name="type"
-                value="daily"
-                checked={type === 'daily'}
-                onChange={(e, {value}) => this.updateBookingType(value)}
-              />
-            )}
-            {!recurrenceHidden && (
-              <Form.Radio
-                label={Translate.string('Recurring booking')}
-                name="type"
-                value="every"
-                checked={type === 'every'}
-                onChange={(e, {value}) => this.updateBookingType(value)}
-              />
-            )}
-          </Form.Group>
+          <fieldset styleName="booking-type">
+            <legend styleName="booking-type-legend">
+              <Translate>Booking type</Translate>
+            </legend>
+            <Form.Group inline styleName="booking-type-field">
+              {!hideOptions.single && (
+                <Form.Radio
+                  id={`${this.bookingTypeId}-single`}
+                  label={Translate.string('Single booking')}
+                  name="type"
+                  value="single"
+                  checked={type === 'single'}
+                  onChange={(e, {value}) => this.updateBookingType(value)}
+                />
+              )}
+              {!hideOptions.daily && (
+                <Form.Radio
+                  id={`${this.bookingTypeId}-daily`}
+                  label={Translate.string('Daily booking')}
+                  name="type"
+                  value="daily"
+                  checked={type === 'daily'}
+                  onChange={(e, {value}) => this.updateBookingType(value)}
+                />
+              )}
+              {!recurrenceHidden && (
+                <Form.Radio
+                  id={`${this.bookingTypeId}-recurring`}
+                  label={Translate.string('Recurring booking')}
+                  name="type"
+                  value="every"
+                  checked={type === 'every'}
+                  onChange={(e, {value}) => this.updateBookingType(value)}
+                />
+              )}
+            </Form.Group>
+          </fieldset>
         )}
         {type === 'every' && (
           <Form.Group inline styleName="recurrence-field">
