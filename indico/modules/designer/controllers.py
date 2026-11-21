@@ -293,6 +293,13 @@ class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
         RHManageEventBase._process_args(self)
         CloneTemplateMixin._process_args(self)
 
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
+        CloneTemplateMixin._check_access(self)
+        # Only allow cloening templates from the current ancestry
+        if self.template not in get_all_templates(self.event):
+            raise Forbidden('This template is not available here.')
+
 
 class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
     clonable_elsewhere = True
@@ -300,6 +307,13 @@ class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
         CloneTemplateMixin._process_args(self)
+
+    def _check_access(self):
+        RHManageCategoryBase._check_access(self)
+        CloneTemplateMixin._check_access(self)
+        # Only allow cloning templates from the current ancestry
+        if self.template not in get_all_templates(self.category):
+            raise Forbidden('This template is not available here.')
 
 
 class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHProtected):
