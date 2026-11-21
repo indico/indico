@@ -33,6 +33,9 @@ class SMTPSenderNotSetMockConfig:
     ('Bar <bar@example.com>', ('Bar <bar@example.com>', set())),
     ('Test <test@specific.com>', ('"Test (via Indico)" <sender@example.com>', {'test@specific.com'})),
     ('Foo <foo@specific.com>', ('Foo <foo@specific.com>', set())),
+    # non-ASCII name that was already RFC 2047-encoded must not be encoded twice
+    ('=?utf-8?b?0JzQsNGA0Lo=?= <test@specific.com>',
+     ('=?utf-8?b?0JzQsNGA0LogKHZpYSBJbmRpY28p?= <sender@example.com>', {'test@specific.com'})),
     ('', ('Indico <noreply@example.com>', set())),
 ))
 def test_get_actual_sender_address(mocker, sender_email, result):

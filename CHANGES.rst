@@ -25,6 +25,9 @@ Bugfixes
   in the timetable export API (:pr:`7822`)
 - Fix cache inconsistencies in Book of Abstracts (:pr:`7870`)
 - Disable legacy API keys of blocked users (:pr:`7881`)
+- Fix non-ASCII sender names being encoded twice in the ``From`` header when the sender
+  address is rewritten because of :data:`SMTP_ALLOWED_SENDERS` (:pr:`7910`, thanks
+  :user:`markpolyak`)
 
 Accessibility
 ^^^^^^^^^^^^^
