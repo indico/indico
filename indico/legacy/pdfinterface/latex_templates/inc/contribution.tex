@@ -62,7 +62,7 @@
     \end{addmargin}
 
 
-    \JINJA{for field_value in contrib.field_values
+    \JINJA{for field_value in contrib.field_values|sort(attribute='contribution_field.position')
            if field_value.contribution_field.is_active and field_value.contribution_field.is_public}
         {\bf
             \noindent
@@ -195,7 +195,7 @@
         \setlength{\leftskip}{0pt}
     \JINJA{endif}
 
-    \JINJA{for field_value in contrib.field_values
+    \JINJA{for field_value in contrib.field_values|sort(attribute='contribution_field.position')
            if field_value.contribution_field.is_active and field_value.contribution_field.is_public}
         \textbf{\VAR{field_value.contribution_field.title}}:
 
