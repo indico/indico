@@ -7,10 +7,10 @@
 
 import PropTypes from 'prop-types';
 import React, {useState} from 'react';
-import {Form, Grid, Icon, Segment} from 'semantic-ui-react';
+import {Form, Grid, Icon, Loader, Segment} from 'semantic-ui-react';
 
+import {useRustyMarkdown} from 'indico/react/hooks';
 import {Translate} from 'indico/react/i18n';
-import {AutoLinkerPlugin, Markdown} from 'indico/react/util';
 
 import {rulePropTypes} from './propTypes';
 
@@ -18,11 +18,16 @@ import {rulePropTypes} from './propTypes';
  * A "test drive" widget which just takes Markdown and renders it using the auto-linker rules which are provided
  */
 export default function AutoLinkerTestDrive({rules}) {
+  const md = useRustyMarkdown();
   const [source, setSource] = useState('');
 
   const onChange = value => {
     setSource(value);
   };
+
+  if (!md) {
+    return <Loader />;
+  }
 
   return (
     <Segment>
@@ -46,11 +51,11 @@ export default function AutoLinkerTestDrive({rules}) {
           </Grid.Column>
           <Grid.Column>
             {source ? (
-              <Segment>
-                <Markdown targetBlank remarkPlugins={[[AutoLinkerPlugin, {rules}]]}>
-                  {source}
-                </Markdown>
-              </Segment>
+              <Segment
+                dangerouslySetInnerHTML={{
+                  __html: md(source, {nl2br: true, autolinkRules: rules}),
+                }}
+              />
             ) : null}
           </Grid.Column>
         </Grid>

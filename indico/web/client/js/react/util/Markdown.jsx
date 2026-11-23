@@ -6,8 +6,10 @@
 // LICENSE file for more details.
 
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {forwardRef} from 'react';
 import ReactMarkdown from 'react-markdown';
+
+import {useRustyMarkdown} from 'indico/react/hooks';
 
 // eslint-disable-next-line react/prop-types
 const ExternalLink = ({href, children}) => (
@@ -42,3 +44,21 @@ Markdown.defaultProps = {
 };
 
 export default Markdown;
+
+// eslint-disable-next-line prefer-arrow-callback
+export const RustyMarkdown = forwardRef(function RustyMarkdown(
+  {source, unstyled = false, ...rest},
+  ref
+) {
+  const md = useRustyMarkdown();
+  if (!md) {
+    return null;
+  }
+  const html = md(source, {unstyled});
+  return <div ref={ref} dangerouslySetInnerHTML={{__html: html}} {...rest} />;
+});
+
+RustyMarkdown.propTypes = {
+  source: PropTypes.string.isRequired,
+  unstyled: PropTypes.bool,
+};
