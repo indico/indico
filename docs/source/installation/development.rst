@@ -16,30 +16,32 @@ an outdated npm version.
 Since only the latest Linux distributions include Python 3.12 in their package managers, we recommend installing
 `uv <https://docs.astral.sh/uv/>`_.
 
-.. tab:: Alma / Rocky / Fedora
+.. tab:: Linux
 
-    .. code-block:: shell
+    .. tab:: Alma / Rocky / Fedora
 
-        dnf install -y gcc redis libjpeg-turbo-devel libxslt-devel libxml2-devel \
-            libffi-devel pcre-devel libyaml-devel redhat-rpm-config \
-            postgresql postgresql-server postgresql-contrib libpq-devel pango
-        systemctl start redis.service postgresql.service
+        .. code-block:: shell
 
-.. tab:: Debian
+            dnf install -y gcc redis libjpeg-turbo-devel libxslt-devel libxml2-devel \
+                libffi-devel pcre-devel libyaml-devel redhat-rpm-config \
+                postgresql postgresql-server postgresql-contrib libpq-devel pango
+            systemctl start redis.service postgresql.service
 
-    .. code-block:: shell
+    .. tab:: Debian
 
-        apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
-            libyaml-dev build-essential redis-server postgresql libpq-dev libpango1.0-dev
-        apt install -y libjpeg62-turbo-dev
+        .. code-block:: shell
 
-.. tab:: Ubuntu
+            apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
+                libyaml-dev build-essential redis-server postgresql libpq-dev libpango1.0-dev
+            apt install -y libjpeg62-turbo-dev
 
-    .. code-block:: shell
+    .. tab:: Ubuntu
 
-        apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
-            libyaml-dev build-essential redis-server postgresql libpq-dev libpango1.0-dev
-        apt install -y libjpeg-turbo8-dev zlib1g-dev
+        .. code-block:: shell
+
+            apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
+                libyaml-dev build-essential redis-server postgresql libpq-dev libpango1.0-dev
+            apt install -y libjpeg-turbo8-dev zlib1g-dev
 
 .. tab:: macOS
 
