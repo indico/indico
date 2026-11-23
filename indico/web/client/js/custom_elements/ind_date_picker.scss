@@ -392,11 +392,6 @@ ind-date-picker > .date-label {
   ~ button[data-calendar-trigger] {
     top: auto;
     bottom: 0.375em;
-
-    &:focus-visible {
-      outline: revert;
-      outline-offset: -3px;
-    }
   }
 }
 
@@ -435,9 +430,14 @@ ind-date-range-picker:has(> ind-calendar[data-named-calendar]) > fieldset {
 :is(ind-date-picker, ind-date-range-picker):has(> ind-calendar[data-named-calendar]) {
   max-inline-size: 100%;
 
-  :is(input, button, select):focus-visible {
+  :is(input, button, select):focus-visible:not(:where([data-calendar-trigger])) {
     outline: 2px solid #05425b;
     outline-offset: 1px;
+  }
+
+  button[data-calendar-trigger]:focus-visible {
+    outline: revert;
+    outline-offset: -3px;
   }
 
   input::placeholder {
