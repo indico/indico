@@ -7,7 +7,7 @@
 
 from wtforms.fields import BooleanField, SelectField, TextAreaField, URLField
 from wtforms.fields.simple import StringField
-from wtforms.validators import URL, DataRequired, Optional, ValidationError
+from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.config import config
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -19,7 +19,7 @@ from indico.util.i18n import _, orig_string, pgettext
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EditableFileField, FileField, IndicoEnumSelectField, IndicoProtectionField
 from indico.web.forms.fields.principals import PrincipalListField
-from indico.web.forms.validators import HiddenUnless, UsedIf
+from indico.web.forms.validators import URL, HiddenUnless, UsedIf
 from indico.web.forms.widgets import ColorPickerWidget, SwitchWidget, TinyMCEWidget
 
 

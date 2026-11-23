@@ -7,9 +7,9 @@
 
 import re
 from datetime import date, timedelta
-from urllib.parse import urlsplit
+from urllib.parse import urlparse, urlsplit
 
-from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
+from wtforms.validators import EqualTo, HostnameValidation, Length, Regexp, StopValidation, ValidationError
 
 from indico.core.config import config
 from indico.modules.events.settings import data_retention_settings
@@ -487,3 +487,73 @@ class DataRetentionPeriodValidator:
         elif not max_retention_period and retention_period > timedelta(3650):
             raise ValidationError(_('The retention period cannot be longer than 10 years. Leave the field empty for '
                                     'indefinite.'))
+
+
+# This is a backport from the latest wtforms version. Remove (and use the wtforms one)
+# after updating wtforms.
+class URL:
+    """
+    Simple url validation based on :func:`urllib.parse.urlparse`. Much like
+    the email validator, you probably want to validate the url later by
+    other means if the url must resolve.
+
+    :param require_tld:
+        If true, then the domain-name portion of the URL must contain a .tld
+        suffix.  Set this to false if you want to allow domains like
+        `localhost`.
+    :param allow_ip:
+        If false, then giving an ip as host will fail validation.
+    :param allow_userinfo:
+        If true, accept ``username[:password]@`` in the URL. Defaults to
+        false: forms collecting URLs are often displayed back to users, and
+        userinfo is a known phishing vector
+        (e.g. ``https://accounts.example.com@evil.example/``).
+    :param schemes:
+        Iterable of allowed URL schemes. Defaults to ``("http", "https")``.
+        Pass ``None`` to accept any scheme (use with caution: ``javascript:``,
+        ``data:``, etc. would be accepted).
+    :param message:
+        Error message to raise in case of a validation error.
+    """
+
+    def __init__(
+        self,
+        require_tld=True,
+        allow_ip=True,
+        allow_userinfo=False,
+        schemes=('http', 'https'),
+        message=None,
+    ):
+        self.allow_userinfo = allow_userinfo
+        self.schemes = schemes
+        self.message = message
+        self.validate_hostname = HostnameValidation(
+            require_tld=require_tld, allow_ip=allow_ip
+        )
+
+    def __call__(self, form, field):
+        message = self.message
+        if message is None:
+            message = field.gettext('Invalid URL.')
+
+        try:
+            r = urlparse(field.data)
+        except ValueError as exc:
+            raise ValidationError(message) from exc
+
+        if not r.scheme or not r.hostname:
+            raise ValidationError(message)
+
+        if self.schemes is not None and r.scheme not in self.schemes:
+            raise ValidationError(message)
+
+        if not self.allow_userinfo and (r.username or r.password):
+            raise ValidationError(message)
+
+        try:
+            __ = r.port
+        except ValueError as exc:
+            raise ValidationError(message) from exc
+
+        if not self.validate_hostname(r.hostname):
+            raise ValidationError(message)
