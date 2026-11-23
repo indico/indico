@@ -44,7 +44,7 @@ much as possible, but only issues detected on those will be considered at critic
 |:---------:|:---------:|:---------:|:---------:|
 | 159+ | 156+ | 27.1+ | 155+ |
 
-However, if you have an issue with a browser [on this list](https://browserl.ist/?q=and_chr%20126%2C%20and_ff%20127%2C%20chrome%20126%2C%20chrome%20125%2C%20chrome%20124%2C%20chrome%20123%2C%20chrome%20109%2C%20edge%20126%2C%20edge%20125%2C%20edge%20124%2C%20edge%20123%2C%20firefox%20128%2C%20firefox%20127%2C%20firefox%20126%2C%20firefox%20125%2C%20firefox%20115%2C%20ios_saf%2017.4%2C%20ios_saf%2016.6-16.7%2C%20safari%2017.5%2C%20safari%2017.4%2C%20safari%2017.3%2C%20safari%2017.2%2C%20samsung%2025), please feel free to open a bug report.
+However, if you have an issue with a browser [on this list](https://browsersl.ist/?q=and_chr%20126%2C%20and_ff%20127%2C%20chrome%20126%2C%20chrome%20125%2C%20chrome%20124%2C%20chrome%20123%2C%20chrome%20109%2C%20edge%20126%2C%20edge%20125%2C%20edge%20124%2C%20edge%20123%2C%20firefox%20128%2C%20firefox%20127%2C%20firefox%20126%2C%20firefox%20125%2C%20firefox%20115%2C%20ios_saf%2017.4%2C%20ios_saf%2016.6-16.7%2C%20safari%2017.5%2C%20safari%2017.4%2C%20safari%2017.3%2C%20safari%2017.2%2C%20samsung%2025), please feel free to open a bug report.
 <!-- ENDBROWSERS -->
 
 ## Getting Indico
