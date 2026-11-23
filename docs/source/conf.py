@@ -171,6 +171,10 @@ html_static_path = [
     '../../indico/web/static/images/logo_indico_bw.svg'
 ]
 
+html_css_files = [
+    'rtd-search.css'
+]
+
 html_js_files = [
     'rtd-search.js'
 ]
