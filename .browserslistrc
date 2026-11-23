@@ -11,29 +11,32 @@ Firefox esr
 # begin generated code
 # use `npm run update-browsers` to update
 [production]
-and_chr 126
-and_ff 127
-chrome 126
-chrome 125
-chrome 124
-chrome 123
-chrome 109
-edge 126
-edge 125
-edge 124
-edge 123
-firefox 128
-firefox 127
-firefox 126
-firefox 125
-firefox 115
-ios_saf 17.4
-ios_saf 16.6-16.7
-safari 17.5
-safari 17.4
-safari 17.3
-safari 17.2
-samsung 25
+and_chr 157
+and_ff 160
+chrome 157
+chrome 156
+chrome 155
+chrome 154
+chrome 151
+chrome 146
+edge 156
+edge 155
+edge 154
+edge 153
+firefox 160
+firefox 159
+firefox 158
+firefox 157
+firefox 153
+ios_saf 27.0
+ios_saf 26.6
+ios_saf 26.5
+ios_saf 18.5-18.7
+safari 27.2
+safari 27.1
+safari 27
+safari 26.6
+samsung 30
 # end generated code
 
 [supported]
