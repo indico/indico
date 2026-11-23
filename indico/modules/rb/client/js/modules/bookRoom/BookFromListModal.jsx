@@ -93,9 +93,16 @@ class BookFromListModal extends React.Component {
 
   state = {
     pastDTChosen: false,
+    dateInvalid: false,
   };
 
-  handleCloseModal = () => {
+  handleCloseModal = event => {
+    if (
+      event?.key === 'Escape' &&
+      event.target.closest('ind-calendar[data-named-calendar] dialog[open]')
+    ) {
+      return;
+    }
     const {
       onClose,
       actions: {resetCollisions},
@@ -113,22 +120,23 @@ class BookFromListModal extends React.Component {
     openBookingForm(room.id, {...data, isPrebooking});
   };
 
-  onFiltersChange = filters => {
+  onFiltersChange = (filters, dateInvalid) => {
     const {refreshCollisions, isAdminOverrideEnabled, bookingGracePeriod} = this.props;
     const {
       dates: {startDate},
       timeSlot,
     } = filters;
 
-    refreshCollisions(filters);
-    if (!startDate) {
-      this.setState({pastDTChosen: true});
+    if (dateInvalid) {
+      this.setState({dateInvalid, pastDTChosen: false});
       return;
     }
 
+    refreshCollisions(filters);
     const startTime = timeSlot && timeSlot.startTime ? timeSlot.startTime : '00:00';
     const startDt = createDT(startDate, startTime);
     this.setState({
+      dateInvalid,
       pastDTChosen: !isBookingStartDTValid(startDt, isAdminOverrideEnabled, bookingGracePeriod),
     });
   };
@@ -143,7 +151,7 @@ class BookFromListModal extends React.Component {
       labels,
       isAdminOverrideEnabled,
     } = this.props;
-    const {pastDTChosen} = this.state;
+    const {pastDTChosen, dateInvalid} = this.state;
     const buttonDisabled =
       availabilityLoading || !availability || availability.numDaysAvailable === 0;
     return (
@@ -164,7 +172,7 @@ class BookFromListModal extends React.Component {
                 onSearch={this.handleBook}
                 defaults={defaults}
               >
-                {availability && <ConflictIndicator availability={availability} />}
+                {availability && !dateInvalid && <ConflictIndicator availability={availability} />}
                 {pastDTChosen && !isAdminOverrideEnabled && (
                   <Message color="red">
                     <Icon name="dont" />

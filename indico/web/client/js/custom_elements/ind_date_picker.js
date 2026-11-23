@@ -62,6 +62,7 @@ CustomElementBase.define(
       const clearButton = this.querySelector('button[value=clear]');
       const formatDescription = this.querySelector('[data-format]');
       const indCalendar = this.querySelector('ind-calendar');
+      let opener = openCalendarButton;
 
       const parseDate = createDateParser(this.format);
 
@@ -82,6 +83,7 @@ CustomElementBase.define(
       openCalendarButton.addEventListener('click', () => {
         // Disable the button to prevent re-opening when clicking
         // the button while the dialog is open
+        opener = openCalendarButton;
         openCalendarButton.disabled = true;
         openDialog(indCalendar, input);
       });
@@ -90,7 +92,7 @@ CustomElementBase.define(
       });
       indCalendar.addEventListener('x-keyclose', () => {
         openCalendarButton.disabled = false;
-        openCalendarButton.focus();
+        opener.focus();
       });
       indCalendar.addEventListener('x-select', evt => {
         setValue(new Date(evt.target.value));
@@ -100,6 +102,10 @@ CustomElementBase.define(
       });
       input.addEventListener('keydown', evt => {
         if (evt.code === 'ArrowDown' && evt.altKey) {
+          if (indCalendar.hasAttribute('data-named-calendar')) {
+            evt.preventDefault();
+            opener = input;
+          }
           openDialog(indCalendar, input);
         }
       });
@@ -203,6 +209,8 @@ CustomElementBase.define(
       const clearButton = this.querySelector('button[value=clear]');
       const formatDescription = this.querySelector('[data-format]');
       const indCalendar = this.querySelector('ind-calendar');
+      const namedCalendar = indCalendar.hasAttribute('data-named-calendar');
+      let opener;
 
       const leftTriggerLocked = calendarTriggerLeft.disabled;
       const rightTriggerLocked = calendarTriggerRight.disabled;
@@ -279,16 +287,21 @@ CustomElementBase.define(
       rangeEndInput.addEventListener('keydown', handleAltDownToOpen);
       calendarTriggerLeft.addEventListener('click', () => {
         selection = ds.triggerLeft(selection);
+        opener = calendarTriggerLeft;
         openCalendar();
       });
       calendarTriggerRight.addEventListener('click', () => {
         selection = ds.triggerRight(selection);
+        opener = calendarTriggerRight;
         openCalendar();
       });
       indCalendar.addEventListener('close', () => {
         calendarTriggerLeft.disabled = leftTriggerLocked;
         calendarTriggerRight.disabled = rightTriggerLocked;
       });
+      if (namedCalendar) {
+        indCalendar.addEventListener('x-keyclose', () => opener?.focus());
+      }
       indCalendar.addEventListener('x-select', evt => {
         const result = ds.select(selection, new Date(evt.target.value));
         selection = result.selection;
@@ -311,6 +324,9 @@ CustomElementBase.define(
         // Update the selection preview and range restriction
         indCalendar.setSelectionPreview(selection);
         updateSelectionLimits();
+        if (namedCalendar && result.close) {
+          opener?.focus();
+        }
       });
 
       function updateSelectionLimits() {
@@ -337,7 +353,15 @@ CustomElementBase.define(
 
       function handleAltDownToOpen(evt) {
         if (evt.code === 'ArrowDown' && evt.altKey) {
-          openDialog(indCalendar, indDateRangePicker);
+          if (namedCalendar) {
+            evt.preventDefault();
+            opener = evt.currentTarget;
+            selection =
+              opener === rangeStartInput ? ds.triggerLeft(selection) : ds.triggerRight(selection);
+            openCalendar();
+          } else {
+            openDialog(indCalendar, indDateRangePicker);
+          }
         }
       }
 
@@ -479,6 +503,10 @@ class DialogModeController {
       this.dialog.addEventListener('keydown', evt => {
         if (evt.code !== 'Escape') {
           return;
+        }
+        if (this.calendar.hasAttribute('data-named-calendar')) {
+          evt.preventDefault();
+          evt.stopPropagation();
         }
         this.calendar.open = false;
         this.calendar.dispatchEvent(new Event('x-keyclose'));
@@ -886,21 +914,26 @@ CustomElementBase.define(
       const calendarButtons = listbox.querySelectorAll('[role=option]');
       const weekdayLabels = this.querySelectorAll('[data-weekday-labels] abbr');
       const monthLabel = this.querySelector('[data-month-label]');
+      const namedCalendar = Boolean(this.closest('ind-calendar[data-named-calendar]'));
       const id = `date-grid-${this.constructor.lastId++}`;
 
       // Populate weekday names in the calendar header
       getWeekdayNames(weekInfo, this.locale).forEach(({full, short, isWeekend}, i) => {
         const headerCell = weekdayLabels[i];
-        headerCell.setAttribute('aria-label', full);
+        if (!namedCalendar) {
+          headerCell.setAttribute('aria-label', full);
+          headerCell.id = `${id}-wkd-${i + 1}`;
+        }
         headerCell.setAttribute('title', full);
         headerCell.textContent = short;
         headerCell.toggleAttribute('data-weekend', isWeekend);
-        headerCell.id = `${id}-wkd-${i + 1}`;
       });
 
       // Prepare the initial button states
       calendarButtons.forEach((calendarButton, i) => {
-        calendarButton.setAttribute('aria-describedby', weekdayLabels[i % 7].id);
+        if (!namedCalendar) {
+          calendarButton.setAttribute('aria-describedby', weekdayLabels[i % 7].id);
+        }
         calendarButton.tabIndex = -1;
         calendarButton.type = 'button';
       });
@@ -951,11 +984,17 @@ CustomElementBase.define(
           const firstDayOfCalendar = getFirstDayOfWeek(weekInfo, firstDayOfMonth);
           const calendarMonth = firstDayOfMonth.getMonth();
 
-          if (monthLabel) {
-            monthLabel.textContent = firstDayOfMonth.toLocaleDateString(indDateGrid.locale, {
+          if (monthLabel || namedCalendar) {
+            const month = firstDayOfMonth.toLocaleDateString(indDateGrid.locale, {
               month: 'long',
               year: 'numeric',
             });
+            if (monthLabel) {
+              monthLabel.textContent = month;
+            }
+            if (namedCalendar) {
+              listbox.setAttribute('aria-label', month);
+            }
           }
 
           const selectedRange = new DateRange(indDateGrid.rangeStart, indDateGrid.rangeEnd);
@@ -967,6 +1006,9 @@ CustomElementBase.define(
             const isRenderable = !indDateGrid.hideDatesFromOtherMonths || belongsToCurrentMonth;
 
             calendarButton.dataset.currentMonth = belongsToCurrentMonth;
+            if (namedCalendar) {
+              calendarButton.inert = !isRenderable;
+            }
 
             if (!isRenderable) {
               calendarButton.textContent = '';
@@ -989,6 +1031,7 @@ CustomElementBase.define(
               calendarButton.setAttribute(
                 'aria-label',
                 date.toLocaleDateString(indDateGrid.locale, {
+                  weekday: namedCalendar ? 'long' : undefined,
                   year: 'numeric',
                   month: 'long',
                   day: 'numeric',
@@ -1044,11 +1087,28 @@ CustomElementBase.define(
   }
 );
 
+const viewportCalendarPosition = {
+  __proto__: positioning.dropdownPositionStrategy,
+  setPosition() {
+    const top = this.fitsPreferredDirection
+      ? this.anchorBottom
+      : this.anchorTop - this.targetHeight;
+    this.setTop(Math.max(this.visibleTop, Math.min(top, this.visibleBottom - this.targetHeight)));
+  },
+  setAlignment() {
+    const left = this.alignsPreferredSide ? this.anchorLeft : this.anchorRight - this.targetWidth;
+    this.setLeft(Math.max(this.visibleLeft, Math.min(left, this.visibleRight - this.targetWidth)));
+  },
+};
+
 function openDialog(indCalendar, anchor) {
+  const strategy = indCalendar.hasAttribute('data-named-calendar')
+    ? viewportCalendarPosition
+    : positioning.dropdownPositionStrategy;
   const stopPositioning = positioning.position(
     indCalendar.firstElementChild,
     anchor,
-    positioning.dropdownPositionStrategy,
+    strategy,
     () => {
       indCalendar.open = true;
     }
