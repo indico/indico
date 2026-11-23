@@ -16,6 +16,7 @@ import os
 import re
 import sys
 import warnings
+from datetime import date
 
 from sqlalchemy.exc import SAWarning
 
@@ -70,7 +71,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Indico'
-copyright = '2026, Indico Team'
+copyright = f'{date.today().year}, Indico Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
