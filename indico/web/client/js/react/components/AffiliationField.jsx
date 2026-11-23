@@ -5,7 +5,7 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-import defaultSearchAffiliationURL from 'indico-url:users.api_affiliations';
+import defaultSearchAffiliationURL from 'indico-url:affiliations.api_affiliations';
 
 import PropTypes from 'prop-types';
 import React, {useMemo, useState} from 'react';
