@@ -71,8 +71,9 @@ class RHDisplaySession(RHDisplaySessionBase):
                 .filter_by(id=self.session.id)
                 .options(contributions_strategy, blocks_strategy)
                 .one())
+        contributions = [c for c in sess.contributions if c.can_access(session.user)]
         return self.view_class.render_template('display/session_display.html', self.event,
-                                               sess=sess, page_title=sess.title)
+                                               sess=sess, contributions=contributions, page_title=sess.title)
 
 
 @allow_signed_url
