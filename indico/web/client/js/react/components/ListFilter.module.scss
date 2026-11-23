@@ -24,10 +24,22 @@
     width: max-content !important;
     max-width: 25em;
 
+    // keep searchable submenus from resizing while filtering their options
+    &.searchable-menu {
+      width: 25em !important;
+    }
+
     > :global(.item) {
       white-space: normal;
       overflow-wrap: anywhere;
     }
+  }
+
+  :global(.ui.upward.dropdown.item > .menu) {
+    // SUI forces `top: 0 !important` on nested menus, which combined with
+    // `.upward`'s `bottom: 100%` collapses upward submenus to 0 height
+    top: auto !important;
+    bottom: 0;
   }
 }
 
