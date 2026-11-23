@@ -394,7 +394,8 @@ ind-date-picker > .date-label {
     bottom: 0.375em;
 
     &:focus-visible {
-      outline-offset: -1px;
+      outline: revert;
+      outline-offset: -3px;
     }
   }
 }
