@@ -1,9 +1,6 @@
 Hooking into Indico using Signals
 =================================
 
-.. contents::
-    :depth: 3
-
 Signals allow you to hook into certain parts of Indico without
 adding any code to the core (which is something a plugin can and
 should not do). Each signal has a *sender* which can be any object
