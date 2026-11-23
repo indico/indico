@@ -25,6 +25,8 @@ Bugfixes
   in the timetable export API (:pr:`7822`)
 - Fix cache inconsistencies in Book of Abstracts (:pr:`7870`)
 - Disable legacy API keys of blocked users (:pr:`7881`)
+- Show items in the registration invoice in the same order as in the registration form
+  (:issue:`2778`)
 
 Accessibility
 ^^^^^^^^^^^^^
