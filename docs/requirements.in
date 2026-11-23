@@ -1,9 +1,11 @@
 babel
 flask
 flask-babel
+furo
 plantweb
 sphinx
+sphinx-copybutton
+sphinx-inline-tabs
 sphinx-issues
 sphinx-reredirects
-sphinx-rtd-theme
 sphinxcontrib-mermaid
