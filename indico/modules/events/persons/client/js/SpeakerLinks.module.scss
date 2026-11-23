@@ -1,0 +1,29 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+.speaker-link-item {
+  display: flex !important;
+  flex-direction: row;
+  gap: 1em;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.speaker-link-item-group {
+  display: flex;
+  flex-direction: row;
+  gap: 1em;
+  align-items: center;
+}
+
+.speaker-link-item-group.expand {
+  flex: 1;
+}
+
+.borderless {
+  border-left: none !important;
+}
