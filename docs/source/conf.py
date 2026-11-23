@@ -140,7 +140,7 @@ html_theme_options = {
     'source_repository': 'https://github.com/indico/indico',
     'source_branch': 'master',
     'source_directory': 'docs/source/',
-    'top_of_page_buttons': ['edit'],
+    'top_of_page_buttons': ['view'],
     'light_logo': 'logo_indico.svg',
     'dark_logo': 'logo_indico_bw.svg',
     'sidebar_hide_name': True,
