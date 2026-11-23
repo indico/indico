@@ -52,6 +52,8 @@ from indico.web.util import signed_url_for_user
 
 class RHContact(RH):
     def _process(self):
+        if config.PUBLIC_SUPPORT_URL:
+            return redirect(config.PUBLIC_SUPPORT_URL)
         if not config.PUBLIC_SUPPORT_EMAIL:
             raise NotFound
         return WPContact.render_template('contact.html')
@@ -325,7 +327,8 @@ class RHConfig(RH):
             privacy_policy_html = None
 
         return jsonify(help_url=config.HELP_URL,
-                       contact_email=config.PUBLIC_SUPPORT_EMAIL,
+                       contact_email=None if config.PUBLIC_SUPPORT_URL else config.PUBLIC_SUPPORT_EMAIL,
+                       contact_url=config.PUBLIC_SUPPORT_URL,
                        has_tos=bool(tos_url or tos_html),
                        tos_html=tos_html,
                        tos_url=tos_url,

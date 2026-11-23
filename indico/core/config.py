@@ -93,6 +93,7 @@ DEFAULTS = {
     'PROFILE': False,
     'PROVIDER_MAP': {},
     'PUBLIC_SUPPORT_EMAIL': None,
+    'PUBLIC_SUPPORT_URL': None,
     'REDIS_CACHE_URL': None,
     'ROUTE_OLD_URLS': False,
     'SCHEDULED_TASK_OVERRIDE': {},

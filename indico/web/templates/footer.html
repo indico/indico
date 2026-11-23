@@ -24,9 +24,9 @@
                             {% trans %}Help{% endtrans %}
                         </a>
                     </li>
-                    {% if indico_config.PUBLIC_SUPPORT_EMAIL %}
+                    {% if indico_config.PUBLIC_SUPPORT_URL or indico_config.PUBLIC_SUPPORT_EMAIL %}
                         <li>
-                            <a href="{{ url_for('core.contact') }}">
+                            <a href="{{ indico_config.PUBLIC_SUPPORT_URL or url_for('core.contact') }}">
                                 {% trans %}Contact{% endtrans %}
                             </a>
                         </li>
