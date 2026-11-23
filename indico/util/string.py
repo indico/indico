@@ -26,7 +26,7 @@ import bleach
 import email_validator
 import html5lib
 import markdown
-import translitcodec
+from unidecode import unidecode
 from bleach.css_sanitizer import CSSSanitizer
 from flask import has_app_context
 from html2text import HTML2Text
@@ -190,7 +190,7 @@ def remove_non_alpha(text):
 
 
 def str_to_ascii(text):
-    return translitcodec.long_encode(text)[0].encode('ascii', 'ignore').decode().strip()
+    return unidecode(text).strip()
 
 
 def strict_str(value):
@@ -221,7 +221,7 @@ def slugify(*args, **kwargs):
     fallback = kwargs.get('fallback', '')
 
     value = '-'.join(str(val) for val in args)
-    value = translitcodec.long_encode(value)[0]
+    value = unidecode(value)
     value = re.sub(r'[^\w\s-]', '', value, flags=re.ASCII).strip()
 
     if lower:
