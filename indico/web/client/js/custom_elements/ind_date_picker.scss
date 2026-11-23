@@ -391,7 +391,36 @@ ind-date-picker > .date-label {
 
   ~ button[data-calendar-trigger] {
     top: auto;
-    bottom: 0.2em;
+    bottom: 0.375em;
+
+    &:focus-visible {
+      outline-offset: -1px;
+    }
+  }
+}
+
+@supports (grid-template-rows: subgrid) {
+  ind-date-picker:has(> .date-label) {
+    display: grid;
+    grid-template-rows: auto auto;
+    padding-block-end: var(--control-internal-gap);
+
+    > .date-label {
+      grid-area: 1 / 1 / 3 / 2;
+      grid-template-rows: subgrid;
+    }
+
+    > ind-calendar {
+      grid-area: 2 / 1;
+    }
+
+    > .date-label ~ button[data-calendar-trigger] {
+      grid-area: 2 / 1;
+      place-self: center end;
+      position: relative;
+      inset: auto;
+      margin-inline-end: 0.2em;
+    }
   }
 }
 
