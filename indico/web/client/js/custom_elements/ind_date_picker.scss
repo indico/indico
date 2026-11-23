@@ -32,14 +32,11 @@ ind-date-picker {
   }
 
   > button[data-calendar-trigger] {
-    @extend %text-size-reset;
     @extend %button-icon-only;
 
     position: absolute;
     right: 0.2em;
     top: 0.2em;
-    width: 2em;
-    aspect-ratio: 1;
   }
 
   > button[data-calendar-trigger]::before {
@@ -425,6 +422,18 @@ ind-date-range-picker:has(> ind-calendar[data-named-calendar]) > fieldset {
   @include sui_debt.field-override() {
     border-color: var(--control-border-color);
   }
+}
+
+ind-date-picker > button[data-calendar-trigger],
+ind-date-range-picker:has(> ind-calendar[data-named-calendar])
+  fieldset
+  button[data-calendar-trigger] {
+  @extend %text-size-reset;
+
+  width: 2em;
+  aspect-ratio: 1;
+  flex: none;
+  padding: 0;
 }
 
 :is(ind-date-picker, ind-date-range-picker):has(> ind-calendar[data-named-calendar]) {
