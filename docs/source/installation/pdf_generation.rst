@@ -44,17 +44,17 @@ and avoid installing LaTeX altogether.
 For the reasons mentioned in the warning above, we only support the containerized
 setup using Podman. Installing it is quite easy:
 
-If you are on an RPM-based distribution (AlmaLinux, RockyLinux, RHEL), run this:
+.. tab:: AlmaLinux / RockyLinux / RHEL
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    dnf install podman
+        dnf install podman
 
-If you are on a DEB-based distribution (Debian, Ubuntu), use this instead:
+.. tab:: Debian / Ubuntu
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    apt install podman
+        apt install podman
 
 You then need to configure the Indico user to be able to run unprivileged containers.
 It is recommended that you check ``/etc/subuid`` and ``/etc/subgid`` to avoid any

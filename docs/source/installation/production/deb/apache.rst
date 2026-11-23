@@ -15,18 +15,19 @@ PostgreSQL is installed from its upstream repos to get a more recent version.
     apt install -y --install-recommends postgresql-16 libpq-dev apache2 libapache2-mod-proxy-uwsgi libapache2-mod-xsendfile libxslt1-dev libxml2-dev libffi-dev libpcre2-dev libyaml-dev libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev libncurses5-dev libncursesw5-dev xz-utils liblzma-dev uuid-dev build-essential redis-server git libpango1.0-dev
 
 
-If you use Debian, run this command:
+The name of the libjpeg package depends on your distribution:
 
-.. code-block:: shell
+.. tab:: Debian
 
-    apt install -y libjpeg62-turbo-dev
+    .. code-block:: shell
 
+        apt install -y libjpeg62-turbo-dev
 
-If you use Ubuntu, run this instead:
+.. tab:: Ubuntu
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    apt install -y libjpeg-turbo8-dev
+        apt install -y libjpeg-turbo8-dev
 
 Afterwards, make sure the services you just installed are running:
 
