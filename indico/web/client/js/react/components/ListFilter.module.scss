@@ -26,6 +26,7 @@
 
     > :global(.item) {
       white-space: normal;
+      overflow-wrap: anywhere;
     }
   }
 }
@@ -35,6 +36,8 @@
   flex-direction: column;
   margin: 0.4em;
   gap: 0.4em;
+  max-height: 40vh;
+  overflow-y: auto;
 }
 
 .options-search {

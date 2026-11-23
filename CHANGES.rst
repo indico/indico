@@ -14,7 +14,7 @@ Improvements
 - Include the event's category path in iCalendar exports (:issue:`7711`, :pr:`7885`,
   thanks :user:`titcsl`)
 - Show long options in the editing and affiliation list filters in full instead of
-  truncating them (:pr:`7925`)
+  truncating them (:pr:`7925`, thanks :user:`mindouro, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
