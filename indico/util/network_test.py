@@ -13,17 +13,18 @@ from indico.util.network import (InsecureRequestError, is_private_url, make_vali
 
 
 @pytest.mark.parametrize(('url', 'expected'), (
+    ('https://127.0.0.1', True),
     ('http://127.0.0.1', True),
     ('http://127.0.0.1\\@1.1.1.1', True),
-    ('https://[::1]', True),
+    ('http://[::1]', True),
     ('https://localhost', True),
     ('http://192.168.0.12', True),
-    ('https://indico.cern.ch', False),
-    ('https://[2001:1458:201:87::100:c]', False),
-    ('https://indico.local', True),
-    ('https://local', True),
-    ('https://testing-instance', True),
-    ('https://indico', True),
+    ('http://indico.cern.ch', False),
+    ('http://[2001:1458:201:87::100:c]', False),
+    ('http://indico.local', True),
+    ('http://local', True),
+    ('http://testing-instance', True),
+    ('http://indico', True),
     ('http//nonsense', True),
 ))
 def test_is_private_url(url, expected):
@@ -32,7 +33,8 @@ def test_is_private_url(url, expected):
 
 @pytest.mark.parametrize(('url', 'valid'), (
     ('https://public.test', True),
-    ('https://PUBLIC.test', True),
+    ('http://public.test', True),
+    ('http://PUBLIC.test', True),
     ('http://publi%63.test', False),
     ('http://a{b}.test', False),
     ('http://a%7Bb%7D.test', False),
