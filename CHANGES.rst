@@ -19,6 +19,7 @@ Improvements
   thanks :user:`duartegalvao, unconventionaldotdev`)
 - Add new :data:`PUBLIC_SUPPORT_URL` config option to link the "Contact" page to an
   external URL instead of showing the :data:`PUBLIC_SUPPORT_EMAIL` address
+  (:pr:`7930`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
