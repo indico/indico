@@ -51,7 +51,6 @@ class CategoryMaterialSchema(mm.Schema):
     def _get_url(self, material):
         if not hasattr(material, 'type'):
             return None
-
         if material.is_protected and not material.can_access(session.user):
             return None
         return material.link_url if material.type.name == 'link' else material.download_url
