@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import icalendar
 import pytest
 from flask import request, session
 from werkzeug.datastructures import MultiDict
@@ -61,3 +62,23 @@ def test_user_search_results_filtered_by_all_handlers(app_context, create_user, 
             response = RHUserSearch()._process()
 
     assert [u['full_name'] for u in response.json['users']] == ['Carol Searchable']
+
+
+@pytest.mark.parametrize(('query', 'label'), (
+    ({'include': 'linked'}, 'Events at hand'),
+    ({'include': 'categories'}, 'Categories'),
+    ({}, 'Everything'),
+))
+def test_dashboard_calendar_name(app_context, mocker, query, label):
+    from indico.modules.users.controllers import RHExportDashboardICS
+    rh = RHExportDashboardICS()
+    mocker.patch.object(rh, '_get_user')
+    mocker.patch('indico.modules.users.controllers.get_linked_events', return_value=[])
+    mocker.patch('indico.modules.users.controllers.get_related_categories', return_value={})
+
+    with app_context.test_request_context(query_string=query):
+        response = rh._process()
+        calendar = icalendar.Calendar.from_ical(b''.join(response.response))
+
+    assert calendar['NAME'] == f'Indico: {label}'
+    assert calendar['X-WR-CALNAME'] == f'Indico: {label}'
