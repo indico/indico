@@ -1,4 +1,5 @@
 \JINJA{from 'inc/person_list.tex' import render_person_lists}
+\JINJA{from 'inc/util.tex' import render_field_value}
 
 
 \JINJA{macro render_abstract(abstract, track_class, contrib_type, management=false, status=none, track_judgments=none)}
@@ -46,11 +47,12 @@
         \vspace{1.5em}
     \end{addmargin}
 
-    \JINJA{for field in abstract.event.contribution_fields if field.is_active and (management or field.is_public)}
+    \JINJA{for field_value in abstract.field_values
+           if field_value.contribution_field.is_active and (management or field_value.contribution_field.is_public)}
         {\bf
             \noindent
             \large
-            \VAR{field.title}
+            \VAR{field_value.contribution_field.title}
         }
 
         \begin{addmargin}[1em]{1em}
@@ -60,11 +62,7 @@
                 \sectionfont{\normalsize\rmfamily}
                 \subsectionfont{\small\rmfamily}
                 \small
-                \VAR{
-                    abstract.data_by_field[field.id].friendly_data|markdown
-                    if field.id in abstract.data_by_field
-                    else ''
-                }
+                \VAR{render_field_value(field_value)|markdown}
             }
             \vspace{1.5em}
         \end{addmargin}
