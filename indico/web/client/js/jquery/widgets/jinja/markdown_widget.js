@@ -69,6 +69,80 @@ import {$T} from 'indico/utils/i18n';
     });
   }
 
+  function setupAccessibleToolbar($field) {
+    const $container = $field.closest('[data-field-id]');
+    const $buttonRow = $container.find('.wmd-button-row');
+    if (!$buttonRow.length) {
+      return;
+    }
+
+    $buttonRow.attr({
+      role: 'toolbar',
+      'aria-label': $T.gettext('Formatting'),
+    });
+
+    $buttonRow.find('li.wmd-spacer').attr('aria-hidden', 'true');
+
+    const isMac = /mac|iphone|ipad|ipod/i.test(navigator.platform);
+    const buttonConfig = {
+      bold: {label: $T.gettext('Bold'), shortcut: 'Ctrl+B'},
+      italic: {label: $T.gettext('Italic'), shortcut: 'Ctrl+I'},
+      link: {label: $T.gettext('Insert link'), shortcut: 'Ctrl+L'},
+      quote: {label: $T.gettext('Quote'), shortcut: 'Ctrl+Q'},
+      code: {label: $T.gettext('Code'), shortcut: 'Ctrl+K'},
+      image: {label: $T.gettext('Insert image'), shortcut: 'Ctrl+G'},
+      olist: {label: $T.gettext('Numbered list'), shortcut: 'Ctrl+O'},
+      ulist: {label: $T.gettext('Bulleted list'), shortcut: 'Ctrl+U'},
+      heading: {label: $T.gettext('Heading'), shortcut: 'Ctrl+H'},
+      hr: {label: $T.gettext('Horizontal rule'), shortcut: 'Ctrl+R'},
+      undo: {label: $T.gettext('Undo'), shortcut: 'Ctrl+Z'},
+      redo: {label: $T.gettext('Redo'), shortcut: isMac ? 'Ctrl+Shift+Z' : 'Ctrl+Y'},
+    };
+
+    $buttonRow.find('li.wmd-button').each((_, li) => {
+      const $li = $(li);
+      const isHelp = $li.hasClass('wmd-help-button');
+      const id = li.id;
+      const match = id.match(/^wmd-(\w+)-button/);
+      const action = match ? match[1] : null;
+
+      const iconSpan = li.querySelector('span');
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = li.className;
+      button.id = id;
+      li.removeAttribute('id');
+      li.removeAttribute('title');
+      li.removeAttribute('style');
+      li.className = 'wmd-button-item';
+
+      if (iconSpan) {
+        button.appendChild(iconSpan);
+      }
+
+      if (isHelp) {
+        const label = document.createElement('span');
+        label.className = 'text-label';
+        label.textContent = $T.gettext('Markdown editing help');
+        button.appendChild(label);
+        li.appendChild(button);
+      } else if (action && buttonConfig[action]) {
+        const config = buttonConfig[action];
+        const tipContent = document.createElement('span');
+        tipContent.setAttribute('data-tip-content', '');
+        tipContent.textContent = `${config.label} (${config.shortcut})`;
+        button.appendChild(tipContent);
+
+        const tooltip = document.createElement('ind-with-tooltip');
+        tooltip.appendChild(button);
+        li.appendChild(tooltip);
+      } else {
+        li.appendChild(button);
+      }
+    });
+  }
+
   global.setupMarkdownWidget = function setupMarkdownWidget(options) {
     options = $.extend(
       true,
@@ -84,6 +158,7 @@ import {$T} from 'indico/utils/i18n';
     if (options.useMarkdownEditor) {
       const $field = $(`#${options.fieldId}`);
       $field.pagedown();
+      setupAccessibleToolbar($field);
 
       // The editor doesn't trigger any input/change events when applying changes via keyboard
       // shortcuts or the button bar, so we need to manually take care of this to enable submit
