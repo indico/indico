@@ -172,16 +172,19 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
                     return
             choices = self.form_item.versioned_data['choices']
             captions = self.form_item.data['captions']
-            for k in new_data:
+            for k, slots in new_data.items():
                 choice = next((x for x in choices if x['id'] == k), None)
                 # Need to check the selected choice, because it might have been deleted.
                 if choice:
+                    max_extra_slots = choice.get('max_extra_slots', 0)
+                    if slots > max_extra_slots + 1:
+                        raise ValidationError(f'Too many extra slots for the option {captions[k]}')
                     places_limit = choice.get('places_limit')
                     places_used_dict = self.get_places_used()
                     places_used_dict.setdefault(k, 0)
                     if old_data and old_data.data:
                         places_used_dict[k] -= old_data.data.get(k, 0)
-                    places_used_dict[k] += new_data[k]
+                    places_used_dict[k] += slots
                     if places_limit and (places_limit - places_used_dict.get(k, 0)) < 0:
                         raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
