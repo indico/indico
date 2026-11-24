@@ -497,7 +497,11 @@ class Registration(db.Model):
 
     @property
     def billable_data(self):
-        return [data for data in self.data if data.price]
+        def _sort_key(data):
+            field = data.field_data.field
+            return field.parent.position, field.parent.id, field.position, field.id
+
+        return sorted((data for data in self.data if data.price), key=_sort_key)
 
     @property
     def full_name(self):
