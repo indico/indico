@@ -121,7 +121,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     versioned_data_fields = RegistrationFormBillableItemsField.versioned_data_fields | {'choices'}
     has_default_item = False
     mm_field_class = fields.Dict
-    mm_field_kwargs = {'keys': fields.String(), 'values': fields.Integer()}
+    mm_field_kwargs = {'keys': fields.String(), 'values': fields.Integer(validate=validate.Range(min=0))}
     allow_condition = True
 
     @classmethod
