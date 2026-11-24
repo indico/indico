@@ -39,12 +39,14 @@
     flex-direction: column;
     justify-content: flex-start;
     gap: var(--space-6);
+    container-name: category-layout;
+    container-type: inline-size;
   }
 
   .category {
     width: 100%;
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: minmax(min(100%, 40rem), 1fr) 300px;
     gap: var(--space-6);
   }
 
@@ -52,8 +54,13 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
-    flex: 3 1 40rem;
     min-width: 0;
+  }
+
+  @container category-layout (max-width: calc(40rem + 300px + var(--space-6))) {
+    .category {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .category-title {
