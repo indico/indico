@@ -16,42 +16,42 @@ an outdated npm version.
 Since only the latest Linux distributions include Python 3.12 in their package managers, we recommend installing
 `uv <https://docs.astral.sh/uv/>`_.
 
-RPM-based distributions (Alma, Rocky, Fedora)
-+++++++++++++++++++++++++++++++++++++++++++++
+.. tab:: Linux
 
-.. code-block:: shell
+    .. tab:: Alma / Rocky / Fedora
 
-    dnf install -y gcc redis libjpeg-turbo-devel libxslt-devel libxml2-devel \
-        libffi-devel pcre-devel libyaml-devel redhat-rpm-config \
-        postgresql postgresql-server postgresql-contrib libpq-devel pango
-    systemctl start redis.service postgresql.service
+        .. code-block:: shell
 
+            dnf install -y gcc redis libjpeg-turbo-devel libxslt-devel libxml2-devel \
+                libffi-devel pcre-devel libyaml-devel redhat-rpm-config \
+                postgresql postgresql-server postgresql-contrib libpq-devel pango
+            systemctl start redis.service postgresql.service
 
-Debian/Ubuntu
-+++++++++++++
+    .. tab:: Debian
 
-.. code-block:: shell
+        .. code-block:: shell
 
-    apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
-        libyaml-dev build-essential redis-server postgresql libpq-dev libpango1.0-dev
+            apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
+                libyaml-dev build-essential redis-server postgresql libpq-dev libpango1.0-dev
+            apt install -y libjpeg62-turbo-dev
 
-Then on Debian::
+    .. tab:: Ubuntu
 
-    apt install -y libjpeg62-turbo-dev
+        .. code-block:: shell
 
-And on Ubuntu::
+            apt install -y --install-recommends libxslt1-dev libxml2-dev libffi-dev libpcre3-dev \
+                libyaml-dev build-essential redis-server postgresql libpq-dev libpango1.0-dev
+            apt install -y libjpeg-turbo8-dev zlib1g-dev
 
-    apt install -y libjpeg-turbo8-dev zlib1g-dev
+.. tab:: macOS
 
+    We recommend that you use `Homebrew <https://brew.sh/>`_:
 
-macOS
-+++++
+    .. code-block:: shell
 
-We recommend that you use `Homebrew <https://brew.sh/>`_::
-
-    brew install redis libjpeg libffi pcre libyaml postgresql pango
-    brew services start postgresql
-    brew services start redis
+        brew install redis libjpeg libffi pcre libyaml postgresql pango
+        brew services start postgresql
+        brew services start redis
 
 
 Creating the directory structure
@@ -111,27 +111,25 @@ You'll then be able to access the message log at `<http://localhost:1080>`_.
 Creating the DB
 ---------------
 
-Linux
-+++++
+.. tab:: Linux
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    sudo -u postgres createuser $USER --createdb
-    sudo -u postgres createdb indico_template -O $USER
-    sudo -u postgres psql indico_template -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"
-    createdb indico -T indico_template
+        sudo -u postgres createuser $USER --createdb
+        sudo -u postgres createdb indico_template -O $USER
+        sudo -u postgres psql indico_template -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"
+        createdb indico -T indico_template
 
-macOS
-+++++
+.. tab:: macOS
 
-If you are on macOS with PostgreSQL installed via Homebrew, you should not use ``sudo`` as that only works on Linux
-systems where a system user named ``postgres`` exists. Use the following instead:
+    If you are on macOS with PostgreSQL installed via Homebrew, you should not use ``sudo`` as that only works on Linux
+    systems where a system user named ``postgres`` exists. Use the following instead:
 
-.. code-block:: shell
+    .. code-block:: shell
 
-    createdb indico_template -O $USER
-    psql indico_template -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"
-    createdb indico -T indico_template
+        createdb indico_template -O $USER
+        psql indico_template -c "CREATE EXTENSION unaccent; CREATE EXTENSION pg_trgm;"
+        createdb indico -T indico_template
 
 
 .. _configuring-dev:

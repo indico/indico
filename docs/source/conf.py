@@ -16,6 +16,7 @@ import os
 import re
 import sys
 import warnings
+from datetime import date
 
 from sqlalchemy.exc import SAWarning
 
@@ -44,8 +45,9 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.coverage',
               'sphinx.ext.imgmath',
               'sphinx.ext.intersphinx',
+              'sphinx_copybutton',
+              'sphinx_inline_tabs',
               'sphinx_issues',
-              'sphinxcontrib.jquery',
               'sphinxcontrib.mermaid',
               'exec_directive',
               'indico_uml_directive',
@@ -69,7 +71,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Indico'
-copyright = '2021, Indico Team'
+copyright = f'{date.today().year}, Indico Team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -110,7 +112,7 @@ exclude_trees = []
 #show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+#pygments_style = 'sphinx'
 
 # A list of ignored prefixes for module index sorting.
 #modindex_common_prefix = []
@@ -129,12 +131,20 @@ intersphinx_mapping = {
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'furo'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-# html_theme_options = {}
+html_theme_options = {
+    'source_repository': 'https://github.com/indico/indico',
+    'source_branch': 'master',
+    'source_directory': 'docs/source/',
+    'top_of_page_buttons': ['view'],
+    'light_logo': 'logo_indico.svg',
+    'dark_logo': 'logo_indico_bw.svg',
+    'sidebar_hide_name': True,
+}
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".
@@ -150,12 +160,24 @@ html_theme = 'sphinx_rtd_theme'
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-#html_favicon = None
+html_favicon = '../../indico/web/static/images/indico.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = [
+    '_static',
+    '../../indico/web/static/images/logo_indico.svg',
+    '../../indico/web/static/images/logo_indico_bw.svg'
+]
+
+html_css_files = [
+    'rtd-search.css'
+]
+
+html_js_files = [
+    'rtd-search.js'
+]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -166,9 +188,8 @@ html_static_path = ['_static']
 #html_use_smartypants = True
 
 # Custom sidebar templates, maps document names to template names.
-html_sidebars = {
-    '**': ['about.html', 'navigation.html', 'searchbox.html']
-}
+#html_sidebars = {}
+
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 #html_additional_pages = {}

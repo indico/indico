@@ -1,17 +1,7 @@
-Welcome to Indico's documentation!
-==================================
-
-
-.. raw:: html
-    :file: _static/github_star.html
-
-.. image:: images/indico.png
-    :width: 300 px
-    :align: center
+Indico
+======
 
 .. epigraph:: *The effortless open source tool for event organization, archival and collaboration.*
-
-|build-status| |license| |pypi-ver| |cern-foss|
 
 Welcome to Indico's documentation. This documentation is split into several parts, from `installing Indico <installation/>`_ to developing `Indico plugins <plugins>`_.
 To dive into the internals of Indico, check out the `API documentation <api>`_. Read more about Indico in our `official website <https://getindico.io>`_.
@@ -124,17 +114,3 @@ Contact
     :maxdepth: 2
 
     contact/index.rst
-
-
-.. |build-status| image:: https://github.com/indico/indico/workflows/CI/badge.svg
-                   :alt: CI Build Status
-                   :target: https://github.com/indico/indico/actions
-.. |pypi-ver| image:: https://img.shields.io/pypi/v/indico.png
-                   :alt: Available on PyPI
-                   :target: https://pypi.python.org/pypi/indico/
-.. |license| image:: https://img.shields.io/github/license/indico/indico.png
-                   :alt: License
-                   :target: https://github.com/indico/indico/blob/master/LICENSE
-.. |cern-foss| image:: https://img.shields.io/badge/CERN-Open%20Source-%232980b9.svg
-                   :alt: Made at CERN!
-                   :target: https://home.cern

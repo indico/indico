@@ -1,0 +1,30 @@
+body {
+  /*
+    The RTD Search Addon does not support darkmode. It however exposes CSS variables which
+    we can override manually using Furo's darkmode-aware variables:
+    RTD variables: https://github.com/readthedocs/addons/blob/5cb5ff6f34c290498bf37d42c29c63d0ec14021f/src/search.css#L1-L49
+    Furo variables: https://github.com/pradyunsg/furo/blob/4026dd510f8b4462153d02c2cdc5260390740742/src/furo/assets/styles/variables/_colors.scss#L144-L196
+  */
+
+  --readthedocs-search-color: var(--color-foreground-primary);
+  --readthedocs-search-link-color: var(--color-foreground-primary);
+
+  --readthedocs-search-content-background-color: var(--color-background-primary);
+  --readthedocs-search-content-border-color: var(--color-background-border);
+  --readthedocs-search-filters-border-color: var(--color-background-border);
+  --readthedocs-search-footer-background-color: var(--color-background-secondary);
+  --readthedocs-search-footer-color: var(--color-foreground-secondary);
+  --readthedocs-search-footer-code-background-color: var(--color-background-primary);
+  --readthedocs-search-footer-code-border-color: var(--color-background-border);
+  --readthedocs-search-input-background-color: var(--color-background-secondary);
+
+  --readthedocs-search-result-highlight-color: var(--color-brand-content);
+  --readthedocs-search-result-color: var(--color-foreground-secondary);
+  --readthedocs-search-result-icon-color: var(--color-foreground-muted);
+  --readthedocs-search-result-heading-color: var(--color-foreground-primary);
+  --readthedocs-search-result-subheading-color: var(--color-foreground-primary);
+  --readthedocs-search-result-active-background-color: var(--color-background-hover);
+  --readthedocs-search-result-border-color: var(--color-background-border);
+  --readthedocs-search-badge-background-color: var(--color-highlighted-background);
+  --readthedocs-search-badge-color: var(--color-foreground-primary);
+}
