@@ -8,28 +8,36 @@
 // Roboto
 @font-face {
   font-family: 'Roboto';
-  src: url('static:fonts/roboto/roboto-regular.woff2') format('woff2');
-  font-style: normal;
+  src:
+    url('static:fonts/roboto/roboto-regular.woff2') format('woff2'),
+    url('static:fonts/roboto/roboto-regular.woff') format('woff');
   font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
   font-family: 'Roboto';
-  src: url('static:fonts/roboto/roboto-bold.woff2') format('woff2');
-  font-style: bold;
+  src:
+    url('static:fonts/roboto/roboto-bold.woff2') format('woff2'),
+    url('static:fonts/roboto/roboto-bold.woff') format('woff');
   font-weight: bold;
+  font-style: normal;
 }
 
 @font-face {
   font-family: 'Roboto';
-  src: url('static:fonts/roboto/roboto-bold-italic.woff2') format('woff2');
+  src:
+    url('static:fonts/roboto/roboto-bold-italic.woff2') format('woff2'),
+    url('static:fonts/roboto/roboto-bold-italic.woff') format('woff');
   font-weight: bold;
   font-style: italic;
 }
 
 @font-face {
   font-family: 'Roboto';
-  src: url('static:fonts/roboto/roboto-italic.woff2') format('woff2');
+  src:
+    url('static:fonts/roboto/roboto-italic.woff2') format('woff2'),
+    url('static:fonts/roboto/roboto-italic.woff') format('woff');
   font-weight: normal;
   font-style: italic;
 }
@@ -37,43 +45,64 @@
 // Roboto Light
 @font-face {
   font-family: 'Roboto Light';
-  src: url('static:fonts/roboto/roboto-light.woff2') format('woff2');
-  font-style: normal;
+  src:
+    url('static:fonts/roboto/roboto-light.woff2') format('woff2'),
+    url('static:fonts/roboto/roboto-light.woff') format('woff');
   font-weight: normal;
+  font-style: normal;
 }
 
 @font-face {
   font-family: 'Maven Pro';
-  src: url('static:fonts/maven_pro/maven-pro-regular.woff2') format('woff2');
-  font-style: normal;
+  src:
+    url('static:fonts/maven_pro/maven-pro-medium.woff2') format('woff2'),
+    url('static:fonts/maven_pro/maven-pro-medium.woff') format('woff');
   font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Maven Pro';
+  src:
+    url('static:fonts/maven_pro/maven-pro-bold.woff2') format('woff2'),
+    url('static:fonts/maven_pro/maven-pro-bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
 }
 
 // Liberation Sans
 @font-face {
   font-family: 'Liberation Sans';
-  src: url('static:fonts/liberation_sans/liberation-sans-regular.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_sans/liberation-sans-regular.woff2') format('woff2'),
+    url('static:fonts/liberation_sans/liberation-sans-regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Liberation Sans';
-  src: url('static:fonts/liberation_sans/liberation-sans-bold.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_sans/liberation-sans-bold.woff2') format('woff2'),
+    url('static:fonts/liberation_sans/liberation-sans-bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Liberation Sans';
-  src: url('static:fonts/liberation_sans/liberation-sans-italic.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_sans/liberation-sans-italic.woff2') format('woff2'),
+    url('static:fonts/liberation_sans/liberation-sans-italic.woff') format('woff');
   font-weight: normal;
   font-style: italic;
 }
 
 @font-face {
   font-family: 'Liberation Sans';
-  src: url('static:fonts/liberation_sans/liberation-sans-bolditalic.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_sans/liberation-sans-bolditalic.woff2') format('woff2'),
+    url('static:fonts/liberation_sans/liberation-sans-bolditalic.woff') format('woff');
   font-weight: bold;
   font-style: italic;
 }
@@ -81,28 +110,36 @@
 // Liberation Serif
 @font-face {
   font-family: 'Liberation Serif';
-  src: url('static:fonts/liberation_serif/liberation-serif-regular.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_serif/liberation-serif-regular.woff2') format('woff2'),
+    url('static:fonts/liberation_serif/liberation-serif-regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Liberation Serif';
-  src: url('static:fonts/liberation_serif/liberation-serif-bold.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_serif/liberation-serif-bold.woff2') format('woff2'),
+    url('static:fonts/liberation_serif/liberation-serif-bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Liberation Serif';
-  src: url('static:fonts/liberation_serif/liberation-serif-italic.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_serif/liberation-serif-italic.woff2') format('woff2'),
+    url('static:fonts/liberation_serif/liberation-serif-italic.woff') format('woff');
   font-weight: normal;
   font-style: italic;
 }
 
 @font-face {
   font-family: 'Liberation Serif';
-  src: url('static:fonts/liberation_serif/liberation-serif-bolditalic.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_serif/liberation-serif-bolditalic.woff2') format('woff2'),
+    url('static:fonts/liberation_serif/liberation-serif-bolditalic.woff') format('woff');
   font-weight: bold;
   font-style: italic;
 }
@@ -110,28 +147,36 @@
 // Liberation Mono
 @font-face {
   font-family: 'Liberation Mono';
-  src: url('static:fonts/liberation_mono/liberation-mono-regular.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_mono/liberation-mono-regular.woff2') format('woff2'),
+    url('static:fonts/liberation_mono/liberation-mono-regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Liberation Mono';
-  src: url('static:fonts/liberation_mono/liberation-mono-bold.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_mono/liberation-mono-bold.woff2') format('woff2'),
+    url('static:fonts/liberation_mono/liberation-mono-bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
   font-family: 'Liberation Mono';
-  src: url('static:fonts/liberation_mono/liberation-mono-italic.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_mono/liberation-mono-italic.woff2') format('woff2'),
+    url('static:fonts/liberation_mono/liberation-mono-italic.woff') format('woff');
   font-weight: normal;
   font-style: italic;
 }
 
 @font-face {
   font-family: 'Liberation Mono';
-  src: url('static:fonts/liberation_mono/liberation-mono-bolditalic.woff2') format('woff2');
+  src:
+    url('static:fonts/liberation_mono/liberation-mono-bolditalic.woff2') format('woff2'),
+    url('static:fonts/liberation_mono/liberation-mono-bolditalic.woff') format('woff');
   font-weight: bold;
   font-style: italic;
 }
