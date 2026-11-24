@@ -10,7 +10,7 @@ import socket
 from urllib.parse import urlsplit
 
 from flask import g, has_app_context
-from requests import Response
+from requests import PreparedRequest, Response
 from requests.exceptions import RequestException
 from urllib3.util import parse_url
 
@@ -44,15 +44,23 @@ class InsecureRequestError(RequestException):
 
 
 def _check_url_consistency(url: str):
-    u3_data = parse_url(url)
-    std_data = urlsplit(url)
+    try:
+        u3_data = parse_url(url)
+        std_data = urlsplit(url)
+    except ValueError:
+        return False
     if u3_data.scheme != (std_data.scheme or None):
         return False
     if u3_data.hostname != std_data.hostname:
         return False
-    if u3_data.authority != std_data.netloc:
+    if u3_data.authority != std_data.netloc.lower():  # urllib3 lowercases this
         return False
     if u3_data.path != (std_data.path or None):
+        return False
+    # also check for hostname encoding inconsistencies when requests prepares a URL
+    req = PreparedRequest()
+    req.prepare_url(url, None)
+    if parse_url(req.url).hostname != std_data.hostname:
         return False
     return True
 
@@ -114,7 +122,8 @@ def patch_socket_getaddrinfo():
         rv = orig_gai(host, port, family, type, proto, flags)
         if not has_app_context() or 'gai_cache' not in g:
             return rv
-        cached_addrs = g.gai_cache.get(host)
+        cache_key = host.lower()
+        cached_addrs = g.gai_cache.get(cache_key)
         addrs = {x[4][0] for x in rv}
         if (
             cached_addrs is not None
@@ -122,7 +131,7 @@ def patch_socket_getaddrinfo():
             and (offender := next((x for x in new_addrs if _is_private_ip(x)), None))
         ):
             raise InsecureRequestError(f'Possible DNS rebinding attack for {host} -> {offender}')
-        g.gai_cache[host] = addrs
+        g.gai_cache[cache_key] = addrs
         return rv
 
     socket.getaddrinfo = safe_getaddrinfo
