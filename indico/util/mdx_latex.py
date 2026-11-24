@@ -75,6 +75,7 @@ import os
 import re
 import textwrap
 import uuid
+from collections import deque
 from io import BytesIO
 from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
@@ -217,7 +218,7 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
             '{': r'\{',
             '}': r'\}'})
 
-    math_segments = []
+    math_segments = deque()
 
     def substitute(x):
         return chars[x.group()]
@@ -237,8 +238,8 @@ def latex_escape(text, ignore_math=True, ignore_braces=False):
 
     if ignore_math:
         # Sanitize math-mode segments and put them back in place
-        math_segments = list(map(sanitize_mathmode, math_segments))
-        text = re.sub(re.escape(math_placeholder), lambda _: '\\protect ' + math_segments.pop(0), text)
+        math_segments = deque(map(sanitize_mathmode, math_segments))
+        text = re.sub(re.escape(math_placeholder), lambda _: '\\protect ' + math_segments.popleft(), text)
 
     return text
 

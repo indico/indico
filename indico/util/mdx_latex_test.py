@@ -14,6 +14,7 @@ from indico.util.mdx_latex import LaTeXExtension, _resolve_latex_carets, latex_e
 
 
 @pytest.mark.parametrize(('input', 'expected'), (
+    ('$foo$$bar$', r'\protect $foo$\protect $bar$'),
     (r'\naughty', r'\textbackslash{}naughty'),
     (r'^^5cnaughty', r'\^{}\^{}5cnaughty'),
     ('^^\x1cnaughty', '\\^{}\\^{}\x1cnaughty'),

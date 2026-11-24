@@ -13,7 +13,7 @@ import re
 import string
 import typing as t
 import unicodedata
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from email.utils import escapesre, specialsre
 from enum import Enum
 from itertools import chain
@@ -271,7 +271,7 @@ def render_markdown(text, *, escape_latex_math=True, md=None, extra_html=False, 
                    processor
     """
     if escape_latex_math:
-        math_segments = []
+        math_segments = deque()
 
         def _math_replace(m):
             segment = m.group(0)
@@ -303,7 +303,7 @@ def render_markdown(text, *, escape_latex_math=True, md=None, extra_html=False, 
         result = md(text, **kwargs)
 
     if escape_latex_math:
-        return re.sub(LATEX_MATH_PLACEHOLDER, lambda _: math_segments.pop(0), result)
+        return re.sub(LATEX_MATH_PLACEHOLDER, lambda _: math_segments.popleft(), result)
     else:
         return result
 
