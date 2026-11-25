@@ -84,7 +84,6 @@ from xml.etree import ElementTree as etree  # noqa: N813
 
 import markdown
 import requests
-from lxml.html import html5parser
 from markdown.util import HtmlStash
 from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL
@@ -395,13 +394,11 @@ class LaTeXExtension(markdown.Extension):
 
         latex_tp = LaTeXTreeProcessor(self.configs)
         math_pp = MathTextPostProcessor()
-        link_pp = LinkTextPostProcessor()
         unescape_html_pp = UnescapeHtmlTextPostProcessor()
 
         md.treeprocessors.register(latex_tp, 'latex', md.treeprocessors._priority[-1].priority - 1)
         md.postprocessors.register(unescape_html_pp, 'unescape_html', md.postprocessors._priority[-1].priority - 1)
         md.postprocessors.register(math_pp, 'math', md.postprocessors._priority[-1].priority - 1)
-        md.postprocessors.register(link_pp, 'link', md.postprocessors._priority[-1].priority - 1)
 
         # Needed for LaTeX postprocessors not to choke on URL-encoded urls
         md.inlinePatterns.register(NonEncodedAutoMailPattern(markdown.inlinepatterns.AUTOMAIL_RE, md), 'automail', 110)
@@ -501,8 +498,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'img':
             buffer += latex_render_image(ournode.get('src'), ournode.get('alt'), tmpdir=self.configs.get('tmpdir'))[0]
         elif ournode.tag == 'a':
-            # this one gets escaped in convert_link_to_latex
-            buffer += '<a href="{}">{}</a>'.format(ournode.get('href'), subcontent)
+            buffer += '\\href{%s}{%s}' % (latex_escape(ournode.get('href'), ignore_math=False), subcontent)
         else:
             buffer = subcontent
 
@@ -553,17 +549,3 @@ class MathTextPostProcessor(markdown.postprocessors.Postprocessor):
         # out = out.replace('\\lt', '<')
         # out = out.replace(' * ', ' \\cdot ')
         # out = out.replace('\\del', '\\partial')
-
-
-# ========================== LINKS =================================
-
-class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
-    def run(self, instr):
-        new_blocks = [re.sub(r'<a[^>]*>([^<]+)</a>', lambda m: convert_link_to_latex(m.group(0)).strip(), block)
-                      for block in instr.split('\n\n')]
-        return '\n\n'.join(new_blocks)
-
-
-def convert_link_to_latex(instr):
-    dom = html5parser.fragment_fromstring(instr)
-    return '\\href{%s}{%s}' % (latex_escape(dom.get('href'), ignore_math=True), dom.text)

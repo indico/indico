@@ -87,6 +87,7 @@ def test_resolve_carets(input, expected):
     ('## Plain Heading ##', r'\subsection{Plain Heading}'),
     ('## Heading with reserved chars &{} ##', r'\subsection{Heading with reserved chars \&\{\}}'),
     (r'<div>\naughty</div>', r'<div>\textbackslash{}naughty</div>'),
+    (r'[text](<a" >\naughty<a href="x">)', r'\href{<a" >\textbackslash{}naughty<a href="x">}{text}'),
 ))
 def test_convert_markdown_to_latex(input, expected):
     md = Markdown()
