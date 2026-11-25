@@ -63,16 +63,27 @@ class RHEditingUploadContributionFile(RHEditingUploadFile):
         'id': fields.Int(load_default=None),
         'paper_id': fields.Int(load_default=None)
     })
-    def _process(self, id, paper_id):
+    def _process_args(self, id, paper_id):
+        RHEditingUploadFile._process_args(self)
         if bool(id) == bool(paper_id):
-            raise BadRequest
+            raise BadRequest('Only one ID can be specified')
+        self.editable_file_id = id
+        self.paper_file_id = paper_id
+
+    def _check_access(self):
+        RHEditingUploadFile._check_access(self)
+        if self.editable_file_id and (not self.editable or not self.editable.can_see_timeline(session.user)):
+            raise Forbidden
+        if self.paper_file_id and (not self.contrib.paper or not self.contrib.paper.can_access_timeline(session.user)):
+            raise Forbidden
+
+    def _process(self):
         files = []
-        if id and self.contrib.editables:
-            files = [file.file for e in self.contrib.editables
-                     if e.type == self.editable.type for file in e.revisions[-1].files]
-        if paper_id and self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
+        if self.editable_file_id and self.contrib.editables:
+            files = [f.file for f in self.editable.latest_revision_with_files.files]
+        if self.paper_file_id and self.contrib.paper and (last_rev := self.contrib.paper.get_last_revision()):
             files = last_rev.files
-        if found := next((f for f in files if f.id == (id or paper_id)), None):
+        if found := next((f for f in files if f.id == (self.editable_file_id or self.paper_file_id)), None):
             with found.open() as stream:
                 return self._save_file(_FileWrapper(found), stream)
         raise UserValueError(_('No such file was found within the paper'))
