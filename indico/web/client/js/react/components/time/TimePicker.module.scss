@@ -15,6 +15,16 @@
 
 .control {
   position: relative;
+
+  &:has(> .options:not([hidden], [data-above])) .field input[type='text'] {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  &:has(> .options[data-above]:not([hidden])) .field input[type='text'] {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
 }
 
 .field {
@@ -32,11 +42,11 @@
 
   position: absolute;
   z-index: 1100;
-  top: 100%;
+  top: calc(100% - 1px);
   left: 0;
   box-sizing: border-box;
   min-width: 100%;
-  width: min(11rem, calc(100vw - 1rem));
+  width: 100%;
   max-height: min(14rem, 50vh, var(--available-height, 50vh));
   overflow-x: hidden;
   overflow-y: auto;
@@ -47,9 +57,20 @@
   list-style: none;
   text-align: left;
 
+  &:has(.duration) {
+    width: min(11rem, calc(100vw - 1rem));
+  }
+
+  &:not([data-above]) {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+
   &[data-above] {
     top: auto;
-    bottom: 100%;
+    bottom: calc(100% - 1px);
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
   }
 
   &[data-align-end] {
