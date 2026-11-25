@@ -1,0 +1,96 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+
+.picker {
+  display: block;
+  min-width: 0;
+}
+
+.control {
+  position: relative;
+}
+
+.field {
+  display: block;
+
+  :global(.ui.form) & input[type='text'],
+  input[type='text'] {
+    border-color: #767676;
+
+    &:focus-visible {
+      outline: 2px solid #1a4b72;
+      outline-offset: -2px;
+    }
+
+    &::placeholder {
+      color: #595959;
+      opacity: 1;
+    }
+  }
+}
+
+.field-label {
+  @extend %visually-hidden;
+}
+
+.options:not([hidden]) {
+  position: absolute;
+  z-index: 1100;
+  top: 100%;
+  left: 0;
+  box-sizing: border-box;
+  min-width: 100%;
+  width: min(11rem, calc(100vw - 1rem));
+  max-height: min(14rem, 50vh, var(--available-height, 50vh));
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.25em 0;
+  border: 1px solid #767676;
+  border-radius: 0.25em;
+  background: white;
+  color: #222;
+  list-style: none;
+
+  &[data-above] {
+    top: auto;
+    bottom: 100%;
+  }
+
+  &[data-align-end] {
+    right: 0;
+    left: auto;
+  }
+
+  li {
+    overflow-wrap: anywhere;
+    padding: 0.35em 0.9em 0.35em 0.6em;
+    cursor: pointer;
+  }
+
+  li:hover {
+    background: #eee;
+  }
+
+  li[aria-selected='true'] {
+    box-shadow: inset 3px 0 #1a4b72;
+    background: #e1edf5;
+    font-weight: bold;
+  }
+}
+
+.duration {
+  color: #495561;
+  font-size: 0.85em;
+}
+
+.error {
+  display: block;
+  color: #912d2b;
+}

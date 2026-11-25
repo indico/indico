@@ -5,34 +5,34 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+@use 'design_system';
+@use 'partials/sui_debt';
+
 .time-range-picker {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5em;
   width: 200px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
 
-  .start-time-dropdown {
-    max-width: 100px !important;
-    min-width: 90px !important;
-    text-align: center !important;
+  :global(ind-time-picker input[type='text']) {
+    @include sui_debt.input-font();
+    @include sui_debt.border-radius();
+    @include sui_debt.input-padding();
+
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #767676;
+    line-height: 1.21428571em;
+    font-size: 1em;
+    text-align: center;
   }
+}
 
-  .end-time-dropdown {
-    max-width: 100px !important;
-    min-width: 90px !important;
-    text-align: center !important;
-
-    :global(.menu) {
-      min-width: 140px !important;
-    }
-  }
-
-  .duration {
-    font-size: 0.7em;
-    color: #808c99;
-    white-space: nowrap;
-  }
-
-  .end-time-item {
-    white-space: nowrap;
-  }
+.legend {
+  @extend %visually-hidden;
 }

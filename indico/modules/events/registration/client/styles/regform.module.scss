@@ -141,6 +141,16 @@
 
       .date-field {
         margin-bottom: 0;
+
+        &:has(.time-field) {
+          flex-wrap: wrap;
+          row-gap: 0.25em;
+        }
+
+        .time-field {
+          width: 9rem;
+          min-width: 9rem;
+        }
       }
 
       .file-field :global(.ui.segment) {
@@ -367,14 +377,6 @@
     &:hover > .actions > * {
       visibility: visible;
     }
-  }
-
-  :global(.rc-time-picker) {
-    max-width: 110px;
-  }
-
-  :global(.rc-time-picker-input) {
-    height: inherit;
   }
 }
 

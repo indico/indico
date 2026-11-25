@@ -8,12 +8,12 @@
 import createDecorator from 'final-form-calculate';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import TimePicker from 'rc-time-picker';
 import React from 'react';
 import {Field} from 'react-final-form';
 import {Form, Input} from 'semantic-ui-react';
 
 import {DatePicker, FinalDatePicker} from 'indico/react/components';
+import TimePicker from 'indico/react/components/time/TimePicker';
 import {FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
@@ -32,6 +32,7 @@ export function DateInputComponent({
   timeFormat,
   minDate,
   maxDate,
+  title,
 }) {
   const dateValue = value.split('T')[0];
   const timeValue = value.includes('T') ? value.split('T')[1] : '';
@@ -41,8 +42,7 @@ export function DateInputComponent({
     const timeString = timeFormat ? timeValue : '00:00:00';
     onChange(dateString ? `${dateString}T${timeString}` : '');
   };
-  const handleTimeChange = newTime =>
-    onChange(newTime ? `${dateValue}T${newTime.format('HH:mm:00')}` : dateValue);
+  const handleTimeChange = newTime => onChange(newTime ? `${dateValue}T${newTime}:00` : dateValue);
 
   return (
     <Form.Group styleName="date-field">
@@ -62,20 +62,18 @@ export function DateInputComponent({
         />
       </Form.Field>
       {timeFormat && (
-        <Form.Field>
+        <Form.Field styleName="time-field">
           <TimePicker
-            id={id}
-            name="time"
+            label={
+              title ? Translate.string('{field} time', {field: title}) : Translate.string('Time')
+            }
             disabled={disabled}
-            required={required}
-            showSecond={false}
-            value={toMoment(timeValue, 'HH:mm:ss', true)}
-            focusOnOpen
+            required={required || !!dateValue}
+            timeFormat={timeFormat}
+            value={timeValue.slice(0, 5)}
             onChange={handleTimeChange}
-            use12Hours={timeFormat === '12h'}
-            allowEmpty={false}
-            placeholder={timeFormat === '12h' ? '--:-- am/pm' : '--:--'}
-            getPopupContainer={node => node}
+            onFocus={onFocus}
+            onBlur={onBlur}
           />
         </Form.Field>
       )}
@@ -105,12 +103,14 @@ DateInputComponent.propTypes = {
   timeFormat: PropTypes.oneOf(['12h', '24h']),
   minDate: PropTypes.string,
   maxDate: PropTypes.string,
+  title: PropTypes.string,
 };
 
 DateInputComponent.defaultProps = {
   timeFormat: null,
   minDate: undefined,
   maxDate: undefined,
+  title: undefined,
 };
 
 export default function DateInput({
@@ -122,6 +122,7 @@ export default function DateInput({
   timeFormat,
   minDate,
   maxDate,
+  title,
 }) {
   const friendlyDateFormat = dateFormat.replace(
     /%([HMdmY])/g,
@@ -129,6 +130,14 @@ export default function DateInput({
   );
 
   const validateDateTimeWithMinMax = dateTime => {
+    if (timeFormat && dateTime) {
+      const [date, time] = dateTime.split('T', 2);
+      if (!date) {
+        return Translate.string('Enter a date.');
+      } else if (!time) {
+        return Translate.string('Enter a time.');
+      }
+    }
     if (dateTime && !moment(dateTime, moment.ISO_8601, true).isValid()) {
       return Translate.string('The provided date is invalid.');
     }
@@ -156,6 +165,7 @@ export default function DateInput({
         parse={v => v}
         minDate={minDate}
         maxDate={maxDate}
+        title={title}
       />
     );
   } else {
@@ -223,6 +233,7 @@ DateInput.propTypes = {
   timeFormat: PropTypes.oneOf(['12h', '24h']),
   minDate: PropTypes.string,
   maxDate: PropTypes.string,
+  title: PropTypes.string,
 };
 
 DateInput.defaultProps = {
@@ -231,6 +242,7 @@ DateInput.defaultProps = {
   timeFormat: null,
   minDate: undefined,
   maxDate: undefined,
+  title: undefined,
 };
 
 export const dateSettingsFormDecorator = createDecorator({
