@@ -26,7 +26,7 @@ const optionSchema = PropTypes.shape({
 const FilterLabel = ({text, options, onClick}) => (
   <Label styleName="filter" className="fluid" color="orange" basic>
     <p>{text}</p>
-    <Label.Detail className="float right">
+    <Label.Detail>
       {_.sortBy(options, 'text').map(o => (
         <p key={o.value}>{o.text}</p>
       ))}
@@ -208,7 +208,9 @@ export default function ListFilter({
                 disabled={options.length === 0}
                 trigger={<Dropdown.Item text={filterText} icon="plus" />}
               >
-                <Dropdown.Menu>
+                <Dropdown.Menu
+                  styleName={options.length > OPTIONS_SEARCH_THRESHOLD ? 'searchable-menu' : ''}
+                >
                   {options.length > OPTIONS_SEARCH_THRESHOLD && (
                     <div
                       styleName="options-search"
