@@ -116,6 +116,7 @@ export default function TimePicker({
     const popup = list.current;
     popup.style.removeProperty('--available-height');
     const rect = input.current.getBoundingClientRect();
+    popup.style.setProperty('--field-width', `${rect.width}px`);
     const viewport = window.visualViewport;
     const below =
       (viewport?.height ?? window.innerHeight) + (viewport?.offsetTop ?? 0) - rect.bottom;
@@ -295,7 +296,7 @@ export default function TimePicker({
               onMouseDown={event => event.preventDefault()}
               onClick={() => commit(option.time)}
             >
-              {option.label}
+              <span styleName="option-time">{option.label}</span>
               {option.duration && (
                 <span styleName="duration"> ({formatDuration(option.duration)})</span>
               )}
