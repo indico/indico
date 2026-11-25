@@ -540,7 +540,7 @@ def get_gravatar_for_user(user, identicon, size=256, lastmod=None):
     try:
         resp = requests.get(gravatar_url, params=params, headers=headers, timeout=5)
     except RequestException:
-        logger.exception(f'Could not retrieve {gravatar_type}')
+        logger.warning(f'Could not retrieve {gravatar_type}')
         raise GravatarError(_('Could not retrieve {gravatar_type}').format(gravatar_type=gravatar_type))
     if resp.status_code == 304:
         return None, resp.headers.get('Last-Modified')
