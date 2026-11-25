@@ -6,6 +6,7 @@
 // LICENSE file for more details.
 
 @use 'design_system';
+@use 'partials/sui_debt';
 
 .picker {
   display: block;
@@ -18,21 +19,6 @@
 
 .field {
   display: block;
-
-  :global(.ui.form) & input[type='text'],
-  input[type='text'] {
-    border-color: #767676;
-
-    &:focus-visible {
-      outline: 2px solid #1a4b72;
-      outline-offset: -2px;
-    }
-
-    &::placeholder {
-      color: #595959;
-      opacity: 1;
-    }
-  }
 }
 
 .field-label {
@@ -40,6 +26,10 @@
 }
 
 .options:not([hidden]) {
+  @include sui_debt.input-border();
+  @include sui_debt.input-background();
+  @include sui_debt.border-radius();
+
   position: absolute;
   z-index: 1100;
   top: 100%;
@@ -51,12 +41,11 @@
   overflow-x: hidden;
   overflow-y: auto;
   margin: 0;
-  padding: 0.25em 0;
-  border: 1px solid #767676;
-  border-radius: 0.25em;
-  background: white;
-  color: #222;
+  padding: 0;
+  box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+  color: rgba(0, 0, 0, 0.87);
   list-style: none;
+  text-align: left;
 
   &[data-above] {
     top: auto;
@@ -70,24 +59,23 @@
 
   li {
     overflow-wrap: anywhere;
-    padding: 0.35em 0.9em 0.35em 0.6em;
+    padding: 0.78571429em 1.14285714em;
     cursor: pointer;
   }
 
   li:hover {
-    background: #eee;
+    background: rgba(0, 0, 0, 0.05);
   }
 
   li[aria-selected='true'] {
-    box-shadow: inset 3px 0 #1a4b72;
-    background: #e1edf5;
+    background: rgba(0, 0, 0, 0.03);
     font-weight: bold;
   }
 }
 
 .duration {
-  color: #495561;
-  font-size: 0.85em;
+  color: #808c99;
+  font-size: 0.7em;
 }
 
 .error {

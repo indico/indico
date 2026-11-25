@@ -23,13 +23,20 @@
     @include sui_debt.input-font();
     @include sui_debt.border-radius();
     @include sui_debt.input-padding();
+    @include sui_debt.input-border-default();
+    @include sui_debt.input-background();
 
     box-sizing: border-box;
     width: 100%;
-    border: 1px solid #767676;
     line-height: 1.21428571em;
     font-size: 1em;
     text-align: center;
+
+    &:focus {
+      @include sui_debt.input-focus-border();
+
+      outline: none;
+    }
   }
 }
 
