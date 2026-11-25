@@ -275,22 +275,23 @@ export const getConfig = (
     });
 
     // auto-save to hidden field (or trigger change event) on input
-    editor.on(
-      'change input compositionend setcontent CommentChange',
-      _.debounce(
-        () => {
-          if (field) {
-            editor.save();
-            editor.targetElm.dispatchEvent(new Event('change', {bubbles: true}));
-          } else if (onChange) {
-            onChange(editor);
-          }
-        },
-        200,
-        // XXX if you touch this make sure it remains shorter than rollback in the react component
-        {maxWait: 1000}
-      )
+    const saveChanges = _.debounce(
+      () => {
+        if (field) {
+          editor.save();
+          editor.targetElm.dispatchEvent(new Event('change', {bubbles: true}));
+        } else if (onChange) {
+          onChange(editor);
+        }
+      },
+      200,
+      // XXX if you touch this make sure it remains shorter than rollback in the react component
+      {maxWait: 1000}
     );
+    editor.on('change input compositionend setcontent CommentChange', saveChanges);
+    // save pending changes before the `blur` handlers run, since a re-render of the react
+    // component with the outdated value would otherwise replace the editor contents
+    editor.on('focusout', saveChanges.flush);
 
     if (field) {
       editor.on('init', () => {
