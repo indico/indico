@@ -28,6 +28,7 @@ Bugfixes
 - Fix cache inconsistencies in Book of Abstracts (:pr:`7870`)
 - Disable legacy API keys of blocked users (:pr:`7881`)
 - Fix generating PDFs for abstracts containing multi-choice field values (:pr:`7927`)
+- Disallow invalid number of extra slots in registration form choice fields (:pr:`7936`)
 
 Accessibility
 ^^^^^^^^^^^^^
