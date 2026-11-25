@@ -152,6 +152,10 @@ class PersonLinkListFieldBase(PrincipalListField):
         values = values_from_signal(signals.event.person_link_field_extra_params.send(self), as_list=True)
         return {k: v for d in values for k, v in d.items()}
 
+    @property
+    def disallow_event_person_update(self):
+        return getattr(self.get_form(), 'disallow_event_person_update', False)
+
     @no_autoflush
     def _get_person_link(self, data):
         from indico.modules.events.persons.schemas import PersonLinkSchema
@@ -214,6 +218,8 @@ class PersonLinkListFieldBase(PrincipalListField):
         email = data.get('email', '').lower()
         if email != person_link.email:
             if not self.event or not self.event.persons.filter_by(email=email).first():
+                if self.disallow_event_person_update:
+                    raise UserValueError(_('There is already a person with the email {email}').format(email=email))
                 person_link.person.email = email
                 person_link.person.user = get_user_by_email(email)
                 if inspect(person).persistent:

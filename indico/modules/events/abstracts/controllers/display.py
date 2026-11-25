@@ -67,7 +67,7 @@ class RHSubmitAbstract(RHAbstractsBase):
 
     def _process(self):
         abstract_form_class = make_abstract_form(self.event, session.user, management=self.management)
-        form = abstract_form_class(event=self.event)
+        form = abstract_form_class(event=self.event, disallow_event_person_update=True)
         if form.validate_on_submit():
             abstract, notifications_sent = create_abstract(self.event, *get_field_values(form.data),
                                                            send_notifications=True)

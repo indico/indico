@@ -506,10 +506,12 @@ class AbstractForm(IndicoForm):
     submission_comment = TextAreaField(_('Comments'))
     attachments = EditableFileField(_('Attachments'), multiple_files=True, lightweight=True)
 
-    def __init__(self, *args, event, abstract=None, invited=False, management=False, submit_invited=False, **kwargs):
+    def __init__(self, *args, event, abstract=None, invited=False, management=False, submit_invited=False,
+                 disallow_event_person_update=False, **kwargs):
         self.event = event
         self.abstract = abstract
         self.allow_user_search = management or config.ALLOW_PUBLIC_USER_SEARCH
+        self.disallow_event_person_update = disallow_event_person_update
         description_settings = abstracts_settings.get(self.event, 'description_settings')
         description_validators = self._get_description_validators(description_settings, invited=invited)
         if description_validators:
