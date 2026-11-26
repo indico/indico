@@ -63,6 +63,7 @@ export const getConfig = (
     forceAbsoluteURLs = false,
     contentCSS = [],
     height = 475,
+    extraStyleFormats = [],
   } = {},
   {onChange = null} = {}
 ) => ({
@@ -150,6 +151,7 @@ export const getConfig = (
         {title: 'Justify', format: 'alignjustify'},
       ],
     },
+    ...extraStyleFormats,
   ],
   codesample_global_prismjs: true,
   codesample_languages: [

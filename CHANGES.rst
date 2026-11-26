@@ -48,6 +48,8 @@ Internal Changes
 - Update the list of supported browsers so people using highly outdated browsers where
   certain features are likely broken get a warning about having to update their browser
   (:pr:`7928`)
+- Allow adding custom entries to the formats menu of the rich-text editor using the
+  ``extraStyleFormats`` config option (:pr:`XXXX`, thanks :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.14
