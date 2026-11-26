@@ -147,7 +147,12 @@ import Palette from '../../utils/palette';
           clearTimeout(disappearHandler);
         }
         if (options.actionCallback) {
-          const promise = options.actionCallback() || $.Deferred();
+          const result = options.actionCallback();
+          // returning false means the action did not run, so it stays available
+          if (result === false) {
+            return;
+          }
+          const promise = result || $.Deferred();
 
           box.addClass('progress').find('.corner-message-text').text(options.progressMessage);
           text.remove();

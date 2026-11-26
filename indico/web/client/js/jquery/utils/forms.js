@@ -136,7 +136,10 @@ import {$T} from 'indico/utils/i18n';
       message: $T.gettext('Do not forget to save your changes!'),
       class: 'highlight save-corner-message',
       actionCallback() {
-        $form.submit();
+        if (!$form[0].reportValidity()) {
+          return false;
+        }
+        $form[0].requestSubmit();
       },
     });
   }
