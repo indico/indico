@@ -8,6 +8,7 @@
 import {act, render, waitFor} from '@testing-library/react';
 import React from 'react';
 import {Form} from 'react-final-form';
+import tinymce from 'tinymce/tinymce';
 
 import {FinalTinyMCETextEditor} from '../TinyMCETextEditor';
 
@@ -27,8 +28,8 @@ describe('FinalTinyMCETextEditor', () => {
         }}
       </Form>
     );
-    await waitFor(() => expect(window.tinymce.activeEditor?.initialized).toBe(true));
-    const editor = window.tinymce.activeEditor;
+    await waitFor(() => expect(tinymce.activeEditor?.initialized).toBe(true));
+    const editor = tinymce.activeEditor;
 
     // leave the editor before the debounced change handler had a chance to run; the
     // browser fires `focusout` on the editor body first, then TinyMCE's own `blur`
