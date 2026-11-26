@@ -11,7 +11,7 @@ import 'indico/legacy/libs/presentation/Ui/Text';
 
 import '../multiple_items_widget';
 
-global.$ = global.jQuery = window.$ = window.jQuery = jQuery;
+global.$ = global.jQuery = jQuery;
 jQuery.fn.qtip = function() {
   return this;
 };
@@ -67,7 +67,7 @@ describe('multiple items widget', () => {
     fillRow(widget, 0, ['a@example.com', 'en']);
 
     expect(form[0].checkValidity()).toBe(false);
-    expect(firstInput(widget).validationMessage).not.toBe('');
+    expect(firstInput(widget).validationMessage).toBe('Please save or cancel this row first.');
   });
 
   it('blocks the submission while a saved row is reopened for editing', () => {

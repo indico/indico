@@ -9,7 +9,7 @@
 
 import jQuery from 'jquery';
 
-global.$ = global.jQuery = window.$ = window.jQuery = jQuery;
+global.$ = global.jQuery = jQuery;
 
 // the module runs on import, so it can only be loaded once jQuery is global
 require('../forms'); // eslint-disable-line import/no-commonjs
@@ -29,7 +29,7 @@ function setupForm(widgetHtml = '') {
 
 describe('initForms change tracking', () => {
   // let the module's own document-ready run before any test builds a form
-  beforeAll(() => new Promise(resolve => setTimeout(resolve, 0)));
+  beforeAll(() => new Promise(resolve => $(resolve)));
 
   it('keeps the submit button disabled while the form is untouched', () => {
     const {submit} = setupForm();

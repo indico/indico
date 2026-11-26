@@ -178,9 +178,7 @@ import {$T} from 'indico/utils/i18n';
           $(this).closest('tr').find('.js-cancel-edit').trigger('click');
         }
       })
-      .on('change input', '.js-table-input', () => {
-        updatePendingRows();
-      });
+      .on('change input', '.js-table-input', updatePendingRows);
 
     function isBlankRow(row) {
       return !row
