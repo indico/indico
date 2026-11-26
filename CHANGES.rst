@@ -50,6 +50,9 @@ Internal Changes
   (:pr:`7928`)
 - Allow adding custom entries to the formats menu of the rich-text editor using the
   ``extraStyleFormats`` config option (:pr:`7946`, thanks :user:`moliholy, unconventionaldotdev`)
+- Allow custom registration form field types that store no data to skip retention period
+  checks between conditional fields by setting ``has_retention_period = False`` (:pr:`XXXX`,
+  thanks :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.14

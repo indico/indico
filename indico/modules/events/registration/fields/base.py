@@ -70,6 +70,11 @@ class RegistrationFormFieldBase:
     #: on the frontend it depends solely on the config in the field registry whether
     #: the field can be selected as a condition.
     allow_condition = False
+    #: whether this field has a retention period; fields that do not store any data
+    #: should set this to `False` so they are ignored when validating the retention
+    #: periods of conditional fields. on the frontend, set ``noRetentionPeriod`` in
+    #: the field registry to hide the setting.
+    has_retention_period = True
 
     def __init__(self, form_item):
         self.form_item = form_item

@@ -207,8 +207,8 @@ class GeneralFieldDataSchema(mm.Schema):
     @no_autoflush
     def _validate_conditions_retention_period(self, data, **kwargs):
         from indico.modules.events.registration.models.form_fields import RegistrationFormItem
-        if isinstance(self, TextDataSchema):
-            # for static text we have no retention period
+        if isinstance(self, TextDataSchema) or not get_field_types()[data['input_type']].has_retention_period:
+            # for static text and fields storing no data we have no retention period
             return
         regform = self.context['regform']
         show_if_id = data['show_if_id']
@@ -226,7 +226,7 @@ class GeneralFieldDataSchema(mm.Schema):
                     )
         # check downstream fields
         for field in self.context['field'].condition_for_transitive:
-            if isinstance(field, RegistrationFormText):
+            if isinstance(field, RegistrationFormText) or not field.field_impl.has_retention_period:
                 continue
             # this field has a retention period, and the downstream field doesn't
             if retention_period and not field.retention_period:
