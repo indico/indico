@@ -29,6 +29,8 @@ Bugfixes
 - Disable legacy API keys of blocked users (:pr:`7881`)
 - Fix generating PDFs for abstracts containing multi-choice field values (:pr:`7927`)
 - Disallow invalid number of extra slots in registration form choice fields (:pr:`7936`)
+- Require backside templates to belong to the same ancestry (:pr:`7896`, thanks :user:`p-w`)
+- Require cloned templates to belong to the same ancestry (:pr:`7896`)
 
 Accessibility
 ^^^^^^^^^^^^^

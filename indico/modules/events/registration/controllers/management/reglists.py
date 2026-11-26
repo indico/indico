@@ -28,7 +28,7 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.categories.models.categories import Category
 from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.designer.util import get_badge_format, get_inherited_templates
+from indico.modules.designer.util import get_all_templates, get_badge_format
 from indico.modules.events import EventLogRealm
 from indico.modules.events.payment.util import toggle_registration_payment
 from indico.modules.events.registration import logger
@@ -110,8 +110,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         regform = self.regform
 
         event = regform.event
-        badge_templates = [tpl for tpl in set(event.designer_templates) | get_inherited_templates(event)
-                           if tpl.type == TemplateType.badge]
+        badge_templates = [tpl for tpl in get_all_templates(event) if tpl.type == TemplateType.badge]
 
         action_menu_items = [
             ActionMenuEntry(
@@ -693,7 +692,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         event_badge_settings.set_multi(self.event, data)
 
     def _process(self):
-        all_templates = set(self.event.designer_templates) | get_inherited_templates(self.event)
+        all_templates = get_all_templates(self.event)
         badge_templates = {tpl.id: {
             'data': tpl.data,
             'backside_tpl_id': tpl.backside_template_id,

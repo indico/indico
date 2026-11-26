@@ -293,6 +293,13 @@ class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
         RHManageEventBase._process_args(self)
         CloneTemplateMixin._process_args(self)
 
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
+        CloneTemplateMixin._check_access(self)
+        # Only allow cloening templates from the current ancestry
+        if self.template not in get_all_templates(self.event):
+            raise Forbidden('This template is not available here.')
+
 
 class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
     clonable_elsewhere = True
@@ -300,6 +307,13 @@ class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
     def _process_args(self):
         RHManageCategoryBase._process_args(self)
         CloneTemplateMixin._process_args(self)
+
+    def _check_access(self):
+        RHManageCategoryBase._check_access(self)
+        CloneTemplateMixin._check_access(self)
+        # Only allow cloning templates from the current ancestry
+        if self.template not in get_all_templates(self.category):
+            raise Forbidden('This template is not available here.')
 
 
 class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHProtected):
@@ -390,6 +404,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             - it has the same size as the frontside
             - the templates are linked to the same registration form or
               at least one template is not linked to any registration form
+            - the backside template belongs to the same ancestry (unless already set)
         """
         same_size = (
             self.template.data['width'] == backside_template.data['width'] and
@@ -409,6 +424,10 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             not linked_to_same_regform
         ):
             raise BadRequest('Incompatible backside template')
+
+        if backside_template != self.template.backside_template:
+            if backside_template not in get_all_templates(self.target):
+                raise Forbidden('This template is not available here.')
 
 
 class RHLinkDesignerTemplate(RHModifyDesignerTemplateBase):

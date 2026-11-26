@@ -24,7 +24,7 @@ from indico.modules.categories import Category
 from indico.modules.categories.fields import CategoryField
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.designer import PageSize
-from indico.modules.designer.util import get_inherited_templates
+from indico.modules.designer.util import get_all_templates
 from indico.modules.events import Event, LegacyEventMapping
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.fields import EventPersonLinkListField, ReferencesField
@@ -332,7 +332,7 @@ class PosterPrintingForm(IndicoForm):
     page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize, default=PageSize.A4, sorted=True)
 
     def __init__(self, event, **kwargs):
-        all_templates = set(event.designer_templates) | get_inherited_templates(event)
+        all_templates = get_all_templates(event)
         poster_templates = [tpl for tpl in all_templates if tpl.type.name == 'poster']
         super().__init__(**kwargs)
         self.template.choices = sorted(((str(tpl.id), tpl.title) for tpl in poster_templates), key=itemgetter(1))

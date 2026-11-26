@@ -61,7 +61,14 @@ def is_regform_field_placeholder(designer_item):
 def get_all_templates(obj):
     """Get all templates usable by an event/category."""
     category = (obj.category or Category.get_root()) if isinstance(obj, Event) else obj
-    return set(DesignerTemplate.query.filter(DesignerTemplate.category_id.in_(categ['id'] for categ in category.chain)))
+    templates = set(
+        DesignerTemplate.query.filter(DesignerTemplate.category_id.in_(categ['id'] for categ in category.chain))
+    )
+    if isinstance(obj, Event):
+        # For categories we already have the current one included in the chain, but for events
+        # this is missing and we need to explicitly add it
+        templates |= set(obj.designer_templates)
+    return templates
 
 
 def get_inherited_templates(obj):

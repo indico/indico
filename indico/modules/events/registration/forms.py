@@ -21,7 +21,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
-from indico.modules.designer.util import get_inherited_templates
+from indico.modules.designer.util import get_all_templates, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
@@ -483,7 +483,7 @@ class BadgeSettingsForm(IndicoForm):
     submitted = HiddenField()
 
     def __init__(self, event, **kwargs):
-        all_templates = set(event.designer_templates) | get_inherited_templates(event)
+        all_templates = get_all_templates(event)
         badge_templates = [tpl for tpl in all_templates if tpl.type.name == 'badge']
         signals.event.filter_selectable_badges.send(type(self), badge_templates=badge_templates)
         tickets = kwargs.pop('tickets')
