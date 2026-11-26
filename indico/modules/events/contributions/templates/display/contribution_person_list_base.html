@@ -36,8 +36,8 @@
     </ul>
 {% endmacro %}
 
-{% macro _render_person_list(authors, rendering) %}
-    {% call(user_data) render_users(authors, separator='') %}
+{% macro _render_person_list(authors, rendering, person_filter) %}
+    {% call(user_data) render_users(authors, separator='', person_filter=person_filter) %}
         <li class="speaker-list-item">
             <span class="speaker-item" data-searchable="{{ user_data.display_full_name | lower }}">
                 <span class="name">
@@ -54,7 +54,7 @@
     {% endcall %}
 {% endmacro %}
 
-{% macro render_person_list(persons, rendering) %}
+{% macro render_person_list(persons, rendering, person_filter) %}
     {% set person_list = persons|list %}
     <div class="toolbar f-j-end">
         <div id="counter" class="group">
@@ -66,7 +66,7 @@
         </div>
     </div>
     <ul class="author-list speaker-list">
-        {{ _render_person_list(person_list, rendering) }}
+        {{ _render_person_list(person_list, rendering, person_filter) }}
     </ul>
 {% endmacro %}
 
