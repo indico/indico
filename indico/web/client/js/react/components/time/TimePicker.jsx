@@ -40,6 +40,7 @@ export default function TimePicker({
   onChange,
   onFocus,
   onBlur,
+  labelErrors,
 }) {
   const input = useRef(null);
   const list = useRef(null);
@@ -154,7 +155,7 @@ export default function TimePicker({
     }
   }, [isOpen, visibleTime, matching.length]);
 
-  function validationMessage(raw, time) {
+  function validationDetails(raw, time) {
     if (!raw.trim()) {
       return required ? Translate.string('Enter a time.') : '';
     }
@@ -174,6 +175,13 @@ export default function TimePicker({
       });
     }
     return '';
+  }
+
+  function validationMessage(raw, time) {
+    const message = validationDetails(raw, time);
+    return message && labelErrors
+      ? Translate.string('{field}: {message}', {field: label, message})
+      : message;
   }
 
   function commit(raw, selectValue = false) {
@@ -242,7 +250,7 @@ export default function TimePicker({
 
   return (
     <ind-time-picker styleName="picker" open={isOpen ? '' : undefined}>
-      <div styleName="control">
+      <div styleName="control" data-invalid={error ? '' : undefined}>
         <label styleName="field">
           <span styleName="field-label">{label}</span>
           <input
@@ -270,7 +278,12 @@ export default function TimePicker({
               commit(event.target.value);
               onBlur?.(event);
             }}
-            onInvalid={event => setError(event.target.validationMessage)}
+            onInvalid={event => {
+              const {target} = event;
+              const message = validationMessage(target.value, Time.fromString(target.value));
+              target.setCustomValidity(message);
+              setError(message);
+            }}
             onKeyDown={handleKeyDown}
           />
         </label>
@@ -319,6 +332,7 @@ TimePicker.propTypes = {
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
+  labelErrors: PropTypes.bool,
 };
 
 TimePicker.defaultProps = {
@@ -331,4 +345,5 @@ TimePicker.defaultProps = {
   disabled: false,
   onFocus: undefined,
   onBlur: undefined,
+  labelErrors: false,
 };

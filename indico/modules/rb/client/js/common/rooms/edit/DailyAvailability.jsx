@@ -28,20 +28,31 @@ export default class DailyAvailability extends React.Component {
     value: [],
   };
 
-  handleTimesChange = ({startTime, endTime}, index) => {
+  entryKeys = new WeakMap();
+
+  getEntryKey(entry) {
+    if (!this.entryKeys.has(entry)) {
+      this.entryKeys.set(entry, nanoid());
+    }
+    return this.entryKeys.get(entry);
+  }
+
+  updateEntry(index, changes) {
     const {value, onChange} = this.props;
-    onChange(
-      value.map((v, vIndex) =>
-        vIndex === index
-          ? {...v, start_time: serializeTime(startTime), end_time: serializeTime(endTime)}
-          : v
-      )
-    );
+    const updated = {...value[index], ...changes};
+    this.entryKeys.set(updated, this.getEntryKey(value[index]));
+    onChange(value.map((entry, i) => (i === index ? updated : entry)));
+  }
+
+  handleTimesChange = ({startTime, endTime}, index) => {
+    this.updateEntry(index, {
+      start_time: serializeTime(startTime),
+      end_time: serializeTime(endTime),
+    });
   };
 
   handleWeekdayChange = (weekday, index) => {
-    const {value, onChange} = this.props;
-    onChange(value.map((v, vIndex) => (vIndex === index ? {...v, weekday} : v)));
+    this.updateEntry(index, {weekday});
   };
 
   handleRemoveTimes = index => {
@@ -51,7 +62,7 @@ export default class DailyAvailability extends React.Component {
 
   renderEntry = (bookableHour, index) => {
     const {start_time: startT, end_time: endT, weekday} = bookableHour;
-    const key = nanoid();
+    const key = this.getEntryKey(bookableHour);
     const weekdayOptions = moment.weekdays(true).map(wd => ({
       value: moment().day(wd).locale('en').format('ddd').toLowerCase(),
       text: moment().isoWeekday(wd).format('ddd'),

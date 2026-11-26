@@ -81,6 +81,7 @@ export default function TimeRangePicker({startTime, endTime, onChange, disabled,
         step={STEP}
         onChange={updateStart}
         disabled={disabled}
+        labelErrors
         required
       />
       <TimePicker
@@ -93,6 +94,7 @@ export default function TimeRangePicker({startTime, endTime, onChange, disabled,
         step={STEP}
         onChange={updateEnd}
         disabled={disabled}
+        labelErrors
         required
       />
     </fieldset>

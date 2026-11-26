@@ -16,6 +16,11 @@
 .control {
   position: relative;
 
+  &[data-invalid] > .field > input[type='text'],
+  &[data-invalid] > .field > input[type='text']:focus {
+    @include sui_debt.input-error();
+  }
+
   &:has(> .options:not([hidden], [data-above])) .field input[type='text'] {
     border-end-start-radius: 0;
     border-end-end-radius: 0;

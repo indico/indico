@@ -9,6 +9,8 @@
 @use 'rb:styles/responsive' as *;
 
 .filter-dropdown {
+  --time-range-error-width: 200px;
+
   .filter-dropdown-actions {
     margin-top: 15px;
   }
