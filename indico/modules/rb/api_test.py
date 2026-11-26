@@ -5,7 +5,26 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import pytest
 import pytz
+
+from indico.modules.rb.api import ReservationHook, RoomHook, RoomNameHook
+from indico.web.http_api import HTTPAPIHook
+
+
+@pytest.mark.parametrize(('path', 'hook_cls', 'path_params'), (
+    ('/export/room/CERN/23.json', RoomHook, {'location': 'CERN', 'idlist': '23'}),
+    ('/export/room/HIM-Building 1395/8-9.json', RoomHook, {'location': 'HIM-Building 1395', 'idlist': '8-9'}),
+    ('/export/roomName/CERN/pump.json', RoomNameHook, {'location': 'CERN', 'room_name': 'pump'}),
+    ('/export/roomName/HIM-Building 1395/1/2-3.json', RoomNameHook,
+     {'location': 'HIM-Building 1395', 'room_name': '1/2-3'}),
+    ('/export/reservation/CERN-HIM.json', ReservationHook, {'loclist': 'CERN-HIM'}),
+))
+def test_parse_request_path(path, hook_cls, path_params):
+    hook, format_ = HTTPAPIHook.parseRequest(path, {})
+    assert isinstance(hook, hook_cls)
+    assert hook._pathParams == path_params
+    assert format_ == 'json'
 
 
 def test_serialize_room_api(dummy_room):
