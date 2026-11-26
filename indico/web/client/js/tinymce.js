@@ -291,8 +291,10 @@ export const getConfig = (
     editor.on('change input compositionend setcontent CommentChange', saveChanges);
     if (!field) {
       // save pending changes before the `blur` handlers run, since a re-render of the react
-      // component with the outdated value would otherwise replace the editor contents
-      editor.on('focusout', saveChanges.flush);
+      // component with the outdated value would otherwise replace the editor contents, and
+      // before the form handles a submission, since clicking a button does not always move
+      // the focus out of the editor (e.g. on macOS)
+      editor.on('focusout submit', saveChanges.flush);
     }
 
     if (field) {
