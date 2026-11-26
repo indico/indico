@@ -19,5 +19,6 @@ export const getTOSHTML = ({config}) => config.data.tosHTML;
 export const hasPrivacyPolicy = ({config}) => config.data.hasPrivacyPolicy;
 export const getPrivacyPolicyHTML = ({config}) => config.data.privacyPolicyHTML;
 export const getContactEmail = ({config}) => config.data.contactEmail;
+export const getContactURL = ({config}) => config.data.contactURL;
 export const hasInternalNotesEnabled = ({config}) => config.data.internalNotesEnabled;
 export const getBookingReasonRequired = ({config}) => config.data.bookingReasonRequired;

@@ -93,6 +93,7 @@ DEFAULTS = {
     'PROFILE': False,
     'PROVIDER_MAP': {},
     'PUBLIC_SUPPORT_EMAIL': None,
+    'PUBLIC_SUPPORT_URL': None,
     'REDIS_CACHE_URL': None,
     'ROUTE_OLD_URLS': False,
     'SCHEDULED_TASK_OVERRIDE': {},
@@ -383,6 +384,10 @@ class IndicoConfig:
             raise ValueError('Minimum password length cannot be less than 8 characters long')
         if self.CSP_ENABLED not in {True, False, 'report-only'}:
             raise ValueError(f'Invalid value for CSP_ENABLED: {self.CSP_ENABLED!r}')
+        if self.PUBLIC_SUPPORT_URL:
+            support_url = urlsplit(self.PUBLIC_SUPPORT_URL)
+            if support_url.scheme not in {'http', 'https'} or not support_url.netloc:
+                raise ValueError(f'PUBLIC_SUPPORT_URL must be an absolute http(s) URL: {self.PUBLIC_SUPPORT_URL!r}')
         try:
             self.XELATEX_PODMAN_CONFIG  # noqa: B018
         except ValidationError as err:

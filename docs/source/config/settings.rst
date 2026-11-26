@@ -696,6 +696,14 @@ Emails
 
     Default: ``None``
 
+.. data:: PUBLIC_SUPPORT_URL
+
+    The URL of an external support or contact page. If set, the "Contact" link
+    points to this URL and :data:`PUBLIC_SUPPORT_EMAIL` is not shown to users.
+    It must be an absolute ``http://`` or ``https://`` URL.
+
+    Default: ``None``
+
 .. data:: SUPPORT_EMAIL
 
     The email address of the technical manager of the Indico instance.

@@ -26,7 +26,8 @@ const buildMenuItems = (
   hasTOSHTML,
   hasPrivacyPolicy,
   hasPrivacyPolicyHTML,
-  contactEmail
+  contactEmail,
+  externalContactURL
 ) => {
   const menuItems = [
     [
@@ -41,15 +42,13 @@ const buildMenuItems = (
     ],
   ];
 
-  if (contactEmail) {
+  if (externalContactURL || contactEmail) {
+    const contactProps = externalContactURL
+      ? {href: externalContactURL, target: '_blank', rel: 'noopener noreferrer'}
+      : {href: contactURL(), modal: true};
     menuItems.push([
       'contact',
-      {
-        href: contactURL(),
-        modal: true,
-        caption: Translate.string('Contact'),
-        icon: 'at',
-      },
+      {...contactProps, caption: Translate.string('Contact'), icon: 'at'},
     ]);
   }
   if (hasTOS) {
@@ -88,6 +87,7 @@ function SidebarFooter({
   privacyPolicyHTML,
   helpURL,
   contactEmail,
+  externalContactURL,
 }) {
   const [currentModal, setModal] = useState(null);
 
@@ -102,7 +102,8 @@ function SidebarFooter({
     !!tosHTML,
     hasPrivacyPolicy,
     !!privacyPolicyHTML,
-    contactEmail
+    contactEmail,
+    externalContactURL
   );
 
   return (
@@ -187,16 +188,19 @@ SidebarFooter.propTypes = {
   privacyPolicyHTML: PropTypes.string,
   helpURL: PropTypes.string.isRequired,
   contactEmail: PropTypes.string,
+  externalContactURL: PropTypes.string,
 };
 
 SidebarFooter.defaultProps = {
   tosHTML: null,
   privacyPolicyHTML: null,
   contactEmail: null,
+  externalContactURL: null,
 };
 
 export default connect(state => ({
   contactEmail: configSelectors.getContactEmail(state),
+  externalContactURL: configSelectors.getContactURL(state),
   helpURL: configSelectors.getHelpURL(state),
   hasTOS: configSelectors.hasTOS(state),
   tosHTML: configSelectors.getTOSHTML(state),

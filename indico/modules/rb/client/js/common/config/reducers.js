@@ -26,6 +26,7 @@ export const initialState = {
   internalNotesEnabled: false,
   privacyPolicyHTML: null,
   contactEmail: null,
+  contactURL: null,
   bookingReasonRequired: true,
 };
 
@@ -44,6 +45,7 @@ export default combineReducers({
           managersEditRooms,
           helpURL,
           contactEmail,
+          contactURL,
           hasPrivacyPolicy,
           bookingReasonRequired,
           hasTos: hasTOS,
@@ -65,6 +67,7 @@ export default combineReducers({
           hasPrivacyPolicy,
           privacyPolicyHTML,
           contactEmail,
+          contactURL,
           internalNotesEnabled,
           bookingReasonRequired,
         };

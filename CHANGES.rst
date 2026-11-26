@@ -17,6 +17,8 @@ Improvements
   truncating them (:pr:`7925`, thanks :user:`mindouro, unconventionaldotdev`)
 - Allow referencing registration fields by internal name in document templates (:pr:`7907`,
   thanks :user:`duartegalvao, unconventionaldotdev`)
+- Let administrators point the Contact link to an external support page with
+  :data:`PUBLIC_SUPPORT_URL` (:pr:`7930`, thanks :user:`moliholy, unconventionaldotdev`)
 
 Bugfixes
 ^^^^^^^^
