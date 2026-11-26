@@ -289,9 +289,11 @@ export const getConfig = (
       {maxWait: 1000}
     );
     editor.on('change input compositionend setcontent CommentChange', saveChanges);
-    // save pending changes before the `blur` handlers run, since a re-render of the react
-    // component with the outdated value would otherwise replace the editor contents
-    editor.on('focusout', saveChanges.flush);
+    if (!field) {
+      // save pending changes before the `blur` handlers run, since a re-render of the react
+      // component with the outdated value would otherwise replace the editor contents
+      editor.on('focusout', saveChanges.flush);
+    }
 
     if (field) {
       editor.on('init', () => {
