@@ -225,7 +225,12 @@ import {$T} from 'indico/utils/i18n';
         widget.find('tbody.ui-sortable').sortable('refresh');
       }
       fixWidths();
+      const wasPending = widget.is('[data-pending-changes]');
       updatePendingRows();
+      // opening or closing a row changes no field, so the form has to recheck itself
+      if (widget.is('[data-pending-changes]') !== wasPending) {
+        widget.trigger('change');
+      }
       addButton.prop('disabled', !!widget.find('.js-table-input').length);
       if (moveTooltips === undefined || moveTooltips) {
         repositionTooltips();

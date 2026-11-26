@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+/* global initForms */
+
 import jQuery from 'jquery';
 
 import 'indico/legacy/libs/presentation/Ui/Text';
@@ -16,6 +18,9 @@ jQuery.fn.qtip = function() {
   return this;
 };
 global.repositionTooltips = () => {};
+
+// the module runs on import, so it can only be loaded once jQuery is global
+require('../../../utils/forms'); // eslint-disable-line import/no-commonjs
 
 const COLUMNS = [
   {id: 'email', caption: 'Email', type: 'text', required: true},
@@ -33,6 +38,7 @@ function setupWidget(value = [], columns = COLUMNS) {
           <button type="button" id="items-add-button" class="js-add-row"></button>
         </div>
       </div>
+      <input type="submit" value="Save" data-disabled-until-change>
     </form>
   `;
   window.setupMultipleItemsWidget({
@@ -155,5 +161,38 @@ describe('multiple items widget', () => {
     const {widget} = setupWidget();
 
     expect(widget.is('[data-pending-changes]')).toBe(false);
+  });
+});
+
+describe('multiple items widget with form change tracking', () => {
+  // let the forms module's own document-ready run before any test builds a form
+  beforeAll(() => new Promise(resolve => $(resolve)));
+
+  function setupTrackedWidget(value) {
+    const {form, widget} = setupWidget(value);
+    initForms(form);
+    return {form, widget, submit: form.find(':submit')};
+  }
+
+  it('enables the submit button once a saved row is reopened', () => {
+    const {form, widget, submit} = setupTrackedWidget([{email: 'a@example.com', lang: 'en'}]);
+    widget.find('.js-edit-row').trigger('click');
+
+    expect(submit.prop('disabled')).toBe(false);
+    expect(form.data('fieldsChanged')).toBe(true);
+  });
+
+  it.each([
+    ['a changed edit is cancelled', ['b@example.com', 'fr'], '.js-cancel-edit', false],
+    ['the row is saved unchanged', [], '.js-save-row', false],
+    ['the row is saved with new values', ['b@example.com', 'fr'], '.js-save-row', true],
+  ])('tracks the form change once %s', (desc, values, action, changed) => {
+    const {form, widget, submit} = setupTrackedWidget([{email: 'a@example.com', lang: 'en'}]);
+    widget.find('.js-edit-row').trigger('click');
+    fillRow(widget, 0, values);
+    widget.find(action).trigger('click');
+
+    expect(submit.prop('disabled')).toBe(!changed);
+    expect(form.data('fieldsChanged')).toBe(changed);
   });
 });
