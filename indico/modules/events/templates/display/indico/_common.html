@@ -67,8 +67,8 @@
     {%- endif %}
 {%- endmacro %}
 
-{% macro render_users(user_list, span_class='', title=true, separator=', ') -%}
-    {%- for link in user_list -%}
+{% macro render_users(user_list, span_class='', title=true, separator=', ', person_filter=none) -%}
+    {%- for link in user_list if not person_filter or person_filter(link) -%}
         {%- if caller is defined -%}
             {{- caller(link) -}}
         {%- else -%}

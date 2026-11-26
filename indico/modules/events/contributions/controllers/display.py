@@ -5,6 +5,7 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+import functools
 from io import BytesIO
 
 from flask import jsonify, redirect, request, session
@@ -44,6 +45,16 @@ def _get_persons(event, condition):
                     ContributionPersonLink.contribution.has(~Contribution.is_deleted))))
             .options(joinedload('contribution_links').joinedload('contribution'))
             .order_by(db.func.lower(EventPerson.last_name)))
+
+
+def _filter_person(person, rendering):
+    if rendering == 'speakers':
+        contribution_links = [x for x in person.contribution_links if x.is_speaker]
+    else:
+        contribution_links = [x for x in person.contribution_links if x.is_author]
+    return any(
+        not link.contribution.is_deleted and link.contribution.can_access(session.user) for link in contribution_links
+    )
 
 
 def _author_page_active(event):
@@ -198,7 +209,8 @@ class RHAuthorList(RHDisplayProtectionBase):
 
     def _process(self):
         authors = _get_persons(self.event, ContributionPersonLink.author_type != AuthorType.none)
-        return self.view_class.render_template('display/author_list.html', self.event, authors=authors)
+        return self.view_class.render_template('display/author_list.html', self.event, authors=authors,
+                                               person_filter=functools.partial(_filter_person, rendering='authors'))
 
 
 class RHSpeakerList(RHDisplayProtectionBase):
@@ -207,7 +219,8 @@ class RHSpeakerList(RHDisplayProtectionBase):
 
     def _process(self):
         speakers = _get_persons(self.event, ContributionPersonLink.is_speaker)
-        return self.view_class.render_template('display/speaker_list.html', self.event, speakers=speakers)
+        return self.view_class.render_template('display/speaker_list.html', self.event, speakers=speakers,
+                                               person_filter=functools.partial(_filter_person, rendering='speakers'))
 
 
 class RHContributionAuthor(RHContributionDisplayBase):
