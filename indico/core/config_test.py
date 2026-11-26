@@ -158,3 +158,18 @@ def test_plugin_config_proxy_missing_attr_raises():
     proxy = PluginConfigProxy(FakeConfig(), prefix='FOO')
     with pytest.raises(AttributeError):
         proxy.NOPE  # noqa: B018
+
+
+@pytest.mark.parametrize('url', ('support.example.test/help', '/contact', 'ftp://support.example.test', 'https://'))
+def test_validate_rejects_invalid_public_support_url(write_config, url):
+    write_config(f'PUBLIC_SUPPORT_URL = {url!r}\n')
+    cfg = IndicoConfig(load_config())
+    with pytest.raises(ValueError, match='PUBLIC_SUPPORT_URL'):
+        cfg.validate()
+
+
+@pytest.mark.parametrize('url', (None, 'https://support.example.test/help', 'http://support.example.test'))
+def test_validate_accepts_valid_public_support_url(write_config, url):
+    write_config(f'PUBLIC_SUPPORT_URL = {url!r}\n')
+    cfg = IndicoConfig(load_config())
+    cfg.validate()
