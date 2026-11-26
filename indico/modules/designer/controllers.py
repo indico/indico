@@ -296,7 +296,7 @@ class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
     def _check_access(self):
         RHManageEventBase._check_access(self)
         CloneTemplateMixin._check_access(self)
-        # Only allow cloening templates from the current ancestry
+        # Only allow cloning templates from the current ancestry
         if self.template not in get_all_templates(self.event):
             raise Forbidden('This template is not available here.')
 
