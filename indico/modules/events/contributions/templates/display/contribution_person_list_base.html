@@ -14,7 +14,7 @@
     {% endif %}
     {% set contribution_links = contribution_links|sort(attribute='contribution.title')|sort(attribute='author_type.value') %}
     <ul class="author-links">
-        {% for link in contribution_links if not link.contribution.is_deleted %}
+        {% for link in contribution_links if not link.contribution.is_deleted and link.contribution.can_access(session.user) %}
             {% set contribution = link.contribution %}
             <li>
                 <span class="contrib-role">
