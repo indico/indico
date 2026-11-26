@@ -43,7 +43,7 @@ export default function TimePicker({
 }) {
   const input = useRef(null);
   const list = useRef(null);
-  const selectOnClick = useRef(false);
+  const selectOnCommit = useRef(false);
   const [listId] = useState(() => _.uniqueId('time-picker-options-'));
   const formattedValue = Time.fromString(value, '24h').toFormattedString(timeFormat);
   const [text, setText] = useState(formattedValue);
@@ -92,6 +92,14 @@ export default function TimePicker({
     setFiltering(false);
     setActiveTime(null);
   }, []);
+
+  useLayoutEffect(() => {
+    if (!isOpen && selectOnCommit.current) {
+      selectOnCommit.current = false;
+      input.current.focus();
+      input.current.select();
+    }
+  }, [isOpen]);
 
   useLayoutEffect(() => {
     if (!isOpen) {
@@ -168,12 +176,13 @@ export default function TimePicker({
     return '';
   }
 
-  function commit(raw) {
+  function commit(raw, selectValue = false) {
     const time = Time.fromString(raw);
     const message = validationMessage(raw, time);
     input.current.setCustomValidity(message);
     setError(message);
     if (!message) {
+      selectOnCommit.current = selectValue;
       setText(time.toFormattedString(timeFormat));
       const next = time.toSafeString();
       if (next !== value) {
@@ -220,12 +229,14 @@ export default function TimePicker({
         }
         break;
       }
-      case 'Enter':
+      case 'Enter': {
         if (isOpen || text !== formattedValue) {
           event.preventDefault();
-          commit(activeTime ? (selected?.time ?? text) : text);
+          const option = isOpen && (activeTime || !filtering) ? selected : undefined;
+          commit(option?.time ?? text, !!option);
         }
         break;
+      }
     }
   }
 
@@ -250,23 +261,8 @@ export default function TimePicker({
             required={required}
             disabled={disabled}
             onChange={handleEdit}
-            onFocus={event => {
-              event.target.select();
-              onFocus?.(event);
-            }}
-            onMouseDown={event => {
-              selectOnClick.current = event.currentTarget !== document.activeElement;
-            }}
-            onClick={event => {
-              if (selectOnClick.current) {
-                const target = event.currentTarget;
-                requestAnimationFrame(() => {
-                  if (document.activeElement === target) {
-                    target.select();
-                  }
-                });
-                selectOnClick.current = false;
-              }
+            onFocus={onFocus}
+            onClick={() => {
               setFiltering(false);
               setExpanded(true);
             }}
@@ -294,7 +290,7 @@ export default function TimePicker({
               data-time={option.time}
               aria-selected={option === selected}
               onMouseDown={event => event.preventDefault()}
-              onClick={() => commit(option.time)}
+              onClick={() => commit(option.time, true)}
             >
               <span styleName="option-time">{option.label}</span>
               {option.duration && (

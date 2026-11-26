@@ -55,6 +55,7 @@
   box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
   color: rgba(0, 0, 0, 0.87);
   list-style: none;
+  text-align: start;
 
   --time-column-width: calc(var(--field-width, 100%) - 2px);
 
@@ -80,21 +81,20 @@
   }
 
   li {
-    display: grid;
-    grid-template-columns: minmax(0, var(--time-column-width)) minmax(0, 1fr);
-    align-items: baseline;
     overflow-wrap: anywhere;
-    padding-block: 0.78571429em;
+    padding: 0.78571429em 1em;
     cursor: pointer;
   }
 
   &[data-align-end] li:has(.duration) {
+    display: grid;
     grid-template-columns: minmax(0, var(--time-column-width));
     justify-content: end;
+    padding-inline: 0;
 
+    .option-time,
     .duration {
-      padding-inline: 0;
-      text-align: center;
+      padding-inline: 1em;
     }
   }
 
@@ -108,13 +108,7 @@
   }
 }
 
-.option-time {
-  padding-inline: 1em;
-  text-align: var(--time-picker-text-align, start);
-}
-
 .duration {
-  padding-inline-end: 0.5em;
   color: #808c99;
   font-size: 0.7em;
 }
