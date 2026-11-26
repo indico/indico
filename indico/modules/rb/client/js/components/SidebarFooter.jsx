@@ -42,26 +42,13 @@ const buildMenuItems = (
     ],
   ];
 
-  if (externalContactURL) {
+  if (externalContactURL || contactEmail) {
+    const contactProps = externalContactURL
+      ? {href: externalContactURL, target: '_blank', rel: 'noopener noreferrer'}
+      : {href: contactURL(), modal: true};
     menuItems.push([
       'contact',
-      {
-        href: externalContactURL,
-        target: '_blank',
-        rel: 'noopener noreferrer',
-        caption: Translate.string('Contact'),
-        icon: 'at',
-      },
-    ]);
-  } else if (contactEmail) {
-    menuItems.push([
-      'contact',
-      {
-        href: contactURL(),
-        modal: true,
-        caption: Translate.string('Contact'),
-        icon: 'at',
-      },
+      {...contactProps, caption: Translate.string('Contact'), icon: 'at'},
     ]);
   }
   if (hasTOS) {
