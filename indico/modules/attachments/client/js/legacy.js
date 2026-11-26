@@ -92,7 +92,9 @@ import {$T} from 'indico/utils/i18n';
     }
 
     function previewAttachment(id) {
-      const attachment = $('.attachment[data-previewable][data-attachment-id="{0}"]'.format(id));
+      const attachment = $(
+        '.attachment[data-previewable=true][data-attachment-id="{0}"]'.format(id)
+      );
       if (!attachment.length) {
         clearHash();
         return;
