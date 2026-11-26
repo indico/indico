@@ -5,14 +5,18 @@
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
 
+from datetime import timedelta
+
 import pytest
 from marshmallow import ValidationError
 from werkzeug.exceptions import BadRequest
 
+from indico.core import signals
 from indico.modules.events.registration.controllers.management.fields import (GeneralFieldDataSchema,
                                                                               RHRegistrationFormToggleFieldState,
                                                                               TextDataSchema,
                                                                               _fill_form_field_with_data)
+from indico.modules.events.registration.fields.base import RegistrationFormFieldBase
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormSection,
                                                              RegistrationFormText)
@@ -332,6 +336,58 @@ class TestTextDataSchema:
                                    is_static_text=True)
         db.session.flush()
         assert new_label_field.internal_name is None
+
+
+@pytest.fixture
+def dataless_field_type():
+    class DatalessField(RegistrationFormFieldBase):
+        name = 'dataless'
+        has_retention_period = False
+
+    with signals.core.get_fields.connected_to(lambda sender, **kwargs: DatalessField,
+                                              sender=RegistrationFormFieldBase):
+        yield DatalessField
+
+
+class TestConditionsRetentionPeriod:
+    @pytest.mark.usefixtures('dataless_field_type')
+    @pytest.mark.parametrize(('input_type', 'valid'), (
+        ('text', False),
+        ('dataless', True),
+    ))
+    def test_depend_on_field_with_retention_period(self, db, dummy_regform, input_type, valid):
+        section = dummy_regform.sections[0]
+        condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform, title='Condition',
+                                                input_type='checkbox', retention_period=timedelta(weeks=4))
+        db.session.flush()
+        field = RegistrationFormField(parent=section, registration_form=dummy_regform)
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': field})
+        data = {'input_type': input_type, 'title': 'Conditional', 'show_if_field_id': condition_field.id,
+                'show_if_field_values': [True]}
+        if valid:
+            assert schema.load(data)
+        else:
+            with pytest.raises(ValidationError, match='which has a shorter retention period'):
+                schema.load(data)
+
+    @pytest.mark.usefixtures('dataless_field_type')
+    @pytest.mark.parametrize(('input_type', 'valid'), (
+        ('text', False),
+        ('dataless', True),
+    ))
+    def test_set_retention_period_on_condition(self, dummy_regform, input_type, valid):
+        section = dummy_regform.sections[0]
+        condition_field = RegistrationFormField(parent=section, registration_form=dummy_regform, title='Condition',
+                                                input_type='checkbox')
+        RegistrationFormField(parent=section, registration_form=dummy_regform, title='Conditional',
+                              input_type=input_type, show_if_field=condition_field, show_if_values=[True])
+        schema = GeneralFieldDataSchema(context={'regform': dummy_regform, 'field': condition_field})
+        data = {'input_type': 'checkbox', 'title': 'Condition', 'retention_period': 4}
+        if valid:
+            assert schema.load(data)
+        else:
+            with pytest.raises(ValidationError, match='which has a longer retention period'):
+                schema.load(data)
 
 
 class TestRegistrationFormToggleFieldState:
