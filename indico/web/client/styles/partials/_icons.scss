@@ -19,6 +19,7 @@ using the `bin/maintenance/generate_icons.py` script.
   font-family: 'icomoon-ultimate';
   src:
     url('static:fonts/icomoon/icomoon.svg#icomoon-ultimate') format('svg'),
+    url('static:fonts/icomoon/icomoon.woff2') format('woff2'),
     url('static:fonts/icomoon/icomoon.woff') format('woff'),
     url('static:fonts/icomoon/icomoon.ttf') format('truetype');
   font-weight: normal;
@@ -91,6 +92,7 @@ i[class^='icon-']::before {
  *      - icomoon.zip/fonts/icommon.{svg,ttf,woff} to indico/web/static/fonts/icomoon/
  *      - icomoon.zip/selection.json to indico/web/static/fonts/icomoon/
  * 16. Run the update script: `./bin/maintenance/generate_icons.py`
+ * 17. Run script to generate .woff2 `./bin/maintenance/generate_woff_woff2_fonts.py`
  */
 
 // BEGIN GENERATED ICON RULES
