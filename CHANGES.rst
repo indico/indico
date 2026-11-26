@@ -49,7 +49,7 @@ Internal Changes
   certain features are likely broken get a warning about having to update their browser
   (:pr:`7928`)
 - Allow adding custom entries to the formats menu of the rich-text editor using the
-  ``extraStyleFormats`` config option (:pr:`XXXX`, thanks :user:`moliholy, unconventionaldotdev`)
+  ``extraStyleFormats`` config option (:pr:`7946`, thanks :user:`moliholy, unconventionaldotdev`)
 
 
 Version 3.3.14
