@@ -42,6 +42,37 @@ i.info-helper {
 }
 
 .multiple-items-widget {
+  .table-input-label {
+    display: block;
+    font-weight: normal;
+  }
+
+  .table-input-name {
+    position: absolute;
+    clip-path: inset(50%);
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .table-input-error {
+    display: block;
+    margin-top: 0.3em;
+    line-height: 1.2;
+    color: $dark-red;
+  }
+
+  .js-table-input.hasError:focus {
+    outline: 2px solid $blue;
+    outline-offset: 2px;
+  }
+
+  .js-editing-row .js-action-col {
+    vertical-align: top;
+    padding-top: 14px;
+    padding-bottom: 2px;
+  }
+
   .sort-handle {
     cursor: move;
     @include icon-before('icon-handle');
