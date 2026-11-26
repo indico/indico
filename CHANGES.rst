@@ -33,6 +33,8 @@ Bugfixes
 - Disallow invalid number of extra slots in registration form choice fields (:pr:`7936`)
 - Require backside templates to belong to the same ancestry (:pr:`7896`, thanks :user:`p-w`)
 - Require cloned templates to belong to the same ancestry (:pr:`7896`)
+- Fix rich-text editors losing the latest change when moving to another field or submitting
+  the form right after making it (:pr:`7942`, thanks :user:`moliholy`)
 
 Accessibility
 ^^^^^^^^^^^^^
