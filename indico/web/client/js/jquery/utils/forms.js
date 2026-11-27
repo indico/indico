@@ -113,6 +113,14 @@ import {$T} from 'indico/utils/i18n';
     });
   }
 
+  // widgets holding uncommitted state report it themselves since it is not part of the form data
+  function isUntouched($form) {
+    return (
+      !$form.find('[data-pending-changes]').length &&
+      $.param($form.serializeArray(), true) === $form.data('initialData')
+    );
+  }
+
   function isElementInView(elem) {
     const docViewTop = $(window).scrollTop();
     const docViewBottom = docViewTop + $(window).height();
@@ -128,7 +136,10 @@ import {$T} from 'indico/utils/i18n';
       message: $T.gettext('Do not forget to save your changes!'),
       class: 'highlight save-corner-message',
       actionCallback() {
-        $form.submit();
+        if (!$form[0].reportValidity()) {
+          return false;
+        }
+        $form[0].requestSubmit();
       },
     });
   }
@@ -208,7 +219,7 @@ import {$T} from 'indico/utils/i18n';
       })
       .on('change input', function() {
         const $this = $(this);
-        const untouched = $.param($this.serializeArray(), true) === $this.data('initialData');
+        const untouched = isUntouched($this);
         const $cornerMessage = $('.save-corner-message');
         $this.find('[data-disabled-until-change]').prop('disabled', untouched);
         $this.closest('form').data('fieldsChanged', !untouched);
@@ -234,7 +245,7 @@ import {$T} from 'indico/utils/i18n';
           const $form = forms.find('[data-save-reminder]').closest('form');
           if ($form.length) {
             const $cornerMessage = $('.save-corner-message');
-            const untouched = $.param($form.serializeArray(), true) === $form.data('initialData');
+            const untouched = isUntouched($form);
             if (isElementInView($form.find('[data-save-reminder]'))) {
               hideSaveCornerMessage($cornerMessage);
             } else if (!untouched && !$cornerMessage.length) {

@@ -33,6 +33,8 @@ Bugfixes
 - Disallow invalid number of extra slots in registration form choice fields (:pr:`7936`)
 - Require backside templates to belong to the same ancestry (:pr:`7896`, thanks :user:`p-w`)
 - Require cloned templates to belong to the same ancestry (:pr:`7896`)
+- Require saving or canceling list row edits before submitting a form (:pr:`7702`, thanks
+  :user:`moliholy, unconventionaldotdev`)
 
 Accessibility
 ^^^^^^^^^^^^^
