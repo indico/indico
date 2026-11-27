@@ -17,7 +17,7 @@
             {% block logo %}
                 {%- set logo_url = indico_config.LOGO_URL or (indico_config.IMAGES_BASE_URL + '/logo_indico_bw.svg') -%}
                 <a class="indico-top-bar-logo" href="{{ url_for_index() }}">
-                    <img src="{{ logo_url }}">
+                    <img src="{{ logo_url }}" alt="{% trans %}Indico main page{% endtrans %}">
                 </a>
             {% endblock %}
             <div class="indico-user-menu" id="indico-user-menu-container"></div>
