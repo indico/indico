@@ -52,7 +52,7 @@ from indico.modules.events.registration.notifications import (notify_registratio
                                                               notify_registration_state_update)
 from indico.modules.events.registration.placeholders.registrations import PicturePlaceholder
 from indico.modules.events.registration.settings import event_badge_settings
-from indico.modules.events.registration.util import (ActionMenuEntry, create_registration,
+from indico.modules.events.registration.util import (ActionMenuEntry, can_moderate_registrations, create_registration,
                                                      generate_pdf_data_from_registrations,
                                                      generate_spreadsheet_from_registrations,
                                                      get_flat_section_submission_data, get_initial_form_values,
@@ -426,8 +426,12 @@ class RHRegistrationCreate(RHManageRegFormBase):
         schema_cls = make_registration_schema(self.regform, management=True, override_required=override_required)
         form_data = load_registration_schema(self.regform, schema_cls)
         session['registration_notify_user_default'] = notify_user = form_data.pop('notify_user', False)
-        create_registration(self.regform, form_data, management=True, notify_user=notify_user)
-        flash(_('The registration was created.'), 'success')
+        registration = create_registration(self.regform, form_data, management=True, notify_user=notify_user,
+                                           skip_moderation=can_moderate_registrations(self.event, session.user))
+        if registration.state == RegistrationState.pending:
+            flash(_('The registration was created and is awaiting approval.'), 'success')
+        else:
+            flash(_('The registration was created.'), 'success')
         return jsonify({'redirect': url_for('event_registration.manage_reglist', self.regform)})
 
     @use_kwargs({
@@ -446,6 +450,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
                 'uuid': PROFILE_PICTURE_SENTINEL,
                 'previewUrl': user.avatar_url,
             }
+        skip_moderation = can_moderate_registrations(self.event, session.user)
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     regform=self.regform,
                                                     form_data=form_data,
@@ -455,6 +460,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
                                                     invitation=None,
                                                     registration=None,
                                                     management=True,
+                                                    skip_moderation=skip_moderation,
                                                     login_required=False,
                                                     is_restricted_access=False,
                                                     captcha_required=False)
@@ -465,7 +471,7 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
 
     PERMISSION = ('registration', 'registration_edit')
 
-    def _register_user(self, user, notify):
+    def _register_user(self, user, notify, skip_moderation):
         # Fill only the personal data fields, custom fields are left empty.
         # Picture is excluded from getattr loop: user.picture is raw bytes, not a file UUID.
         data = {pdt.name: getattr(user, pdt.name, None) for pdt in PersonalDataType
@@ -474,21 +480,24 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
             data['picture'] = PROFILE_PICTURE_SENTINEL
         data['title'] = get_title_uuid(self.regform, data['title'])
         with db.session.no_autoflush:
-            create_registration(self.regform, data, management=True, notify_user=notify)
+            create_registration(self.regform, data, management=True, notify_user=notify,
+                                skip_moderation=skip_moderation)
 
     def _process(self):
         form = CreateMultipleRegistrationsForm(regform=self.regform, open_add_user_dialog=(request.method == 'GET'),
                                                notify_users=session.get('registration_notify_user_default', True))
+        skip_moderation = can_moderate_registrations(self.event, session.user)
 
         if form.validate_on_submit():
             if self.regform.is_purged:
                 raise Forbidden(_('Registration is disabled due to an expired retention period'))
             session['registration_notify_user_default'] = form.notify_users.data
             for user in form.user_principals.data:
-                self._register_user(user, form.notify_users.data)
+                self._register_user(user, form.notify_users.data, skip_moderation)
             return jsonify_data(**self.list_generator.render_list())
 
-        return jsonify_template('events/registration/management/registration_create_multiple.html', form=form)
+        return jsonify_template('events/registration/management/registration_create_multiple.html', form=form,
+                                moderated=(self.regform.moderation_enabled and not skip_moderation))
 
 
 class RHRegistrationCheckEmail(CheckEmailMixin, RHManageRegFormBase):
