@@ -18,6 +18,7 @@ export default function EmailPendingInvitations({
   metadataURL,
   previewURL,
   sendURL,
+  imageUploadURL,
   selectedInvitations,
   onClose,
 }) {
@@ -64,6 +65,7 @@ export default function EmailPendingInvitations({
       senders={senders}
       recipients={recipients}
       previewURL={previewURL}
+      imageUploadURL={imageUploadURL}
       previewContext={invitationIdsPayload}
       placeholders={placeholders}
       initialFormValues={{subject: defaultSubject, body: defaultBody}}
@@ -76,6 +78,7 @@ EmailPendingInvitations.propTypes = {
   metadataURL: PropTypes.string.isRequired,
   previewURL: PropTypes.string.isRequired,
   sendURL: PropTypes.string.isRequired,
+  imageUploadURL: PropTypes.string.isRequired,
   selectedInvitations: PropTypes.arrayOf(PropTypes.number),
   onClose: PropTypes.func.isRequired,
 };

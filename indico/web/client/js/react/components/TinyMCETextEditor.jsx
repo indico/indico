@@ -26,6 +26,7 @@ export default function TinyMCETextEditor({
   onChange,
   onFocus,
   onBlur,
+  onInit,
   lazyValue,
 }) {
   const contentCSS = useMemo(() => JSON.parse(document.body.dataset.tinymceContentCss), []);
@@ -62,6 +63,7 @@ export default function TinyMCETextEditor({
         initialValue={lazyValue ? value.initialValue : initialValue}
         onFocus={onFocus}
         onBlur={onBlur}
+        onInit={onInit}
         // disable the editor if it's set to show the loading animation, since otherwise you could
         // still tab into it and change its contents
         disabled={disabled || loading}
@@ -77,6 +79,7 @@ TinyMCETextEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
   onFocus: PropTypes.func.isRequired,
   onBlur: PropTypes.func.isRequired,
+  onInit: PropTypes.func,
   value: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.shape({initialValue: PropTypes.string, getData: PropTypes.func}),
@@ -93,6 +96,7 @@ TinyMCETextEditor.defaultProps = {
   config: undefined,
   loading: false,
   disabled: false,
+  onInit: undefined,
   value: undefined,
   initialValue: undefined,
   lazyValue: false,
