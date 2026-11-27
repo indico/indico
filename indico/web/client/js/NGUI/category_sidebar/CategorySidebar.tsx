@@ -16,9 +16,18 @@ import {CategoryManager, CategoryMaterial} from 'indico/NGUI/types';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 
+import {ListItemProps} from '../list/List';
+
 interface CategorySidebarProps {
   categoryId: number;
 }
+
+const sidebarContentStyle: React.CSSProperties = {
+  flexDirection: 'row',
+  flexWrap: 'nowrap',
+  alignItems: 'center',
+  minWidth: 0,
+};
 
 export function CategorySidebar({categoryId}: CategorySidebarProps) {
   const {data: managersData, loading: managersLoading} = useIndicoAxios(
@@ -35,43 +44,54 @@ export function CategorySidebar({categoryId}: CategorySidebarProps) {
     folders: CategoryMaterial[];
   } | null;
 
+  if (managersLoading || materialsLoading) {
+    return null;
+  }
+
+  const managerList = managers ?? [];
+  const materialFiles = materials?.files ?? [];
+  const materialFolders = materials?.folders ?? [];
+  if (!managerList.length && !materialFiles.length && !materialFolders.length) {
+    return null;
+  }
+
   return (
-    <div styleName="category-sidebar">
-      {!managersLoading ? (
+    <div styleName="category-sidebar" data-category-sidebar>
+      {managerList.length > 0 && (
         <Card>
           <Card.Header styleName="manager-header">
             <Card.Icon icon="fas:folder" />
             <Translate>Managers</Translate>
           </Card.Header>
-          {managers?.length ? (
-            <List styleName="sidebar-list">
-              {managers.map(manager => (
-                <List.Item key={manager.id}>
-                  <img styleName="manager-avatar" src={manager.avatarURL} alt="" />
-                  <List.Item.Details>{manager.fullName}</List.Item.Details>
-                </List.Item>
-              ))}
-            </List>
-          ) : (
-            <Card.Description styleName="sidebar-empty">
-              <Translate>There are no managers.</Translate>
-            </Card.Description>
-          )}
+          <List styleName="sidebar-list">
+            {managerList.map(manager => (
+              <List.Item key={manager.id} contentProps={{style: sidebarContentStyle}}>
+                <img styleName="manager-avatar" src={manager.avatarURL} alt="" />
+                <List.Item.Details className="category-sidebar-item-details">
+                  {manager.fullName}
+                </List.Item.Details>
+              </List.Item>
+            ))}
+          </List>
         </Card>
-      ) : null}
-      {!materialsLoading ? (
+      )}
+      {materialFiles.length > 0 || materialFolders.length > 0 ? (
         <Card>
           <Card.Header styleName="manager-header">
             <Card.Icon icon="fas:paperclip" />
             <Translate>Materials</Translate>
           </Card.Header>
-          {materials?.files.length || materials?.folders.length ? (
-            <List styleName="sidebar-list material-list">
-              {materials.files.map(material => (
-                <MaterialItem key={`file-${material.id}`} material={material} />
-              ))}
-              {materials.folders.map(folder => (
-                <React.Fragment key={`folder-${folder.id}`}>
+          <div styleName="material-groups">
+            {materialFiles.length > 0 && (
+              <List styleName="material-list">
+                {materialFiles.map(material => (
+                  <MaterialItem key={`file-${material.id}`} material={material} />
+                ))}
+              </List>
+            )}
+            {materialFolders.map(folder => (
+              <div styleName="material-folder-group" key={`folder-${folder.id}`}>
+                <List styleName="material-list" className="category-sidebar-material-folder">
                   <MaterialItem material={folder} isFolder />
                   {folder.attachments?.map(material => (
                     <MaterialItem
@@ -80,21 +100,17 @@ export function CategorySidebar({categoryId}: CategorySidebarProps) {
                       nested
                     />
                   ))}
-                </React.Fragment>
-              ))}
-            </List>
-          ) : (
-            <Card.Description styleName="sidebar-empty">
-              <Translate>There are no materials.</Translate>
-            </Card.Description>
-          )}
+                </List>
+              </div>
+            ))}
+          </div>
         </Card>
       ) : null}
     </div>
   );
 }
 
-interface MaterialItemProps {
+interface MaterialItemProps extends Omit<ListItemProps, 'children'> {
   material: CategoryMaterial;
   isFolder?: boolean;
   nested?: boolean;
@@ -158,12 +174,18 @@ function getMaterialIcon(material: CategoryMaterial): string {
   return 'fas:file';
 }
 
-function MaterialItem({material, isFolder = false, nested = false}: MaterialItemProps) {
+function MaterialItem({material, isFolder = false, nested = false, ...rest}: MaterialItemProps) {
   const inaccessible = !isFolder && material.isProtected && !material.url;
+  const className = `category-sidebar-material-row ${rest.className || ''}`;
   const contentProps =
     !isFolder && material.url
-      ? {href: material.url, target: '_blank', rel: 'noopener noreferrer'}
-      : undefined;
+      ? {
+          href: material.url,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          style: sidebarContentStyle,
+        }
+      : {style: sidebarContentStyle};
   const styleName = [
     'material',
     isFolder && 'material-folder',
@@ -175,7 +197,7 @@ function MaterialItem({material, isFolder = false, nested = false}: MaterialItem
     .join(' ');
 
   return (
-    <List.Item styleName={styleName} contentProps={contentProps}>
+    <List.Item {...rest} className={className} styleName={styleName} contentProps={contentProps}>
       <List.Item.Icon
         icon={isFolder ? 'fas:folder' : getMaterialIcon(material)}
         color="gray"
@@ -183,7 +205,9 @@ function MaterialItem({material, isFolder = false, nested = false}: MaterialItem
         variant="transparent"
         compact
       />
-      <List.Item.Details title={material.title}>{material.title}</List.Item.Details>
+      <List.Item.Details className="category-sidebar-item-details" title={material.title}>
+        {material.title}
+      </List.Item.Details>
       {material.isProtected && (
         <List.Item.Icon
           color="gray"

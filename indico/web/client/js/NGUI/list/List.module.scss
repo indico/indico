@@ -22,7 +22,7 @@
     min-width: 0;
   }
 
-  .list-item-content {
+  :global(.list-item-content) {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -38,7 +38,6 @@
 
     border-radius: var(--radius-xl);
 
-    :is(a),
     &:hover,
     &:focus-visible {
       background: var(--color-surface-soft-hover);

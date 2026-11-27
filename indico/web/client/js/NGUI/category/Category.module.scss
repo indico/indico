@@ -46,19 +46,23 @@
   .category {
     width: 100%;
     display: grid;
-    grid-template-columns: minmax(min(100%, 40rem), 1fr) 300px;
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-6);
+  }
+
+  .category:has(> [data-category-sidebar]) {
+    grid-template-columns: minmax(min(100%, 40rem), 1fr) 300px;
   }
 
   .category-main {
     display: flex;
     flex-direction: column;
-    gap: var(--space-6);
+    gap: var(--space-3);
     min-width: 0;
   }
 
   @container category-layout (max-width: calc(40rem + 300px + var(--space-6))) {
-    .category {
+    .category:has(> [data-category-sidebar]) {
       grid-template-columns: minmax(0, 1fr);
     }
   }
