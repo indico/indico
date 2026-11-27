@@ -14,6 +14,7 @@ import dateutil.parser
 from flask import session
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
+from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
@@ -26,14 +27,19 @@ from indico.modules.events.contributions.models.persons import (AuthorType, Cont
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.operations import create_contribution
-from indico.modules.events.models.events import Event
+from indico.modules.events.layout import layout_settings
+from indico.modules.events.models.events import Event, EventType
 from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.persons import persons_settings
 from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.util import track_time_changes
-from indico.modules.users.models.users import User
+from indico.modules.users import user_management_settings
+from indico.modules.users.models.affiliations import Affiliation
+from indico.modules.users.models.users import NameFormat, User
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper
 from indico.util.string import format_email_with_name, validate_email
 from indico.web.flask.templating import get_template_module
@@ -396,3 +402,32 @@ def get_boa_export_formats():
     if not config.LATEX_ENABLED:
         del formats['PDF']
     return formats
+
+
+def get_contribution_person_link_field_params(event: Event, contrib: Contribution | None = None):
+    """Get the params for a `FinalContributionPersonLinkField` field."""
+    name_format = layout_settings.get(event, 'name_format')
+    if name_format is None and session.user:
+        name_format = session.user.settings.get('name_format')
+    extra_params = values_from_signal(signals.event.person_link_field_extra_params.send(), as_list=True)
+    # XXX this is an awful hack to not break this signal for now; when removing the ContributionForm, plugins
+    # making use of it (ie the JAcoW plugin) need to be updated to take e.g. a string or enum indicating
+    # for what kind of person link (contribution/abstract/...) the required fields are retrieved.
+    from indico.modules.events.contributions.forms import ContributionForm
+    required_person_fields = values_from_signal(
+        signals.event.person_required_fields.send(ContributionForm(event=event)), multi_value_types=list
+    )
+    has_abstract = bool(contrib.abstract) if contrib else False
+    return {
+        'allow_authors': event.type_ == EventType.conference,
+        'has_predefined_affiliations': Affiliation.query.filter(~Affiliation.is_deleted).has_rows(),
+        'allow_custom_affiliations': not user_management_settings.get('only_predefined_affiliations'),
+        'custom_persons_mode': persons_settings.get(event, 'custom_persons_mode').name,
+        'required_person_fields': list(required_person_fields),
+        'default_search_external': persons_settings.get(event, 'default_search_external'),
+        'name_format': (name_format and name_format.name) or NameFormat.first_last.name,
+        'extra_params': {k: v for d in extra_params for k, v in d.items()},
+        'default_is_submitter': not has_abstract,
+        'default_is_speaker': not has_abstract,
+        'default_is_author': has_abstract,
+    }

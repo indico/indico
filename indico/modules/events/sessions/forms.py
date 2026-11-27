@@ -25,6 +25,7 @@ from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.widgets import SwitchWidget
 
 
+# TODO delete this:
 class SessionForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     code = StringField(_('Session code'), description=_('The code that will identify the session in the Book of '
@@ -67,6 +68,7 @@ class SessionProtectionForm(IndicoForm):
         check_permissions(self.event, field)
 
 
+# TODO delete this:
 class SessionBlockForm(IndicoForm):
     title = StringField(_('Title'), description=_('Title of the session block'))
     code = StringField(_('Program code'))

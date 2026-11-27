@@ -78,6 +78,10 @@
                                        data-colors="{{ default_colors | tojson | forceescape }}"
                                        data-color="{{ sess.colors | tojson | forceescape }}"
                                        title="{% if not event.is_locked %}{% trans %}Change color{% endtrans %}{% endif %}"></a>
+                                    <ind-edit-session
+                                        event-id="{{ event.id }}"
+                                        session-id="{{ sess.id }}"
+                                        event-type="{{ event.type }}"></ind-edit-session>
                                     <a href="#" class="i-link highlight icon-edit edit-session hide-if-locked"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"

@@ -1,0 +1,81 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+import {MutableRefObject} from 'react';
+
+export interface Coords {
+  x: number;
+  y: number;
+}
+
+export interface CoordsWithOffset extends Coords {
+  offsetX: number;
+  offsetY: number;
+}
+
+export type MousePosition = Coords;
+export type Transform = Coords;
+
+export interface Rect {
+  top: number;
+  left: number;
+  bottom: number;
+  right: number;
+  width: number;
+  height: number;
+}
+
+export type DragState = 'idle' | 'mousedown' | 'dragging';
+
+export interface Over {
+  id: string;
+  rect: Rect;
+}
+
+export type HTMLRef = MutableRefObject<HTMLElement | null>;
+
+export interface Droppable {
+  node: HTMLRef;
+}
+
+export interface Draggable {
+  node: HTMLRef;
+}
+
+export interface DraggableData {
+  rect?: Rect;
+  transform?: {x: number; y: number};
+  mouse?: MousePosition;
+  initialOffset?: Coords;
+  scroll?: Transform;
+  initialScroll?: {top: number; left: number};
+  fixed: boolean;
+}
+
+export interface DragEvent {
+  who: string;
+  over: Over[];
+  delta: Transform;
+  mouse: MousePosition;
+}
+export type OnDrop = (
+  who: string,
+  over: Over[],
+  delta: Transform,
+  mouse: MousePosition,
+  offset: Coords
+) => void;
+
+export type Modifier = ({
+  draggingNodeRect,
+  transform,
+  id,
+}: {
+  draggingNodeRect: Rect;
+  transform: Transform;
+  id: string;
+}) => Transform;

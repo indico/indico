@@ -6,11 +6,12 @@
 // LICENSE file for more details.
 
 import {FORM_ERROR} from 'final-form';
+import {flatten} from 'flat';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import React, {useEffect} from 'react';
-import {Field, Form as FinalForm, FormSpy, useField} from 'react-final-form';
-import {Button, Form, Modal} from 'semantic-ui-react';
+import {Field, Form as FinalForm, FormSpy, useField, useFormState} from 'react-final-form';
+import {Button, Form, Modal, Icon} from 'semantic-ui-react';
 
 import {FinalSubmitButton} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
@@ -21,12 +22,24 @@ import {handleSubmissionError} from './errors';
 import {FinalUnloadPrompt} from './unload';
 
 export function getChangedValues(data, form, always = []) {
-  const fields = form.getRegisteredFields().filter(x => !x.includes('['));
-  return _.fromPairs(
-    fields
+  const flatFields = form.getRegisteredFields().filter(x => !x.includes('[') && !x.includes('.'));
+  const nestedFields = form.getRegisteredFields().filter(x => !x.includes('[') && x.includes('.'));
+  const changedValues = Object.fromEntries(
+    flatFields
       .filter(name => form.getFieldState(name).dirty || always.includes(name))
       .map(name => [name, data[name]])
   );
+  // handle fields with names like `foo.something` which are nested objects in the data
+  // XXX this only supports one level of nesting, ie not `foo.bar.baz` etc
+  nestedFields.forEach(name => {
+    if (!form.getFieldState(name).dirty && !always.includes(name)) {
+      return;
+    }
+    const [key, subname] = name.split('.', 2);
+    changedValues[key] = changedValues[key] ?? {};
+    changedValues[key][subname] = data[key][subname];
+  });
+  return changedValues;
 }
 
 export function getValuesForFields(data, form) {
@@ -39,10 +52,10 @@ export function getValuesForFields(data, form) {
  * errors that can be handled by final-form instead of showing the usual
  * error dialog for them.
  */
-export function handleSubmitError(error, fieldErrorMap = {}) {
+export function handleSubmitError(error, fieldErrorMap = {}, preserveNested = []) {
   if (_.get(error, 'response.status') === 422) {
     // if it's 422 we assume it's from webargs validation
-    return handleSubmissionError(error, null, fieldErrorMap);
+    return handleSubmissionError(error, null, fieldErrorMap, true, preserveNested);
   } else if (_.get(error, 'response.status') === 418) {
     // this is an error that was expected, and will be handled by the app
     return {[FORM_ERROR]: error.response.data.message};
@@ -311,4 +324,19 @@ export function DebugFormSpy({subscription = {values: true}}) {
 
 DebugFormSpy.propTypes = {
   subscription: PropTypes.object,
+};
+
+export function ErrorMarker({fields, ...rest}) {
+  const {errors, submitErrors} = useFormState({errors: true, submitErrors: true});
+
+  const errorFields = new Set(Object.keys(flatten({...errors, ...submitErrors})));
+  if (!errorFields.intersection(new Set(fields)).size) {
+    return null;
+  }
+
+  return <Icon circular inverted name="warning" color="red" {...rest} />;
+}
+
+ErrorMarker.propTypes = {
+  fields: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

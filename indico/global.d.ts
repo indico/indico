@@ -19,3 +19,42 @@ declare namespace React {
     styleName?: string;
   }
 }
+
+declare const Indico: {
+  User: {
+    address: string;
+    affiliation: string;
+    affiliationId: number | null;
+    affiliationMeta: object | null;
+    avatarURL: string;
+    email: string;
+    favoriteUsers: Record<
+      string,
+      Pick<
+        User,
+        | '_type'
+        | 'affiliation'
+        | 'email'
+        | 'familyName'
+        | 'firstName'
+        | 'id'
+        | 'identifier'
+        | 'name'
+        | 'phone'
+        | 'title'
+      >
+    >;
+    firstName: string;
+    fullName: string;
+    id: number;
+    identifier: string;
+    isAdmin: boolean;
+    language: string;
+    lastName: string;
+    mastodonServerName: string;
+    mastodonServerURL: string;
+    phone: string;
+    title: string;
+    type: string;
+  };
+};

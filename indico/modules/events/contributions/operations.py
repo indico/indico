@@ -16,10 +16,12 @@ from indico.modules.events.abstracts.settings import SubmissionRightsType
 from indico.modules.events.contributions import contribution_settings, logger
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
+from indico.modules.events.contributions.models.references import ContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.timetable.operations import (delete_timetable_entry, schedule_contribution,
                                                         update_timetable_entry)
-from indico.modules.events.util import format_log_person, format_log_ref, set_custom_fields, split_log_location_changes
+from indico.modules.events.util import (format_log_contrib_field_value, format_log_person, format_log_ref,
+                                        set_custom_fields, split_log_location_changes)
 from indico.modules.logs.models.entries import EventLogRealm, LogKind
 from indico.modules.logs.util import make_diff_log
 from indico.util.signals import make_interceptable
@@ -53,11 +55,32 @@ def _ensure_consistency(contrib):
     return False
 
 
+def _process_references(contrib: Contribution, data: list[dict]) -> list[ContributionReference]:
+    """Map reference data from a schema to DB objects.
+
+    This keeps the existing object in case it is unchanged, and creates a new one
+    if the type or value changed because that way we get proper data in the diff
+    log of what changed and to avoid having to pass IDs of the old references
+    around.
+    """
+    existing = {(x.reference_type, x.value): x for x in contrib.references}
+    references = []
+    for entry in data:
+        if old := existing.get((entry['reference_type'], entry['value'])):
+            references.append(old)
+        else:
+            references.append(ContributionReference(reference_type=entry['reference_type'], value=entry['value']))
+    return references
+
+
 @make_interceptable
+@no_autoflush
 def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None, extend_parent=False):
     user = session.user if session else None
     start_dt = contrib_data.pop('start_dt', None)
     contrib = Contribution(event=event)
+    if references := contrib_data.get('references'):
+        contrib_data['references'] = _process_references(contrib, references)
     contrib.populate_from_dict(contrib_data)
     if custom_fields_data:
         set_custom_fields(contrib, custom_fields_data)
@@ -95,6 +118,8 @@ def update_contribution(contrib: Contribution, contrib_data: dict, custom_fields
     if start_dt is not None:
         update_timetable_entry(contrib.timetable_entry, {'start_dt': start_dt})
     old_person_links = contrib.sorted_person_links[:]
+    if references := contrib_data.get('references'):
+        contrib_data['references'] = _process_references(contrib, references)
     changes = contrib.populate_from_dict(contrib_data)
     changes.pop('person_link_data', None)
     visible_person_link_changes = contrib.sorted_person_links != old_person_links
@@ -250,6 +275,10 @@ def log_contribution_update(contrib, changes, extra_log_fields=None, *, visible_
             'title': 'Type',
             'type': 'string',
             'convert': lambda changes: [x.name if x else None for x in changes]
+        },
+        'field_values': {
+            'title': 'Custom fields',
+            'convert': lambda changes: [list(map(format_log_contrib_field_value, refs)) for refs in changes]
         },
         **(extra_log_fields or {})
     }

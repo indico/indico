@@ -5,6 +5,8 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
+import moment from 'moment';
+
 import {Translate} from 'indico/react/i18n';
 
 /** Special value indicating that chained validation should stop immediately. */
@@ -122,6 +124,25 @@ function dates() {
   };
 }
 
+function datetime() {
+  // the value of a datetime field is a combined `<date>T<time>` string, so a plain
+  // `required` check passes even when the date is cleared (e.g. `T10:20:00`). parse the
+  // whole thing instead so a missing date or time is correctly rejected.
+  return value => {
+    if (!moment(value, moment.ISO_8601, true).isValid()) {
+      return Translate.string('Please enter a valid date and time.');
+    }
+  };
+}
+
+function positiveDuration() {
+  return value => {
+    if (!value) {
+      return Translate.string('Please enter a valid duration that is not zero.');
+    }
+  };
+}
+
 export default {
   number,
   min,
@@ -135,5 +156,7 @@ export default {
   chain,
   or,
   dates,
+  datetime,
+  positiveDuration,
   STOP_VALIDATION,
 };
