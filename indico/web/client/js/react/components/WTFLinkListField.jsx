@@ -15,7 +15,7 @@ const linkShape = {
   url: PropTypes.string.isRequired,
 };
 
-export default function WTFLinkListField({fieldId}) {
+export default function WTFLinkListField({fieldId, disabled}) {
   const storageField = useMemo(() => document.getElementById(fieldId), [fieldId]);
   const initialLinks = storageField.value ? JSON.parse(storageField.value) : [];
   const [links, setLinks] = useState(
@@ -46,6 +46,7 @@ export default function WTFLinkListField({fieldId}) {
           placeholder={Translate.string('URL')}
           onChange={evt => handleChange(0, 'url', evt.target.value)}
           value={links[0].url}
+          disabled={disabled}
         />
       </div>
     );
@@ -64,6 +65,7 @@ export default function WTFLinkListField({fieldId}) {
               onDelete={makeOnDelete(idx)}
               title={link.title}
               url={link.url}
+              disabled={disabled}
             />
           ))}
         </tbody>
@@ -73,18 +75,25 @@ export default function WTFLinkListField({fieldId}) {
   return (
     <div className="multiple-items-widget">
       {linksTable}
-      <button type="button" className="js-add-row i-button icon-plus" onClick={addURL}>
-        <Translate>Add</Translate>
-      </button>
+      {!disabled && (
+        <button type="button" className="js-add-row i-button icon-plus" onClick={addURL}>
+          <Translate>Add</Translate>
+        </button>
+      )}
     </div>
   );
 }
 
 WTFLinkListField.propTypes = {
   fieldId: PropTypes.string.isRequired,
+  disabled: PropTypes.bool,
 };
 
-function Link({onChange, onDelete, title, url}) {
+WTFLinkListField.defaultProps = {
+  disabled: false,
+};
+
+function Link({onChange, onDelete, title, url, disabled}) {
   const clearRef = useRef(null);
   const makeOnChange = field => evt => onChange(field, evt.target.value);
   const handleDelete = () => {
@@ -101,6 +110,7 @@ function Link({onChange, onDelete, title, url}) {
           placeholder={Translate.string('Title')}
           onChange={makeOnChange('title')}
           value={title}
+          disabled={disabled}
           required
         />
       </td>
@@ -111,16 +121,19 @@ function Link({onChange, onDelete, title, url}) {
           placeholder={Translate.string('URL')}
           onChange={makeOnChange('url')}
           value={url}
+          disabled={disabled}
           required
         />
       </td>
       <td className="js-action-col">
-        <a
-          ref={clearRef}
-          className="icon-remove remove-row"
-          title={Translate.string('Remove row')}
-          onClick={handleDelete}
-        />
+        {!disabled && (
+          <a
+            ref={clearRef}
+            className="icon-remove remove-row"
+            title={Translate.string('Remove row')}
+            onClick={handleDelete}
+          />
+        )}
       </td>
     </tr>
   );
@@ -130,4 +143,9 @@ Link.propTypes = {
   onChange: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   ...linkShape,
+  disabled: PropTypes.bool,
+};
+
+Link.defaultProps = {
+  disabled: false,
 };
