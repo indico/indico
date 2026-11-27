@@ -37,7 +37,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Make registration and room-booking time fields easier to use with a keyboard
+  and screen reader, and show how to correct invalid times (:pr:`7938`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

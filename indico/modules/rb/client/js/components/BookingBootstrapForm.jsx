@@ -30,7 +30,7 @@ import {selectors as configSelectors} from '../common/config';
 import {selectors as userSelectors} from '../common/user';
 import {sanitizeRecurrence} from '../util';
 
-import TimeRangePicker from './TimeRangePicker';
+import TimeRangePicker, {reportTimeRangeValidity} from './TimeRangePicker';
 import WeekdayRecurrencePicker from './WeekdayRecurrencePicker';
 
 import './BookingBootstrapForm.module.scss';
@@ -242,9 +242,12 @@ class BookingBootstrapForm extends React.Component {
   }
 
   onSearch = e => {
+    e.preventDefault();
+    if (!reportTimeRangeValidity(e.currentTarget.form)) {
+      return;
+    }
     const {onSearch} = this.props;
     onSearch(this.serializedState);
-    e.preventDefault();
   };
 
   preselectWeekday = () => {

@@ -1,0 +1,124 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'design_system';
+@use 'partials/sui_debt';
+
+.picker {
+  display: block;
+  min-width: 0;
+}
+
+.control {
+  position: relative;
+
+  &[data-invalid] > .field > input[type='text'],
+  &[data-invalid] > .field > input[type='text']:focus {
+    @include sui_debt.input-error();
+  }
+
+  &:has(> .options:not([hidden], [data-above])) .field input[type='text'] {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  &:has(> .options[data-above]:not([hidden])) .field input[type='text'] {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+}
+
+.field {
+  display: block;
+}
+
+.field-label {
+  @extend %visually-hidden;
+}
+
+.options:not([hidden]) {
+  @include sui_debt.input-border();
+  @include sui_debt.input-background();
+  @include sui_debt.border-radius();
+
+  position: absolute;
+  z-index: 1100;
+  top: calc(100% - 1px);
+  left: 0;
+  box-sizing: border-box;
+  min-width: 100%;
+  width: 100%;
+  max-height: min(14rem, 50vh, var(--available-height, 50vh));
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+  color: rgba(0, 0, 0, 0.87);
+  list-style: none;
+  text-align: start;
+
+  --time-column-width: calc(var(--field-width, 100%) - 2px);
+
+  &:has(.duration) {
+    width: min(11rem, calc(100vw - 1rem));
+  }
+
+  &:not([data-above]) {
+    border-start-start-radius: 0;
+    border-start-end-radius: 0;
+  }
+
+  &[data-above] {
+    top: auto;
+    bottom: calc(100% - 1px);
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+
+  &[data-align-end] {
+    right: 0;
+    left: auto;
+  }
+
+  li {
+    overflow-wrap: anywhere;
+    padding: 0.78571429em 1em;
+    cursor: pointer;
+  }
+
+  &[data-align-end] li:has(.duration) {
+    display: grid;
+    grid-template-columns: minmax(0, var(--time-column-width));
+    justify-content: end;
+    padding-inline: 0;
+
+    .option-time,
+    .duration {
+      padding-inline: 1em;
+    }
+  }
+
+  li:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  li[aria-selected='true'] {
+    background: rgba(0, 0, 0, 0.03);
+    font-weight: bold;
+  }
+}
+
+.duration {
+  color: #808c99;
+  font-size: 0.7em;
+}
+
+.error {
+  display: block;
+  color: #912d2b;
+}

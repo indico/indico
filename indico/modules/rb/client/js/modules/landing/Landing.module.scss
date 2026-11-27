@@ -40,6 +40,8 @@
     flex-grow: 1;
 
     :global(.ui.form) {
+      --time-range-leading-space: minmax(0, 1fr);
+
       display: flex;
       align-items: center;
       flex-direction: column;

@@ -12,6 +12,8 @@ import {Button, Icon, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
+import {reportTimeRangeValidity} from '../../components/TimeRangePicker';
+
 import './FilterDropdown.module.scss';
 
 function _mergeDefaults(defaults, values) {
@@ -129,7 +131,10 @@ export default class FilterDropdown extends React.Component {
     return !_.isEqual(initialValues, fieldValues);
   };
 
-  handleClose = () => {
+  handleClose = event => {
+    if (!reportTimeRangeValidity(event?.currentTarget?.closest('.ui.popup'))) {
+      return;
+    }
     const {onClose, setGlobalState} = this.props;
     const {fieldValues} = this.state;
     if (this.hasValuesChanged()) {

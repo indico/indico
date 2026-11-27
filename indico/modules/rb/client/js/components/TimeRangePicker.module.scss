@@ -5,34 +5,74 @@
 // modify it under the terms of the MIT License; see the
 // LICENSE file for more details.
 
-.time-range-picker {
-  display: flex;
-  justify-content: space-between;
-  width: 200px;
+@use 'design_system';
+@use 'partials/sui_debt';
 
-  .start-time-dropdown {
-    max-width: 100px !important;
-    min-width: 90px !important;
-    text-align: center !important;
+.time-range-picker {
+  --time-field-width: max(0px, calc((min(100%, 200px) - 0.5em) / 2));
+
+  display: grid;
+  grid-template-columns:
+    var(--time-range-leading-space, 0)
+    var(--time-field-width) 0.5em var(--time-field-width) minmax(0, 1fr);
+  width: 200px;
+  max-width: 100%;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
+
+  &:has(> :global(ind-time-picker) > output:not(:empty)) {
+    width: var(--time-range-error-width, 100%);
   }
 
-  .end-time-dropdown {
-    max-width: 100px !important;
-    min-width: 90px !important;
-    text-align: center !important;
+  > :global(ind-time-picker) {
+    display: contents;
 
-    :global(.menu) {
-      min-width: 140px !important;
+    > div {
+      grid-row: 1;
+    }
+
+    &:first-of-type > div {
+      grid-column: 2;
+    }
+
+    &:last-of-type > div {
+      grid-column: 4;
+    }
+
+    > output {
+      grid-column: 1 / -1;
+      text-align: start;
+      overflow-wrap: anywhere;
+
+      &:not(:empty) {
+        margin-block-start: 0.25em;
+      }
     }
   }
 
-  .duration {
-    font-size: 0.7em;
-    color: #808c99;
-    white-space: nowrap;
-  }
+  :global(ind-time-picker input[type='text']) {
+    @include sui_debt.input-font();
+    @include sui_debt.border-radius();
+    @include sui_debt.input-padding();
+    @include sui_debt.input-border-default();
+    @include sui_debt.input-background();
 
-  .end-time-item {
-    white-space: nowrap;
+    box-sizing: border-box;
+    width: 100%;
+    line-height: 1.21428571em;
+    font-size: 1em;
+    text-align: start;
+
+    &:focus {
+      @include sui_debt.input-focus-border();
+
+      outline: none;
+    }
   }
+}
+
+.legend {
+  @extend %visually-hidden;
 }
