@@ -12,6 +12,20 @@
   justify-content: center;
 }
 
+.date-errors {
+  display: block;
+  color: #a12727;
+  text-align: start;
+
+  &:not(:empty) {
+    margin-block: -0.5em 1em;
+  }
+
+  > span {
+    display: block;
+  }
+}
+
 :global(.ui.form) .recurrence-field:global(.inline.fields) {
   display: flex;
 

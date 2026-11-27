@@ -7,7 +7,7 @@
 
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useLayoutEffect, useRef} from 'react';
 
 import {DatePickerCalendar, DatePickerGrid} from 'indico/react/components/DatePickerCalendar';
 import {FinalField, validators as v} from 'indico/react/forms';
@@ -17,6 +17,16 @@ import {fromISOLocalDate} from 'indico/utils/date_parser';
 
 export const INVALID = '__invalid__';
 
+export function useDateInputValidity(error) {
+  const inputRef = useRef(null);
+  useLayoutEffect(() => {
+    if (error !== undefined) {
+      inputRef.current.setCustomValidity(error || '');
+    }
+  }, [error]);
+  return inputRef;
+}
+
 export default function DatePicker({
   onChange,
   value,
@@ -25,8 +35,12 @@ export default function DatePicker({
   min,
   max,
   filter,
+  label,
+  calendarLabel,
+  error,
   ...inputProps
 }) {
+  const inputRef = useDateInputValidity(error);
   function handleDateChange(evt) {
     const {date} = evt.target.closest('ind-date-picker');
     const invalid = !!evt.target.value && !date;
@@ -35,6 +49,16 @@ export default function DatePicker({
 
   const formattedValue = formatDate(format, fromISOLocalDate(value));
   const showClear = !inputProps.required;
+  const input = (
+    <input
+      ref={inputRef}
+      type="text"
+      onChange={handleDateChange}
+      defaultValue={formattedValue}
+      {...inputProps}
+      placeholder={format}
+    />
+  );
 
   return (
     <ind-date-picker
@@ -43,13 +67,14 @@ export default function DatePicker({
       format={format}
       data-clearable={showClear ? 'true' : undefined}
     >
-      <input
-        type="text"
-        onChange={handleDateChange}
-        defaultValue={formattedValue}
-        {...inputProps}
-        placeholder={format}
-      />
+      {label ? (
+        <label className="date-label">
+          <span>{label}</span>
+          {input}
+        </label>
+      ) : (
+        input
+      )}
       {showClear && (
         <button type="button" className="clear" value="clear">
           <Translate as="span">Clear</Translate>
@@ -64,7 +89,7 @@ export default function DatePicker({
         <Translate as="span">Open a calendar</Translate>
       </button>
 
-      <DatePickerCalendar>
+      <DatePickerCalendar label={calendarLabel}>
         <DatePickerGrid filter={filter} />
       </DatePickerCalendar>
 
@@ -85,6 +110,9 @@ DatePicker.propTypes = {
   min: PropTypes.string,
   max: PropTypes.string,
   filter: PropTypes.func,
+  label: PropTypes.string,
+  calendarLabel: PropTypes.string,
+  error: PropTypes.string,
 };
 
 DatePicker.defaultProps = {

@@ -59,42 +59,62 @@ DatePickerGrid.defaultProps = {
   filter: undefined,
 };
 
-export const DatePickerCalendar = React.forwardRef(({inline = false, children, ...props}, ref) => {
-  const Wrapper = inline ? 'div' : 'dialog';
-  return (
-    <ind-calendar ref={ref} {...props}>
-      <Wrapper>
-        <div className="controls">
-          <button type="button" value="previous-year">
-            <Translate as="span">Previous year</Translate>
-          </button>
-          <button type="button" value="previous-month">
-            <Translate as="span">Previous month</Translate>
-          </button>
+export const DatePickerCalendar = React.forwardRef(
+  ({inline = false, label, children, ...props}, ref) => {
+    const Wrapper = inline ? 'div' : 'dialog';
+    const month = <select data-internal />;
+    const year = <input type="number" required data-internal />;
+    return (
+      <ind-calendar ref={ref} data-named-calendar={label ? '' : undefined} {...props}>
+        <Wrapper aria-label={label}>
+          <div className="controls">
+            <button type="button" value="previous-year">
+              <Translate as="span">Previous year</Translate>
+            </button>
+            <button type="button" value="previous-month">
+              <Translate as="span">Previous month</Translate>
+            </button>
 
-          <div className="month-year">
-            <select data-internal />
-            <input type="number" required data-internal />
+            <div className="month-year">
+              {label ? (
+                <>
+                  <label className="calendar-field">
+                    <Translate as="span">Month</Translate>
+                    {month}
+                  </label>
+                  <label className="calendar-field">
+                    <Translate as="span">Year</Translate>
+                    {year}
+                  </label>
+                </>
+              ) : (
+                <>
+                  {month}
+                  {year}
+                </>
+              )}
+            </div>
+
+            <button type="button" value="next-month">
+              <Translate as="span">Next month</Translate>
+            </button>
+            <button type="button" value="next-year">
+              <Translate as="span">Next year</Translate>
+            </button>
           </div>
 
-          <button type="button" value="next-month">
-            <Translate as="span">Next month</Translate>
-          </button>
-          <button type="button" value="next-year">
-            <Translate as="span">Next year</Translate>
-          </button>
-        </div>
-
-        {children}
-      </Wrapper>
-    </ind-calendar>
-  );
-});
+          {children}
+        </Wrapper>
+      </ind-calendar>
+    );
+  }
+);
 
 DatePickerCalendar.displayName = 'DatePickerCalendar';
 
 DatePickerCalendar.propTypes = {
   inline: PropTypes.bool,
+  label: PropTypes.string,
   children: PropTypes.node.isRequired,
 };
 

@@ -9,6 +9,10 @@
 @use 'partials/icons';
 @use 'partials/sui_debt';
 
+$calendar-stack-width: 46rem;
+$calendar-compact-controls-width: 24rem;
+$range-input-stack-width: 38rem;
+
 ind-date-picker {
   display: flex;
   flex-direction: column;
@@ -28,14 +32,11 @@ ind-date-picker {
   }
 
   > button[data-calendar-trigger] {
-    @extend %text-size-reset;
     @extend %button-icon-only;
 
     position: absolute;
     right: 0.2em;
     top: 0.2em;
-    width: 2em;
-    aspect-ratio: 1;
   }
 
   > button[data-calendar-trigger]::before {
@@ -369,6 +370,157 @@ ind-date-grid {
 
     &:focus-visible {
       z-index: 1;
+    }
+  }
+}
+
+ind-date-picker > .date-label {
+  display: grid;
+  gap: var(--control-internal-gap);
+
+  > span {
+    font-weight: bold;
+  }
+
+  > input {
+    padding-inline-end: 2.5em;
+  }
+
+  ~ button[data-calendar-trigger] {
+    top: auto;
+    bottom: 0.375em;
+  }
+}
+
+@supports (grid-template-rows: subgrid) {
+  ind-date-picker:has(> .date-label) {
+    display: grid;
+    grid-template-rows: auto auto;
+    padding-block-end: var(--control-internal-gap);
+
+    > .date-label {
+      grid-area: 1 / 1 / 3 / 2;
+      grid-template-rows: subgrid;
+    }
+
+    > ind-calendar {
+      grid-area: 2 / 1;
+    }
+
+    > .date-label ~ button[data-calendar-trigger] {
+      grid-area: 2 / 1;
+      place-self: center end;
+      position: relative;
+      inset: auto;
+      margin-inline-end: 0.2em;
+    }
+  }
+}
+
+ind-date-picker:has(> ind-calendar[data-named-calendar]) > .date-label > input,
+ind-date-range-picker:has(> ind-calendar[data-named-calendar]) > fieldset {
+  @include sui_debt.field-override() {
+    border-color: var(--control-border-color);
+  }
+}
+
+ind-date-picker > button[data-calendar-trigger],
+ind-date-range-picker:has(> ind-calendar[data-named-calendar])
+  fieldset
+  button[data-calendar-trigger] {
+  @extend %text-size-reset;
+
+  width: 2em;
+  aspect-ratio: 1;
+  flex: none;
+  padding: 0;
+}
+
+:is(ind-date-picker, ind-date-range-picker):has(> ind-calendar[data-named-calendar]) {
+  max-inline-size: 100%;
+
+  :is(input, button, select):focus-visible:not(:where([data-calendar-trigger])) {
+    outline: 2px solid #05425b;
+    outline-offset: 1px;
+  }
+
+  button[data-calendar-trigger]:focus-visible {
+    outline: revert;
+    outline-offset: -3px;
+  }
+
+  input::placeholder {
+    color: #595959;
+  }
+}
+
+ind-calendar[data-named-calendar] {
+  dialog:is([open], [data-position-check]) {
+    max-inline-size: calc(100dvw - 1rem);
+    max-block-size: calc(100dvh - 1rem);
+    overflow: auto;
+  }
+
+  .calendar-field {
+    display: flex;
+    flex: 1;
+    min-inline-size: 0;
+
+    > span {
+      @extend %visually-hidden;
+    }
+  }
+
+  .month-year {
+    min-inline-size: 0;
+
+    :is(select, input[type='number']) {
+      min-inline-size: 0;
+    }
+  }
+
+  ind-date-grid,
+  [role='listbox'] {
+    min-inline-size: 0;
+  }
+
+  ind-date-grid {
+    inline-size: 21em;
+    max-inline-size: 100%;
+  }
+
+  [role='listbox'] [aria-selected] {
+    font-weight: bold;
+  }
+
+  @media (max-width: $calendar-stack-width) {
+    .calendars {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: $calendar-compact-controls-width) {
+    .controls,
+    .month-year {
+      gap: 0.25em;
+    }
+
+    .controls > button {
+      width: 1.75em;
+    }
+  }
+}
+
+@media (max-width: $range-input-stack-width) {
+  ind-date-range-picker:has(> ind-calendar[data-named-calendar]) {
+    fieldset {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0.5em;
+    }
+
+    .arrow {
+      display: none;
     }
   }
 }

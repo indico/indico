@@ -37,7 +37,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Label room booking date controls, explain invalid dates, and restore focus when closing the
+  calendar with the keyboard (:pr:`7924`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

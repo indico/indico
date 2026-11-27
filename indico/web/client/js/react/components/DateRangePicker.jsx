@@ -16,7 +16,7 @@ import {DateRange} from 'indico/utils/date';
 import {formatDate, ISO_FORMAT} from 'indico/utils/date_format';
 import {fromISOLocalDate} from 'indico/utils/date_parser';
 
-const INVALID = '__invalid__';
+import {INVALID, useDateInputValidity} from './DatePicker';
 
 export default function DateRangePicker({
   value,
@@ -40,8 +40,13 @@ export default function DateRangePicker({
   onFocus,
   onBlur,
   filter,
+  calendarLabel,
+  startError,
+  endError,
 }) {
   format ??= moment.localeData().longDateFormat('L');
+  const startInputRef = useDateInputValidity(startError);
+  const endInputRef = useDateInputValidity(endError);
 
   if (startDisabled && !value?.startDate) {
     console.warn('startDisabled is ignored because value.startDate is not specified');
@@ -101,9 +106,11 @@ export default function DateRangePicker({
         <label>
           <span>{rangeStartLabel}:</span>
           <input
+            ref={startInputRef}
             type="text"
             data-range-start
             placeholder={format}
+            required={calendarLabel ? required : undefined}
             readOnly={readOnly}
             disabled={startLocked || disabled}
             onFocus={onFocus}
@@ -116,15 +123,21 @@ export default function DateRangePicker({
           disabled={startLocked || readOnly || disabled}
           onClick={markTouched}
         >
-          <Translate as="span">Open a calendar</Translate>
+          {calendarLabel ? (
+            <Translate as="span">Open a calendar for the start date</Translate>
+          ) : (
+            <Translate as="span">Open a calendar</Translate>
+          )}
         </button>
         <span className="arrow" />
         <label>
           <span>{rangeEndLabel}:</span>
           <input
+            ref={endInputRef}
             type="text"
             data-range-end
             placeholder={format}
+            required={calendarLabel ? required : undefined}
             readOnly={readOnly}
             disabled={endLocked || disabled}
             onFocus={onFocus}
@@ -137,7 +150,11 @@ export default function DateRangePicker({
           disabled={endLocked || readOnly || disabled}
           onClick={markTouched}
         >
-          <Translate as="span">Open a calendar</Translate>
+          {calendarLabel ? (
+            <Translate as="span">Open a calendar for the end date</Translate>
+          ) : (
+            <Translate as="span">Open a calendar</Translate>
+          )}
         </button>
         {showClear && (
           <button type="button" className="clear" value="clear" onClick={markTouched}>
@@ -152,7 +169,7 @@ export default function DateRangePicker({
         </span>
       </fieldset>
 
-      <DatePickerCalendar>
+      <DatePickerCalendar label={calendarLabel}>
         <div className="calendars">
           <DatePickerGrid filter={filter} includeMonthHeader />
           <DatePickerGrid filter={filter} includeMonthHeader />
@@ -187,6 +204,9 @@ DateRangePicker.propTypes = {
   max: PropTypes.string,
   allowOutOfRange: PropTypes.bool,
   filter: PropTypes.func,
+  calendarLabel: PropTypes.string,
+  startError: PropTypes.string,
+  endError: PropTypes.string,
 };
 
 DateRangePicker.defaultProps = {

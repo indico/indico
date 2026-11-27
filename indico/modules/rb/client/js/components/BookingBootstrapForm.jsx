@@ -14,6 +14,7 @@ import {connect} from 'react-redux';
 import {Button, Form, Select} from 'semantic-ui-react';
 
 import {DatePicker, DateRangePicker} from 'indico/react/components';
+import {INVALID} from 'indico/react/components/DatePicker';
 import {PluralTranslate, Translate} from 'indico/react/i18n';
 import {
   serializeDate,
@@ -83,6 +84,7 @@ class BookingBootstrapForm extends React.Component {
           startDate: startsNextDay ? moment().add(1, 'd') : moment(),
           endDate: null,
         },
+        invalidDates: {start: false, end: false},
         timeSlot: {
           startTime,
           endTime: startsNextDay ? endTime : initialEndTime(endTime),
@@ -126,16 +128,18 @@ class BookingBootstrapForm extends React.Component {
 
   triggerChange() {
     const {onChange} = this.props;
-    onChange(this.serializedState);
+    const {startError, endError} = this.dateErrors;
+    onChange(this.serializedState, Boolean(startError || endError));
   }
 
   updateDates = (startDate, endDate) => {
     this.setState(
       {
         dates: {
-          startDate,
-          endDate,
+          startDate: startDate === INVALID ? null : toMoment(startDate, 'YYYY-MM-DD'),
+          endDate: endDate === INVALID ? null : toMoment(endDate, 'YYYY-MM-DD'),
         },
+        invalidDates: {start: startDate === INVALID, end: endDate === INVALID},
       },
       () => {
         this.triggerChange();
@@ -145,9 +149,12 @@ class BookingBootstrapForm extends React.Component {
 
   updateBookingType = newType => {
     const {
-      recurrence: {number, interval, weekdays},
+      recurrence: {type, number, interval, weekdays},
     } = this.state;
     const newState = {...this.state, recurrence: {type: newType, number, interval, weekdays}};
+    if (type === 'single' || newType === 'single') {
+      newState.invalidDates = {start: false, end: false};
+    }
     sanitizeRecurrence(newState);
     this.setState(newState, () => {
       this.triggerChange();
@@ -241,6 +248,44 @@ class BookingBootstrapForm extends React.Component {
     return state;
   }
 
+  get dateErrors() {
+    const {isAdminOverrideEnabled, bookingGracePeriod} = this.props;
+    const {
+      dates: {startDate, endDate},
+      recurrence: {type},
+      invalidDates,
+    } = this.state;
+    const format = moment.localeData().longDateFormat('L');
+    const min = getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod);
+    let startError = '';
+    let endError = '';
+    if (invalidDates.start) {
+      startError =
+        type === 'single'
+          ? Translate.string('Enter a valid date in the format {format}.', {format})
+          : Translate.string('Enter a valid start date in the format {format}.', {format});
+    } else if (!startDate) {
+      startError =
+        type === 'single'
+          ? Translate.string('Enter a booking date.')
+          : Translate.string('Please provide the start date');
+    } else if (min && serializeDate(startDate) < min) {
+      startError = Translate.string('The entered date cannot be earlier than {min}.', {
+        min: moment(min).format(format),
+      });
+    }
+    if (type !== 'single') {
+      if (invalidDates.end) {
+        endError = Translate.string('Enter a valid end date in the format {format}.', {format});
+      } else if (!endDate) {
+        endError = Translate.string('Please provide the end date');
+      } else if (startDate && endDate.isBefore(startDate, 'day')) {
+        endError = Translate.string('The end date cannot be earlier than the start date.');
+      }
+    }
+    return {startError, endError};
+  }
+
   onSearch = e => {
     const {onSearch} = this.props;
     onSearch(this.serializedState);
@@ -312,6 +357,7 @@ class BookingBootstrapForm extends React.Component {
       bookingGracePeriod
     );
     const recurrenceHidden = hideOptions.recurringWeekly && hideOptions.recurringMonthly;
+    const {startError, endError} = this.dateErrors;
 
     return (
       <Form>
@@ -370,29 +416,33 @@ class BookingBootstrapForm extends React.Component {
             {this.updateIntervalOptions()}
           </Form.Group>
         )}
-        {['every', 'daily'].includes(type) && (
-          <Form.Group inline>
-            <DateRangePicker
-              required
-              min={getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod)}
-              value={{startDate: serializeDate(startDate), endDate: serializeDate(endDate)}}
-              onChange={({startDate: sd, endDate: ed}) =>
-                this.updateDates(toMoment(sd), toMoment(ed))
-              }
-            />
-          </Form.Group>
-        )}
-        {type === 'single' && (
-          <Form.Group inline>
+        <Form.Group inline>
+          {type === 'single' ? (
             <DatePicker
               required
+              label={Translate.string('Booking date')}
+              calendarLabel={Translate.string('Booking calendar')}
               min={getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod)}
               value={serializeDate(startDate)}
-              invalidValue={null}
-              onChange={date => this.updateDates(toMoment(date), null)}
+              error={startError}
+              onChange={date => this.updateDates(date, null)}
             />
-          </Form.Group>
-        )}
+          ) : (
+            <DateRangePicker
+              required
+              calendarLabel={Translate.string('Booking date range calendar')}
+              min={getBookingRangeMinDate(isAdminOverrideEnabled, bookingGracePeriod)}
+              value={{startDate: serializeDate(startDate), endDate: serializeDate(endDate)}}
+              startError={startError}
+              endError={endError}
+              onChange={({startDate: sd, endDate: ed}) => this.updateDates(sd, ed)}
+            />
+          )}
+        </Form.Group>
+        <output styleName="date-errors">
+          {startError && <span>{startError}</span>}
+          {endError && <span>{endError}</span>}
+        </output>
         {!dayBased && (
           <Form.Group inline>
             <TimeRangePicker
@@ -410,7 +460,11 @@ class BookingBootstrapForm extends React.Component {
           </Form.Group>
         )}
         {children}
-        <Button primary disabled={buttonDisabled || !isStartDtValid} onClick={this.onSearch}>
+        <Button
+          primary
+          disabled={buttonDisabled || !isStartDtValid || !!startError || !!endError}
+          onClick={this.onSearch}
+        >
           {buttonCaption}
         </Button>
       </Form>
