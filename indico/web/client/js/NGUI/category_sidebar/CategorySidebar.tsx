@@ -16,8 +16,6 @@ import {CategoryManager, CategoryMaterial} from 'indico/NGUI/types';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
 
-import {ListItemProps} from '../list/List';
-
 interface CategorySidebarProps {
   categoryId: number;
 }
@@ -91,7 +89,7 @@ export function CategorySidebar({categoryId}: CategorySidebarProps) {
             )}
             {materialFolders.map(folder => (
               <div styleName="material-folder-group" key={`folder-${folder.id}`}>
-                <List styleName="material-list" className="category-sidebar-material-folder">
+                <List styleName="material-list">
                   <MaterialItem material={folder} isFolder />
                   {folder.attachments?.map(material => (
                     <MaterialItem
@@ -110,7 +108,7 @@ export function CategorySidebar({categoryId}: CategorySidebarProps) {
   );
 }
 
-interface MaterialItemProps extends Omit<ListItemProps, 'children'> {
+interface MaterialItemProps {
   material: CategoryMaterial;
   isFolder?: boolean;
   nested?: boolean;
@@ -174,9 +172,8 @@ function getMaterialIcon(material: CategoryMaterial): string {
   return 'fas:file';
 }
 
-function MaterialItem({material, isFolder = false, nested = false, ...rest}: MaterialItemProps) {
+function MaterialItem({material, isFolder = false, nested = false}: MaterialItemProps) {
   const inaccessible = !isFolder && material.isProtected && !material.url;
-  const className = `category-sidebar-material-row ${rest.className || ''}`;
   const contentProps =
     !isFolder && material.url
       ? {
@@ -197,7 +194,11 @@ function MaterialItem({material, isFolder = false, nested = false, ...rest}: Mat
     .join(' ');
 
   return (
-    <List.Item {...rest} className={className} styleName={styleName} contentProps={contentProps}>
+    <List.Item
+      className="category-sidebar-material-row"
+      styleName={styleName}
+      contentProps={contentProps}
+    >
       <List.Item.Icon
         icon={isFolder ? 'fas:folder' : getMaterialIcon(material)}
         color="gray"
