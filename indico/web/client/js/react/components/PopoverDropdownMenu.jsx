@@ -12,13 +12,16 @@ import {Manager, Popper} from 'react-popper';
 import {Dropdown, Portal} from 'semantic-ui-react';
 
 import './PopoverDropdownMenu.module.scss';
+import {usePopupMountNode} from './PopupMountScope';
 
 /** Dropdown "context" menu whose position is relative to the trigger. */
 const PopoverDropdownMenu = ({trigger, children, onOpen, onClose, open, placement, overflow}) => {
   const triggerRef = useRef(null);
+  const mountNode = usePopupMountNode();
   return (
     <Manager>
       <Portal
+        mountNode={mountNode || undefined}
         closeOnTriggerClick
         openOnTriggerClick
         open={open}
