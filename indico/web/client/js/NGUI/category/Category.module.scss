@@ -7,9 +7,12 @@
 
 @use 'NGUI/styles/base' as *;
 
+$category-main-min-width: 40rem;
+$category-sidebar-width: 21.5rem;
+
 :global(.category-container),
 :global(.category-header) {
-  background: #e8e8e8;
+  background: var(--surface-default);
 }
 
 :global(.category-container) {
@@ -51,7 +54,7 @@
   }
 
   .category:has(> [data-category-sidebar]) {
-    grid-template-columns: minmax(min(100%, 40rem), 1fr) 300px;
+    grid-template-columns: minmax(min(100%, $category-main-min-width), 1fr) $category-sidebar-width;
   }
 
   .category-main {
@@ -61,7 +64,9 @@
     min-width: 0;
   }
 
-  @container category-layout (max-width: calc(40rem + 300px + var(--space-6))) {
+  @container category-layout (
+    max-width: calc(#{$category-main-min-width} + #{$category-sidebar-width} + var(--space-6))
+  ) {
     .category:has(> [data-category-sidebar]) {
       grid-template-columns: minmax(0, 1fr);
     }

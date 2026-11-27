@@ -54,7 +54,7 @@
       padding-block: var(--space-1);
 
       &.protected {
-        color: var(--text-color-warning);
+        color: var(--indico-warning-700);
       }
 
       &.inaccessible {
@@ -87,10 +87,6 @@
   .material-folder-group {
     border-radius: var(--radius-xl);
     transition: background var(--transition-fast);
-
-    :global(.list-item-content) {
-      padding-inline: none;
-    }
 
     &:hover {
       background: var(--color-surface-soft-hover);
