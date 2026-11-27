@@ -9,7 +9,7 @@ import apiEventListURL from 'indico-url:categories.api_event_list';
 
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 
-import {Button, FavoriteButton, List, ListItem, TimelineItem, YearPicker} from 'indico/NGUI';
+import {Button, Card, FavoriteButton, List, ListItem, TimelineItem, YearPicker} from 'indico/NGUI';
 import {CategoryEventListWithMetaData, Event} from 'indico/NGUI/types';
 import {useIndicoAxios} from 'indico/react/hooks/hooks';
 import {Translate} from 'indico/react/i18n';
@@ -118,7 +118,7 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
   }
 
   return (
-    <div styleName="event-list-wrapper">
+    <Card styleName="event-list-wrapper">
       <YearPicker
         yearList={viewData.availableYears}
         selectedYear={selectedYear}
@@ -224,6 +224,6 @@ export function EventList({categoryId, isFlat, viewData}: EventListProps) {
           disabled={fetchingList}
         />
       )}
-    </div>
+    </Card>
   );
 }

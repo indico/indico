@@ -35,8 +35,6 @@
     'hd hd'
     'ct sb';
   gap: 0 1em;
-
-  background: #fff;
   margin-bottom: 0.75em;
   overflow-x: hidden;
 
@@ -57,9 +55,7 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 1em;
-
-  background-image: linear-gradient(to bottom, #fcfcfc, #f2f2f2);
-  border-bottom: 1px solid #e6e6e6;
+  background: #f2f2f2;
   border-top: 1px solid #fff;
   padding: 1.5em var(--horizontal-padding);
   line-height: initial;
@@ -115,10 +111,12 @@
   }
 }
 
-.category-content-wrapper {
-  grid-area: ct;
-  overflow-x: hidden;
-  padding: 2em var(--horizontal-padding);
+footer.footer {
+  background: #fff;
+}
+
+.category-main {
+  margin: 2em var(--horizontal-padding);
 }
 
 .category-stats-container {

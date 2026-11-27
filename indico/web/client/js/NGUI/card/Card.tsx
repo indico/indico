@@ -48,7 +48,7 @@ type CardChild =
   | React.ReactNode;
 
 interface CustomCardProps {
-  children: CardChild | CardChild[];
+  children: CardChild | CardChild[] | React.ReactNode;
 }
 
 type NativeAnchorProps = NativeProps<'a'>;

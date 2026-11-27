@@ -7,12 +7,72 @@
 
 @use 'NGUI/styles/base' as *;
 
+$category-main-min-width: 40rem;
+$category-sidebar-width: 21.5rem;
+
+:global(.category-container),
+:global(.category-header) {
+  background: var(--surface-default);
+}
+
+:global(.category-container) {
+  overflow-x: clip;
+  flex-grow: 1;
+  box-sizing: border-box;
+  align-content: start;
+}
+
+:global(.main):has(:global(.category-container)) {
+  display: flex;
+  flex-direction: column;
+}
+
+:global(.main):has(:global(.category-container)) > :global(div) {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
 :global(.indico-ui) {
   .category-wrapper {
+    width: 100%;
+    max-width: var(--container-xl);
+    margin-inline: auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
     gap: var(--space-6);
+    container-name: category-layout;
+    container-type: inline-size;
+  }
+
+  .category {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-6);
+  }
+
+  .category:has(> [data-category-sidebar]) {
+    grid-template-columns: minmax(min(100%, $category-main-min-width), 1fr) $category-sidebar-width;
+  }
+
+  .category-main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-width: 0;
+  }
+
+  @container category-layout (
+    max-width: calc(#{$category-main-min-width} + #{$category-sidebar-width} + var(--space-6))
+  ) {
+    .category:has(> [data-category-sidebar]) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .category-title {
     margin-top: var(--space-6);
     @media (max-width: $viewport-mobile) {
       margin-top: var(--space-3);
@@ -21,9 +81,16 @@
 
   .category-info {
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    flex-direction: column;
     gap: var(--space-6);
+    padding: var(--space-6);
+
+    .category-info-sub {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: var(--space-6);
+    }
 
     .category-description {
       @include typography('text-md', 'regular');

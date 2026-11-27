@@ -1,0 +1,100 @@
+// This file is part of Indico.
+// Copyright (C) 2002 - 2026 CERN
+//
+// Indico is free software; you can redistribute it and/or
+// modify it under the terms of the MIT License; see the
+// LICENSE file for more details.
+
+@use 'NGUI/styles/base' as *;
+
+:global(.indico-ui) {
+  .category-sidebar {
+    position: sticky;
+    top: var(--space-3);
+    align-self: start;
+    width: 100%;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+
+    :global(.category-sidebar-item-details) {
+      flex: 1 1 0;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .manager-avatar {
+    flex: 0 0 auto;
+    width: calc(var(--icon-size-md) * 2);
+    height: calc(var(--icon-size-md) * 2);
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .manager-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1-5);
+  }
+
+  .sidebar-list {
+    margin-top: var(--space-3);
+    gap: var(--space-1);
+  }
+
+  .material-list {
+    gap: 0;
+    margin-top: 0;
+
+    .material {
+      padding-block: var(--space-1);
+
+      &.protected {
+        color: var(--indico-warning-700);
+      }
+
+      &.inaccessible {
+        color: var(--color-text-muted);
+        opacity: 0.65;
+      }
+    }
+
+    .material-folder {
+      border-radius: var(--radius-xl);
+    }
+
+    .material-nested {
+      margin-left: var(--space-5);
+    }
+
+    :global(.category-sidebar-material-row) {
+      transition: background var(--transition-fast);
+      background: transparent;
+    }
+  }
+
+  .material-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-top: var(--space-3);
+  }
+
+  .material-folder-group {
+    border-radius: var(--radius-xl);
+    transition: background var(--transition-fast);
+
+    &:hover {
+      background: var(--color-surface-soft-hover);
+
+      :global(.list-item-content) {
+        background: transparent;
+        transition: none;
+      }
+    }
+  }
+}

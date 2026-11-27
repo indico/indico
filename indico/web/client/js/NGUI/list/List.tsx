@@ -97,7 +97,7 @@ const ListItemRoot = forwardRef<HTMLLIElement, ListItemProps>((props, ref) => {
         ref={ref as React.Ref<HTMLLIElement>}
       >
         {marker}
-        <a {...anchorProps} styleName="list-item-content" className={sharedClassName()}>
+        <a {...anchorProps} className={sharedClassName('list-item-content')}>
           {children}
         </a>
       </li>
@@ -112,7 +112,7 @@ const ListItemRoot = forwardRef<HTMLLIElement, ListItemProps>((props, ref) => {
       className={sharedClassName(rest.className)}
     >
       {marker}
-      <div {...divProps} styleName="list-item-content" className={sharedClassName(rest.className)}>
+      <div {...divProps} className={sharedClassName(`${divProps.className} list-item-content`)}>
         {children}
       </div>
     </li>
