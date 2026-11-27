@@ -174,6 +174,11 @@ function getMaterialIcon(material: CategoryMaterial): string {
 
 function MaterialItem({material, isFolder = false, nested = false}: MaterialItemProps) {
   const inaccessible = !isFolder && material.isProtected && !material.url;
+  const protectionTitle = isFolder
+    ? Translate.string('Protected folder')
+    : inaccessible
+      ? Translate.string('You do not have access to this material')
+      : Translate.string('Protected material');
   const contentProps =
     !isFolder && material.url
       ? {
@@ -216,20 +221,8 @@ function MaterialItem({material, isFolder = false, nested = false}: MaterialItem
           size="sm"
           variant="transparent"
           compact
-          ariaLabel={Translate.string(
-            isFolder
-              ? 'Protected folder'
-              : inaccessible
-                ? 'You do not have access to this material'
-                : 'Protected material'
-          )}
-          title={Translate.string(
-            isFolder
-              ? 'Protected folder'
-              : inaccessible
-                ? 'You do not have access to this material'
-                : 'Protected material'
-          )}
+          ariaLabel={protectionTitle}
+          title={protectionTitle}
         />
       )}
     </List.Item>
