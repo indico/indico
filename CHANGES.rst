@@ -37,7 +37,8 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Add a keyboard skip link and main landmark to room booking, and expose the booking form
+  title as a heading (:pr:`7906`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

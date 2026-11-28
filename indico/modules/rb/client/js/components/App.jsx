@@ -77,7 +77,12 @@ class App extends React.Component {
       <Sidebar.Pushable styleName="rb-pushable">
         <SidebarMenu visible={userActionsVisible} onClickOption={this.onSidebarHide} />
         <Sidebar.Pusher dimmed={userActionsVisible} styleName="rb-pusher">
-          <div styleName="rb-content">
+          <main
+            id="main-content"
+            data-bypass-target={Translate.string('Skip to main content')}
+            tabIndex={-1}
+            styleName="rb-content"
+          >
             <Switch>
               <Route
                 exact
@@ -120,7 +125,7 @@ class App extends React.Component {
               />
             </Switch>
             <ModalController />
-          </div>
+          </main>
         </Sidebar.Pusher>
       </Sidebar.Pushable>
     );

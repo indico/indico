@@ -81,6 +81,10 @@
     margin: 10vh auto auto auto;
     width: unset;
 
+    .booking-heading {
+      margin-bottom: 0;
+    }
+
     @media (max-width: $tablet-width) {
       width: 100%;
       max-height: 100%;
