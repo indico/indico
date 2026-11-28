@@ -76,8 +76,8 @@ $sui-font-family: 'Muli', 'Helvetica Neue', 'Arial', 'Helvetica', sans-serif;
 }
 
 // stylelint-disable-next-line length-zero-no-unit
-@mixin remaining-screen-height($offset: 0px) {
-  height: calc(
+@mixin remaining-screen-height($offset: 0px, $property: height) {
+  #{$property}: calc(
     100vh - (#{$indico-top-bar-height} + #{$menu-height} + var(--extra-bars, 0) * 50px) - #{$offset}
   );
 }

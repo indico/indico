@@ -64,10 +64,6 @@
 
       &:global(.checked) {
         background-color: $dark-highlight-color;
-
-        :global(label) {
-          color: #fff;
-        }
       }
     }
 
@@ -132,5 +128,16 @@
         }
       }
     }
+  }
+}
+
+// The lower row is only rendered when the viewport is at least 900px tall.
+// At shorter heights the form can grow past the viewport without wrapping.
+// stylelint-disable-next-line scss/media-feature-value-dollar-variable
+@media (height < 900px) {
+  .landing-page:global(.ui.grid) {
+    @include remaining-screen-height($property: min-height);
+    height: auto;
+    flex-wrap: nowrap;
   }
 }

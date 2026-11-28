@@ -37,7 +37,9 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Label booking type choices for assistive technology, improve their contrast and keyboard focus,
+  and keep the booking form reachable on short screens (:pr:`7911`,
+  thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
