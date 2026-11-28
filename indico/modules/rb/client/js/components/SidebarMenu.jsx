@@ -8,10 +8,11 @@
 import {push as pushRoute} from 'connected-react-router';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, {useRef} from 'react';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
-import {Icon, Sidebar, Menu} from 'semantic-ui-react';
+import {Link} from 'react-router-dom';
+import {Icon, Sidebar, Menu, Ref} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
@@ -24,20 +25,31 @@ import SidebarFooter from './SidebarFooter';
 
 import './SidebarMenu.module.scss';
 
-export function SidebarTrigger({onClick, active}) {
-  const icon = <Icon name="bars" size="large" />;
-  // The icon can only be wrapped by the 'trigger' element if it's clickable,
-  // otherwise the 'click outside' event would be caught both by the EventStack
-  // in SUI's Sidebar component and the trigger's onClick handler (and silently
-  // cancel itself)
+export function SidebarTrigger({onClick, active, triggerRef}) {
   return (
-    <div className={active ? 'active' : ''} styleName="sidebar-button">
-      {active ? icon : <div onClick={onClick}>{icon}</div>}
-    </div>
+    <button
+      type="button"
+      ref={triggerRef}
+      className={active ? 'active' : ''}
+      styleName="sidebar-button"
+      aria-expanded={active}
+      onClick={onClick}
+      onKeyDown={event => {
+        if (active && event.key === 'Escape') {
+          onClick(event);
+        }
+      }}
+    >
+      <Icon name="bars" size="large" />
+      <span styleName="visually-hidden">
+        {active ? <Translate>Close menu</Translate> : <Translate>Open menu</Translate>}
+      </span>
+    </button>
   );
 }
 
 SidebarTrigger.propTypes = {
+  triggerRef: PropTypes.object.isRequired,
   onClick: PropTypes.func.isRequired,
   active: PropTypes.bool.isRequired,
 };
@@ -56,18 +68,22 @@ function SidebarMenu({
   toggleAdminOverride,
   visible,
   onClickOption,
+  onBlur,
   hideOptions,
   extraOptions,
 }) {
+  const sidebarRef = useRef(null);
   const options = [
     {
       key: 'my_bookings',
+      to: '/calendar?my_bookings=true&hide_unused=true',
       icon: 'list alternate outline',
       text: Translate.string('My Bookings'),
       onClick: gotoMyBookings,
     },
     {
       key: 'bookings_my_rooms',
+      to: '/calendar?mine=true&hide_unused=true',
       icon: 'checkmark',
       text: Translate.string('Bookings in My Rooms'),
       onClick: gotoBookingsInMyRooms,
@@ -75,6 +91,7 @@ function SidebarMenu({
     },
     {
       key: 'my_rooms',
+      to: '/rooms?mine=true',
       icon: 'user',
       text: Translate.string('List of My Rooms'),
       onClick: gotoMyRoomsList,
@@ -82,6 +99,7 @@ function SidebarMenu({
     },
     {
       key: 'my_blockings',
+      to: '/blockings?my_blockings=true',
       icon: 'window close outline',
       text: Translate.string('My Blockings'),
       onClick: gotoMyBlockings,
@@ -89,6 +107,7 @@ function SidebarMenu({
     },
     {
       key: 'my_locations',
+      to: '/admin/locations',
       icon: 'location arrow',
       text: Translate.string('My Locations'),
       onClick: gotoRBLocationArea,
@@ -96,6 +115,7 @@ function SidebarMenu({
     },
     {
       key: 'isAdmin',
+      to: '/admin',
       icon: 'cogs',
       text: Translate.string('Administration'),
       onClick: gotoRBAdminArea,
@@ -105,7 +125,6 @@ function SidebarMenu({
       key: 'adminOverride',
       icon: isAdminOverrideEnabled ? 'unlock' : 'lock',
       text: Translate.string('Admin Override'),
-      iconColor: isAdminOverrideEnabled ? 'orange' : undefined,
       active: isAdminOverrideEnabled,
       onClick: toggleAdminOverride,
       onlyIf: isAdmin,
@@ -119,40 +138,91 @@ function SidebarMenu({
     );
 
   return (
-    <Sidebar
-      as={Menu}
-      animation="overlay"
-      icon="labeled"
-      vertical
-      width="thin"
-      direction="right"
-      onHide={onClickOption}
-      inverted
-      visible={visible}
-      styleName="sidebar"
-    >
-      {options.map(({key, text, icon, onClick, iconColor, active}) => {
-        return (
-          <Menu.Item
-            as="a"
-            key={key}
-            active={active}
-            onClick={() => {
-              onClick();
-              if (onClickOption) {
-                onClickOption();
-              }
-            }}
-          >
-            <Icon name={icon} color={iconColor} />
-            {text}
-          </Menu.Item>
-        );
-      })}
-      <div styleName="bottom-align">
-        <SidebarFooter />
-      </div>
-    </Sidebar>
+    <Ref innerRef={sidebarRef}>
+      <Sidebar
+        as={Menu}
+        animation="overlay"
+        icon="labeled"
+        vertical
+        width="thin"
+        direction="right"
+        onHide={(event, data) => {
+          if (visible) {
+            onClickOption?.(event, data);
+          }
+        }}
+        onBlur={onBlur}
+        onVisible={() => {
+          const sidebar = sidebarRef.current;
+          const top = Math.max(0, sidebar.parentElement.getBoundingClientRect().top);
+          sidebar.style.setProperty('--sidebar-top', `${top}px`);
+        }}
+        onShow={() => sidebarRef.current.querySelector('a, button, input')?.focus()}
+        onKeyDown={event => {
+          if (event.defaultPrevented) {
+            return;
+          }
+          if (event.key === 'Escape') {
+            event.preventDefault();
+            onClickOption?.();
+          } else if (
+            event.key === 'Tab' &&
+            event.shiftKey &&
+            event.target === event.currentTarget.querySelector('a[href], button, input')
+          ) {
+            event.preventDefault();
+            onClickOption?.();
+          }
+        }}
+        inverted
+        visible={visible}
+        styleName="sidebar"
+      >
+        {options.map(({key, text, icon, onClick, iconColor, active, to}) => {
+          if (key === 'adminOverride') {
+            return (
+              <Menu.Item as="label" key={key} active={active} styleName="override">
+                <input
+                  type="checkbox"
+                  checked={active}
+                  styleName="visually-hidden"
+                  onChange={() => {
+                    onClick();
+                    onClickOption?.();
+                  }}
+                />
+                <Icon name={icon} color={iconColor} />
+                {text}
+                {active && <span styleName="active-indicator" />}
+              </Menu.Item>
+            );
+          }
+          return (
+            <Menu.Item
+              as={to ? Link : 'button'}
+              to={to}
+              type={to ? undefined : 'button'}
+              key={key}
+              active={active}
+              onClick={event => {
+                if (to && (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey)) {
+                  return;
+                }
+                event.preventDefault();
+                onClick();
+                onClickOption?.();
+              }}
+            >
+              <Icon name={icon} color={iconColor} />
+              {text}
+            </Menu.Item>
+          );
+        })}
+        <div styleName="bottom-align">
+          <SidebarFooter />
+        </div>
+      </Sidebar>
+    </Ref>
   );
 }
 
@@ -176,6 +246,7 @@ SidebarMenu.propTypes = {
   toggleAdminOverride: PropTypes.func.isRequired,
   visible: PropTypes.bool,
   onClickOption: PropTypes.func,
+  onBlur: PropTypes.func,
   hideOptions: PropTypes.objectOf(PropTypes.bool),
 };
 
@@ -183,6 +254,7 @@ SidebarMenu.defaultProps = {
   extraOptions: [],
   visible: false,
   onClickOption: null,
+  onBlur: null,
   hideOptions: {},
 };
 
