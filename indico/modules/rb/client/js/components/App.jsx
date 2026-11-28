@@ -10,7 +10,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Overridable from 'react-overridable';
 import {connect} from 'react-redux';
-import MediaQuery from 'react-responsive';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {Dimmer, Header, Icon, Loader, Segment, Sidebar} from 'semantic-ui-react';
 
@@ -129,6 +128,8 @@ class App extends React.Component {
   render() {
     const {title, history, iconName, resetPageState, isInitializing} = this.props;
     const {userActionsVisible} = this.state;
+    const shortTitle =
+      title === Translate.string('Room Booking') ? Translate.string('Room') : title;
 
     return (
       <ConnectedRouter history={history}>
@@ -138,9 +139,10 @@ class App extends React.Component {
               <h1>
                 <Link to="/" onClick={() => resetPageState('bookRoom')}>
                   <Icon name={iconName} />
-                  <MediaQuery as="span" minWidth={500}>
-                    {title}
-                  </MediaQuery>
+                  <span aria-hidden="true" styleName="rb-title">
+                    {shortTitle}
+                  </span>
+                  <span styleName="accessible-title">{title}</span>
                 </Link>
               </h1>
             </div>

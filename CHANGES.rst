@@ -37,7 +37,9 @@ Bugfixes
 Accessibility
 ^^^^^^^^^^^^^
 
-- Nothing so far
+- Keep compact room-booking navigation links fully named for screen readers, improve their text
+  and icon contrast, identify the current destination and keep navigation usable with enlarged text
+  (:pr:`7898`, thanks :user:`foxbunny`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
